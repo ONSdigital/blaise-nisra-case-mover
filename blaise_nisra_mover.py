@@ -22,5 +22,6 @@ def look_for_survey_folder(sftp):
 
 sftp = establish_sftp_connection()
 logging.log('INFO', look_for_survey_folder(sftp))
+print('This is working')
 
 # def get_all_blaise_files(sftp):
