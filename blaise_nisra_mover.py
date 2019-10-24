@@ -1,5 +1,6 @@
 import pysftp
 import os
+import logging
 
 
 def establish_sftp_connection():
@@ -20,6 +21,6 @@ def look_for_survey_folder(sftp):
 
 
 sftp = establish_sftp_connection()
-print(look_for_survey_folder(sftp))
+logging.log('INFO', look_for_survey_folder(sftp))
 
 # def get_all_blaise_files(sftp):
