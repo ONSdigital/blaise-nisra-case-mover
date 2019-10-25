@@ -1,13 +1,14 @@
 import pysftp
 import os
-import logging
 
 
 def establish_sftp_connection():
     try:
         cnopts = pysftp.CnOpts()
         cnopts.hostkeys = None
+        # sftp = pysftp.Connection("172.30.120.58", username="foo", password="pass", port=2222, cnopts=cnopts)
         sftp = pysftp.Connection(os.getenv('SFTP_HOST'), username=os.getenv('SFTP_USERNAME'), password=os.getenv('SFTP_PASSWORD'), port=int(os.getenv('SFTP_PORT')), cnopts=cnopts)
+        print(sftp.listdir('ONS'))
     except Exception as err:
         print('Connection error:', err)
         raise
@@ -15,13 +16,5 @@ def establish_sftp_connection():
     return sftp
 
 
-def look_for_survey_folder(sftp):
-
-    return sftp.listdir('ONS')
-
-
 sftp = establish_sftp_connection()
-logging.log('INFO', look_for_survey_folder(sftp))
 print('This is working')
-
-# def get_all_blaise_files(sftp):
