@@ -15,7 +15,7 @@ spec:
                 claimName: nisra-mover-pv-claim
           containers:
           - name: nisra-mover-container
-            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp"
+            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
             volumeMounts:
               - mountPath: "/mnt/data"
                 name: nisra-mover-pv-storage
