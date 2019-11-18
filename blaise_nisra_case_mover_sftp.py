@@ -24,5 +24,13 @@ def establish_sftp_connection():
 sftp = establish_sftp_connection()
 
 
+# Instantiates a client
+storage_client = storage.Client()
+buckets = storage_client.list_buckets()
+
+for bucket in buckets:
+    print(bucket.name)
+sftp = establish_sftp_connection()
+
 
 exit(0)
