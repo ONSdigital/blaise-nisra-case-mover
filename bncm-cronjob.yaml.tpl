@@ -10,11 +10,11 @@ spec:
       template:
         spec:
           containers:
-          - volumeMounts:
-              - name: nisra-transfer
-                mountPath: /mnt/data
           - name: nisra-mover-container
             image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:COMMIT_SHA"
+            volumeMounts:
+            - name: nisra-transfer
+              mountPath: /mnt/data
             env:
               - name: SFTP_HOST
                 valueFrom:
@@ -37,4 +37,6 @@ spec:
                   secretKeyRef:
                     name: nisrasftp
                     key: SFTP_PORT
+          volumes:
+          - name: nisra-transfer
           restartPolicy: OnFailure
