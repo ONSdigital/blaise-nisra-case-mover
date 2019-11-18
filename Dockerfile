@@ -9,4 +9,4 @@ RUN pipenv install --deploy --system
 
 COPY . .
 
-CMD [ "python", "blaise_nisra_mover.py" ]
+CMD [ "python", "blaise_nisra_case_mover_sftp.py" ]
