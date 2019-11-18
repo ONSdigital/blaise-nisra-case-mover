@@ -71,8 +71,8 @@ steps:
   args:
   - '-c'
   - |
-     sed "s/GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" cronjob.yaml.tpl | \
-     sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-nisra-case-mover-sftp-k8s/cronjob.yaml
+     sed "s/GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" bncm-cronjob.yaml.tpl | \
+     sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-nisra-case-mover-sftp-k8s/bncm-cronjob.yaml
 # This step pushes the manifest back to blaise-nisra-case-mover-sftp-k8s
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Push manifest
@@ -82,7 +82,7 @@ steps:
   - |
     set -x && \
     cd blaise-nisra-case-mover-sftp-k8s && \
-    git add cronjob.yaml && \
+    git add bncm-cronjob.yaml && \
     git commit -m "Deploying image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA}
     Built from commit ${COMMIT_SHA} of repository blaise-nisra-case-mover-sftp
     Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
