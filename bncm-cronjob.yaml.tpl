@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: nisra-mover
 spec:
-  schedule: "*/30 * * * *"
+  schedule: "*/5 * * * *"
   successfulJobsHistoryLimit: 5
   jobTemplate:
     spec:
@@ -15,7 +15,7 @@ spec:
                 claimName: nisra-mover-pv-claim
           containers:
           - name: nisra-mover-container
-            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp"
+            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:COMMIT_SHA"
             volumeMounts:
               - mountPath: "/mnt/data"
                 name: nisra-mover-pv-storage
