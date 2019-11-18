@@ -1,5 +1,5 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest', '.' ]
+  args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}', '.' ]
 images:
-- 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest'
+- 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
