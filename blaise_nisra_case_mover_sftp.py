@@ -19,7 +19,7 @@ def establish_sftp_connection():
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
             print(sftp.listdir('ONS/OPN/opn1911a'))
-            blob.upload_from_filename(sftp.put('ONS/OPN/opn1911a/OPN1911a.bdbx'))
+            blob.upload_from_filename(sftp.put('ONS/OPN/OPN1911a.bdbx'))
 
     except Exception as err:
         print('Connection error:', err)
