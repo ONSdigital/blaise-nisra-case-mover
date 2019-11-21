@@ -41,7 +41,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
-    if blob.exists(destination_blob_name):
+    if blob.exists():
         print('Replacing with new version of {}.'.format(
             destination_blob_name))
     else:
