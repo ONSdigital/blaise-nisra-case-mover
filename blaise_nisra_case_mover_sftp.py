@@ -3,9 +3,6 @@ from google.cloud import storage
 import os
 
 
-survey_list = ['OPN']
-
-
 def establish_sftp_connection():
     try:
         cnopts = pysftp.CnOpts()
@@ -16,12 +13,14 @@ def establish_sftp_connection():
                                password=os.getenv('SFTP_PASSWORD'),
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
-            sftp.get('ONS/OPN/opn1911a/', 'OPN1911a')
-            source_file_name = 'OPN1911a'
-            destination_blob_name = 'OPN/OPN1911a'
-            upload_blob(bucket_name='nisra-transfer',
-                        source_file_name=source_file_name,
-                        destination_blob_name=destination_blob_name)
+
+            file_list = sftp.listdir('ONS/OPN/opn1911a')
+
+            [sftp.get('ONS/OPN/opn1911a/' + file, file) for file in file_list]
+
+            [upload_blob(bucket_name='nisra-transfer',
+                         source_file_name=file,
+                         destination_blob_name=file) for file in file_list]
 
     except Exception as err:
         print('Connection error:', err)
@@ -43,6 +42,6 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
         destination_blob_name))
 
 
-sftp = establish_sftp_connection()
+establish_sftp_connection()
 
 exit(0)
