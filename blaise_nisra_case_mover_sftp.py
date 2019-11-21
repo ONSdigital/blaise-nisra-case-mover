@@ -14,7 +14,6 @@ def establish_sftp_connection():
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
             print(sftp.listdir('ONS/OPN/opn1911a'))
-            sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', 'tmp/OPN1911a.manifest')
 
             sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', '/usr/src/app/data/OPN1911a.manifest')
             source_file_name = '/usr/src/app/data/OPN1911a.manifest'
