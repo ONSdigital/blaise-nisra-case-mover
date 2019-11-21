@@ -16,11 +16,9 @@ def establish_sftp_connection():
                                password=os.getenv('SFTP_PASSWORD'),
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
-            print(sftp.listdir('ONS/OPN/opn1911a'))
-
-            sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', 'OPN1911a.manifest')
-            source_file_name = 'OPN1911a.manifest'
-            destination_blob_name = 'test/this/folder/OPN1911a.manifest'
+            sftp.get('ONS/OPN/opn1911a/', 'OPN1911a')
+            source_file_name = 'OPN1911a'
+            destination_blob_name = 'OPN/OPN1911a'
             upload_blob(bucket_name='nisra-transfer',
                         source_file_name=source_file_name,
                         destination_blob_name=destination_blob_name)
@@ -46,6 +44,5 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
 
 sftp = establish_sftp_connection()
-build_folder_structure(survey_list, sftp)
 
 exit(0)
