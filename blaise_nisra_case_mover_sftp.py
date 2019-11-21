@@ -14,13 +14,13 @@ def establish_sftp_connection():
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
             print(sftp.listdir('ONS/OPN/opn1911a'))
-            sftp.get('ONS/OPN/opn1911a/OPN1911a.bdbx', 'OPN1911a.bdbx')
+            sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', 'tmp/OPN1911a.manifest')
 
             bucket_name = 'nisra-transfer'
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(bucket_name)
-            blob = bucket.blob('OPN1911a.bdbx')
-            blob.download_to_filename('OPN1911a.bdbx')
+            blob = bucket.blob('tmp')
+            blob.upload_from_filename('OPN1911a.manifest')
     except Exception as err:
         print('Connection error:', err)
         raise
