@@ -3,6 +3,9 @@ from google.cloud import storage
 import os
 
 
+survey_list = ['OPN']
+
+
 def establish_sftp_connection():
     try:
         cnopts = pysftp.CnOpts()
@@ -17,7 +20,7 @@ def establish_sftp_connection():
 
             sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', 'OPN1911a.manifest')
             source_file_name = 'OPN1911a.manifest'
-            destination_blob_name = 'OPN1911a.manifest'
+            destination_blob_name = 'test/this/folder/OPN1911a.manifest'
             upload_blob(bucket_name='nisra-transfer',
                         source_file_name=source_file_name,
                         destination_blob_name=destination_blob_name)
@@ -43,5 +46,6 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
 
 sftp = establish_sftp_connection()
+build_folder_structure(survey_list, sftp)
 
 exit(0)
