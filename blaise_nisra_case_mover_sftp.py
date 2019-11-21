@@ -8,11 +8,6 @@ def establish_sftp_connection():
         cnopts = pysftp.CnOpts()
         cnopts.hostkeys = None
 
-        bucket_name = 'nisra-transfer'
-        storage_client = storage.Client()
-        bucket = storage_client.get_bucket(bucket_name)
-        blob = bucket.blob('OPN1911a.bdbx')
-
         with pysftp.Connection(os.getenv('SFTP_HOST'),
                                username=os.getenv('SFTP_USERNAME'),
                                password=os.getenv('SFTP_PASSWORD'),
@@ -21,6 +16,11 @@ def establish_sftp_connection():
             print(sftp.listdir('ONS/OPN/opn1911a'))
             sftp.get('ONS/OPN/opn1911a/OPN1911a.bdbx', 'OPN1911a.bdbx')
 
+            bucket_name = 'nisra-transfer'
+            storage_client = storage.Client()
+            bucket = storage_client.get_bucket(bucket_name)
+            blob = bucket.blob('OPN1911a.bdbx')
+            blob.download_to_filename('OPN1911a.bdbx')
     except Exception as err:
         print('Connection error:', err)
         raise
