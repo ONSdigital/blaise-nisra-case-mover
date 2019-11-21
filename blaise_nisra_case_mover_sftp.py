@@ -16,16 +16,31 @@ def establish_sftp_connection():
             print(sftp.listdir('ONS/OPN/opn1911a'))
             sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', 'tmp/OPN1911a.manifest')
 
-            bucket_name = 'nisra-transfer'
-            storage_client = storage.Client()
-            bucket = storage_client.get_bucket(bucket_name)
-            blob = bucket.blob('tmp')
-            blob.upload_from_filename('OPN1911a.manifest')
+            sftp.get('ONS/OPN/opn1911a/OPN1911a.manifest', '/usr/src/app/data/OPN1911a.manifest')
+            source_file_name = '/usr/src/app/data/OPN1911a.manifest'
+            destination_blob_name = 'OPN1911a.manifest'
+            upload_blob(bucket_name='nisra-transfer',
+                        source_file_name=source_file_name,
+                        destination_blob_name=destination_blob_name)
+
     except Exception as err:
         print('Connection error:', err)
         raise
 
     return sftp
+
+
+def upload_blob(bucket_name, source_file_name, destination_blob_name):
+    """Uploads a file to the bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+    blob.upload_from_filename(source_file_name)
+
+    print('File {} uploaded to {}.'.format(
+        source_file_name,
+        destination_blob_name))
 
 
 sftp = establish_sftp_connection()
