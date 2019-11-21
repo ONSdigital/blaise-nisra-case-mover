@@ -1,6 +1,7 @@
 import pysftp
 from google.cloud import storage
 import os
+import logging
 
 
 def establish_sftp_connection():
@@ -14,13 +15,17 @@ def establish_sftp_connection():
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
 
-            file_list = sftp.listdir('ONS/OPN/opn1911a')
+            survey_path = 'ONS/OPN/opn1911a'
 
-            [sftp.get('ONS/OPN/opn1911a/' + file, file) for file in file_list]
+            file_list = sftp.listdir(survey_path)
 
-            [upload_blob(bucket_name='nisra-transfer',
-                         source_file_name=file,
-                         destination_blob_name=file) for file in file_list]
+            for file in file_list:
+                logging.info('Copying %s from SFTP server...', file)
+                sftp.get(survey_path + '/' + file, file)
+
+                upload_blob(bucket_name='nisra-transfer',
+                            source_file_name=file,
+                            destination_blob_name=survey_path + '/' + file)
 
     except Exception as err:
         print('Connection error:', err)
