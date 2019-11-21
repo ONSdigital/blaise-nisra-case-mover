@@ -45,7 +45,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     blob = bucket.blob(destination_blob_name)
 
     if blob.exists():
-        print(blob.md5_hash())
+        print(blob.md5_hash)
         print('Replacing with new version of {}.'.format(
             destination_blob_name))
     else:
