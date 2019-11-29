@@ -9,6 +9,7 @@ verify_ssl = true
 pysftp = "*"
 python-crontab = "*"
 google-cloud-storage = "*"
+pybase64 = "*"
 
 [requires]
 python_version = "3.7"

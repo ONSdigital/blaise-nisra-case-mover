@@ -3,23 +3,22 @@ kind: CronJob
 metadata:
   name: nisra-mover
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/50 * * * *"
   successfulJobsHistoryLimit: 5
   jobTemplate:
     spec:
       template:
         spec:
-          volumes:
-            - name: nisra-mover-pv-storage
-              persistentVolumeClaim:
-                claimName: nisra-mover-pv-claim
           containers:
           - name: nisra-mover-container
             image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:COMMIT_SHA"
-            volumeMounts:
-              - mountPath: "/mnt/data"
-                name: nisra-mover-pv-storage
             env:
+              - name: SURVEY_DESTINATION_PATH
+                value: 'OPN/opn1911a/'
+              - name: SURVEY_SOURCE_PATH_PREFIX
+                value: 'ONS/'
+              - name: NISRA_BUCKET_NAME
+                value: 'nisra-transfer'
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:
