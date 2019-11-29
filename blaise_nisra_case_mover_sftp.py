@@ -31,15 +31,13 @@ def main():
 
                 if file_blob is None:
                     print('Uploading {} to bucket {}'.format(file, bucket_name))
-                    upload_blob(bucket_name=bucket_name,
-                                source_file_name=file,
+                    upload_blob(source_file_name=file,
                                 destination_blob_name=blob_destination_path)
                 elif file_same_as_bucket_file(file, file_blob):
                     print('Ignoring file {} because its unchanged'.format(file))
                 else:
                     print('Uploading file {} to bucket {}'.format(file, bucket_name))
-                    upload_blob(bucket_name=bucket_name,
-                                source_file_name=file,
+                    upload_blob(source_file_name=file,
                                 destination_blob_name=blob_destination_path)
     except Exception as err:
         print('Connection error:', err)
