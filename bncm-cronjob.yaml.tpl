@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: nisra-mover
 spec:
-  schedule: "*/1 * * * *"
+  schedule: "*/50 * * * *"
   successfulJobsHistoryLimit: 5
   jobTemplate:
     spec:
@@ -13,6 +13,12 @@ spec:
           - name: nisra-mover-container
             image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:COMMIT_SHA"
             env:
+              - name: SURVEY_DESTINATION_PATH
+                value: 'OPN/opn1911a/'
+              - name: SURVEY_SOURCE_PATH_PREFIX
+                value: 'ONS/'
+              - name: NISRA_BUCKET_NAME
+                value: 'nisra-transfer'
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:
