@@ -12,11 +12,8 @@ The .yaml.tpl specifies the variables for the SFTP connection (stored as secrets
 
 A new .yaml.tpl file has to be created for different survey periods, adjusting the SURVEY_DESTINATION_PATH and container and cronjob name.
 
-### To do: 
-1. Change config.py to have a list of extensions rather than filenames
-2. Configure the yaml.tpl to work with different survey periods
-
-## Integration with GCP and Cloudbuild
+## Integration with GCP and Cloudbuild 
+(Note GitOps integration currently only works with bncm-cronjob.yaml.tpl)
 
 The repo now contains the following files to achieve CI\CD integration:
 
@@ -45,4 +42,3 @@ Three SSH steps are carried out:
 5. The k8s repository carries out the deployment. If successful it copies the new bsm.yaml to the dev branch in the k8s repo.
 
 6. Upon successful build of step 4 and 5 - it copies and does a commit (push) of the manifest (containing the bcv.yaml file) to the dev branch of the k8s repo ( A GCP Trigger on the dev branch initiates a build based on the cloudbuild-delivery.yaml ).
-
