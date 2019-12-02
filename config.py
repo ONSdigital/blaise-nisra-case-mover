@@ -10,9 +10,9 @@ if 'AUDIT_TRAIL' in os.environ:
     audit_trail = environ.get('AUDIT_TRAIL')
     extension_list = '*.db'
 else:
-    extension_list = ('*.blix',
+    extension_list = ['*.blix',
                       '*.badi',
                       '*.bdbx',
                       '*.bdix',
                       '*.bmix',
-                      '*.manifest')
+                      '*.manifest']

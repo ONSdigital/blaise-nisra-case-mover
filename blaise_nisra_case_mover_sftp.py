@@ -2,7 +2,7 @@ import os
 import pysftp
 import pybase64
 import hashlib
-import glob
+import fnmatch
 from config import survey_source_path, survey_destination_path
 from config import bucket_name, extension_list
 from google.cloud import storage
@@ -12,10 +12,7 @@ def main():
 
     bucket = connect_to_bucket()
 
-    # Grab files names based on extensions
     file_list = []
-    for ext in extension_list:
-        file_list.extend(glob.glob(ext))
 
     try:
         print('Attempting SFTP connection...')
@@ -26,7 +23,12 @@ def main():
                                password=os.getenv('SFTP_PASSWORD'),
                                port=int(os.getenv('SFTP_PORT')),
                                cnopts=cnopts) as sftp:
-            print('Connection established.')
+            print('SFTP connection established.')
+
+            for filename in sftp.listdir(survey_source_path):
+                if any(fnmatch.fnmatch(filename, pattern) for pattern in extension_list):
+                    file_list.append(filename)
+            print('Available files: '.format(file_list))
 
             for file in file_list:
                 print('Copying {} from SFTP server to container storage.'.format(file))
