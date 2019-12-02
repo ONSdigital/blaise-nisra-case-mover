@@ -1,5 +1,20 @@
 # Blaise NISRA case mover (SFTP)
+This app connects to the SFTP server where NISRA drops files and copies any changed ones to a bucket in GCP.
 
+The .yaml.tpl specifies the variables for the SFTP connection (stored as secrets in GCP), as well as the following environment variables: 
+
+              - name: SURVEY_DESTINATION_PATH
+                value: 'OPN/opn1911a/'
+              - name: SURVEY_SOURCE_PATH_PREFIX
+                value: 'ONS/'
+              - name: NISRA_BUCKET_NAME
+                value: 'nisra-transfer'
+
+A new .yaml.tpl file has to be created for different survey periods, adjusting the SURVEY_DESTINATION_PATH and container and cronjob name.
+
+### To do: 
+1. Change config.py to have a list of extensions rather than filenames
+2. Configure the yaml.tpl to work with different survey periods
 
 ## Integration with GCP and Cloudbuild
 
