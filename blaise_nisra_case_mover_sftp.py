@@ -2,14 +2,20 @@ import os
 import pysftp
 import pybase64
 import hashlib
+import glob
 from config import survey_source_path, survey_destination_path
-from config import bucket_name, file_list
+from config import bucket_name, extension_list
 from google.cloud import storage
 
 
 def main():
 
     bucket = connect_to_bucket()
+
+    # Grab files names based on extensions
+    file_list = []
+    for ext in extension_list:
+        file_list.extend(glob.glob(ext))
 
     try:
         print('Attempting SFTP connection...')
