@@ -12,10 +12,6 @@ The .yaml.tpl specifies the variables for the SFTP connection (stored as secrets
 
 A new .yaml.tpl file has to be created for different survey periods, adjusting the SURVEY_DESTINATION_PATH and container and cronjob name.
 
-### To do: 
-1. Change config.py to have a list of extensions rather than filenames
-2. Configure the yaml.tpl to work with different survey periods
-
 ## Integration with GCP and Cloudbuild
 
 The repo now contains the following files to achieve CI\CD integration:
