@@ -1,7 +1,19 @@
 # Blaise NISRA case mover (SFTP)
+This app connects to the SFTP server where NISRA drops files and copies any changed ones to a bucket in GCP.
 
+The .yaml.tpl specifies the variables for the SFTP connection (stored as secrets in GCP), as well as the following environment variables: 
 
-## Integration with GCP and Cloudbuild
+              - name: SURVEY_DESTINATION_PATH
+                value: 'OPN/opn1911a/'
+              - name: SURVEY_SOURCE_PATH_PREFIX
+                value: 'ONS/'
+              - name: NISRA_BUCKET_NAME
+                value: 'nisra-transfer'
+
+A new .yaml.tpl file has to be created for different survey periods, adjusting the SURVEY_DESTINATION_PATH and container and cronjob name.
+
+## Integration with GCP and Cloudbuild 
+(Note GitOps integration currently only works with bncm-cronjob.yaml.tpl)
 
 The repo now contains the following files to achieve CI\CD integration:
 
@@ -30,4 +42,3 @@ Three SSH steps are carried out:
 5. The k8s repository carries out the deployment. If successful it copies the new bsm.yaml to the dev branch in the k8s repo.
 
 6. Upon successful build of step 4 and 5 - it copies and does a commit (push) of the manifest (containing the bcv.yaml file) to the dev branch of the k8s repo ( A GCP Trigger on the dev branch initiates a build based on the cloudbuild-delivery.yaml ).
-
