@@ -31,7 +31,7 @@ def main():
                 open(processed_folder.strip("/"), 'w').close()
                 log.info('Creating empty processed folder for {}.'.format(survey_destination_path))
                 upload_blob(source_file_name='processed',
-                            destination_blob_name=survey_destination_path + 'processed/')
+                            destination_blob_name=survey_destination_path + processed_folder)
 
             file_list = list_files_to_transfer(sftp)
 
