@@ -63,10 +63,9 @@ def processed_folder_exists():
     blobs = storage_client.list_blobs(bucket_name, prefix=survey_destination_path)
 
     processed_folder = 'processed/'
-    blob_names = [blob.name for blob in blobs]
-    print(blob_names)
+    folder_in_blobs = [True for blob in blobs if processed_folder in blob]
 
-    if processed_folder in blob_names:
+    if any(folder_in_blobs):
         log.info('Processed folder exists for {}'.format(survey_destination_path))
         return True
     else:
