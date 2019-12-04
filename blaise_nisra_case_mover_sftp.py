@@ -41,6 +41,7 @@ def main():
                 blob_destination_path = survey_destination_path + bucket_file
 
                 file_blob = bucket.get_blob(blob_destination_path)
+                file_blob_processed = bucket.get_blob(survey_destination_path + processed_folder + file)
 
                 log.info('Copying {} from SFTP server to container storage.'.format(file))
                 sftp.get(survey_source_path + file, file)
@@ -48,7 +49,7 @@ def main():
                 if file_blob is None:
                     upload_blob(source_file_name=file,
                                 destination_blob_name=blob_destination_path)
-                elif file_same_as_bucket_file(file, file_blob):
+                elif file_same_as_bucket_file(file, file_blob) or file_same_as_bucket_file(file, file_blob_processed):
                     log.info('Ignoring file {} because its unchanged'.format(file))
                 else:
                     upload_blob(source_file_name=file,
