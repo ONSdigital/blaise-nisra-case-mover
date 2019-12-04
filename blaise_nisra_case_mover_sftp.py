@@ -12,6 +12,7 @@ from util.service_logging import log
 def main():
 
     bucket = connect_to_bucket()
+    processed_folder = 'processed/'
 
     try:
         log.info('Attempting SFTP connection...')
@@ -26,8 +27,8 @@ def main():
 
             log.info('SFTP connection established.')
 
-            if not processed_folder_exists():
-                os.mknod('processed')
+            if not processed_folder_exists(folder_name=processed_folder):
+                os.mknod(processed_folder)
                 log.info('Creating empty processed folder for {}.'.format(survey_destination_path))
                 upload_blob(source_file_name='processed',
                             destination_blob_name=survey_destination_path + 'processed/')
@@ -58,12 +59,13 @@ def main():
     return 0
 
 
-def processed_folder_exists():
+def processed_folder_exists(folder_name):
     storage_client = storage.Client()
     blobs = storage_client.list_blobs(bucket_name, prefix=survey_destination_path)
 
-    processed_folder = 'processed/'
-    folder_in_blobs = [True for blob in blobs if processed_folder in blob]
+    blob_names = [blob.name for blob in blobs]
+
+    folder_in_blobs = [True for blob in blob_names if folder_name in blob]
 
     if any(folder_in_blobs):
         log.info('Processed folder exists for {}'.format(survey_destination_path))
