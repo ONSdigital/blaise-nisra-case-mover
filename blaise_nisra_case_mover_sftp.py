@@ -27,7 +27,10 @@ def main():
             log.info('SFTP connection established.')
 
             if not processed_folder_exists():
-                log.info('Creating empty processed folder for {}.'.format(survey_source_path))
+                os.mknod('processed')
+                log.info('Creating empty processed folder for {}.'.format(survey_destination_path))
+                upload_blob(source_file_name='processed',
+                            destination_blob_name=survey_destination_path + 'processed/')
 
             file_list = list_files_to_transfer(sftp)
 
