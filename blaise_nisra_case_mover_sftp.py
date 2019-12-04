@@ -36,8 +36,9 @@ def main():
             file_list = list_files_to_transfer(sftp)
 
             for file in file_list:
+                bucket_file = file.lower()
 
-                blob_destination_path = survey_destination_path + file
+                blob_destination_path = survey_destination_path + bucket_file
 
                 file_blob = bucket.get_blob(blob_destination_path)
 
