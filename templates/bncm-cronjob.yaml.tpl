@@ -14,7 +14,7 @@ spec:
             image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:COMMIT_SHA"
             env:
               - name: SURVEY_DESTINATION_PATH
-                value: 'OPN/opn1911a/'
+                value: 'opn/opn1911a/'
               - name: SURVEY_SOURCE_PATH_PREFIX
                 value: 'ONS/'
               - name: NISRA_BUCKET_NAME

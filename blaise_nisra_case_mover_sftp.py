@@ -26,11 +26,15 @@ def main():
 
             log.info('SFTP connection established.')
 
+            if not processed_folder_exists():
+                log.info('Creating empty processed folder for {}.'.format(survey_source_path))
+
             file_list = list_files_to_transfer(sftp)
 
             for file in file_list:
 
                 blob_destination_path = survey_destination_path + file
+
                 file_blob = bucket.get_blob(blob_destination_path)
 
                 log.info('Copying {} from SFTP server to container storage.'.format(file))
@@ -49,6 +53,21 @@ def main():
         raise
 
     return 0
+
+
+def processed_folder_exists():
+    storage_client = storage.Client()
+    blobs = storage_client.list_blobs(bucket_name, prefix=survey_source_path)
+
+    processed_folder = 'processed/'
+    blob_names = [blob.name for blob in blobs]
+
+    if processed_folder in blob_names:
+        log.info('Processed folder exists for {}'.format(survey_source_path))
+        return True
+    else:
+        log.info('Processed folder for {} does not exist'.format(survey_source_path))
+        return False
 
 
 def list_files_to_transfer(sftp):
