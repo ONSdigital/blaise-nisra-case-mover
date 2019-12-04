@@ -28,7 +28,7 @@ def main():
             log.info('SFTP connection established.')
 
             if not processed_folder_exists(folder_name=processed_folder):
-                os.mknod(processed_folder)
+                open(processed_folder.strip("/"), 'w').close()
                 log.info('Creating empty processed folder for {}.'.format(survey_destination_path))
                 upload_blob(source_file_name='processed',
                             destination_blob_name=survey_destination_path + 'processed/')
@@ -62,6 +62,9 @@ def main():
 
 
 def processed_folder_exists(folder_name):
+    """Checks if a folder called folder_name exists in the bucket.
+    folder_name should have a trailing slash, otherwise it will be just a file"""
+
     storage_client = storage.Client()
     blobs = storage_client.list_blobs(bucket_name, prefix=survey_destination_path)
 
@@ -78,6 +81,8 @@ def processed_folder_exists(folder_name):
 
 
 def list_files_to_transfer(sftp):
+    """ Given an sftp server, lists all files available in directory"""
+
     file_list = []
 
     for filename in sftp.listdir(survey_source_path):
