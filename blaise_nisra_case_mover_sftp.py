@@ -64,6 +64,7 @@ def processed_folder_exists():
 
     processed_folder = 'processed/'
     blob_names = [blob.name for blob in blobs]
+    print(blob_names)
 
     if processed_folder in blob_names:
         log.info('Processed folder exists for {}'.format(survey_source_path))

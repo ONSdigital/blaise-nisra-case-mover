@@ -16,7 +16,7 @@ spec:
               - name: AUDIT_TRAIL
                 value: 'TRUE'
               - name: SURVEY_DESTINATION_PATH
-                value: 'OPN/opn1911a/'
+                value: 'opn/opn1911a/'
               - name: SURVEY_SOURCE_PATH_PREFIX
                 value: 'ONS/'
               - name: NISRA_BUCKET_NAME
