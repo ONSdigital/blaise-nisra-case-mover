@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: nisra-mover-opn2001a
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/60 * * * *"
   successfulJobsHistoryLimit: 5
   jobTemplate:
     spec:
