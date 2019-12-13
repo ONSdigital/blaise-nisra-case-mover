@@ -12,6 +12,7 @@ from util.service_logging import log
 def main():
 
     bucket = connect_to_bucket()
+    processed_folder = 'processed/'
 
     try:
         log.info('Attempting SFTP connection...')
@@ -26,12 +27,21 @@ def main():
 
             log.info('SFTP connection established.')
 
+            if not processed_folder_exists(folder_name=processed_folder):
+                open(processed_folder.strip("/"), 'w').close()
+                log.info('Creating empty processed folder for {}.'.format(survey_destination_path))
+                upload_blob(source_file_name='processed',
+                            destination_blob_name=survey_destination_path + processed_folder)
+
             file_list = list_files_to_transfer(sftp)
 
             for file in file_list:
+                bucket_file = file.lower()
 
-                blob_destination_path = survey_destination_path + file
+                blob_destination_path = survey_destination_path + bucket_file
+
                 file_blob = bucket.get_blob(blob_destination_path)
+                file_blob_processed = bucket.get_blob(survey_destination_path + processed_folder + file)
 
                 log.info('Copying {} from SFTP server to container storage.'.format(file))
                 sftp.get(survey_source_path + file, file)
@@ -39,7 +49,7 @@ def main():
                 if file_blob is None:
                     upload_blob(source_file_name=file,
                                 destination_blob_name=blob_destination_path)
-                elif file_same_as_bucket_file(file, file_blob):
+                elif file_same_as_bucket_file(file, file_blob) or file_same_as_bucket_file(file, file_blob_processed):
                     log.info('Ignoring file {} because its unchanged'.format(file))
                 else:
                     upload_blob(source_file_name=file,
@@ -51,7 +61,28 @@ def main():
     return 0
 
 
+def processed_folder_exists(folder_name):
+    """Checks if a folder called folder_name exists in the bucket.
+    folder_name should have a trailing slash, otherwise it will be just a file"""
+
+    storage_client = storage.Client()
+    blobs = storage_client.list_blobs(bucket_name, prefix=survey_destination_path)
+
+    blob_names = [blob.name for blob in blobs]
+
+    folder_in_blobs = [True for blob in blob_names if folder_name in blob]
+
+    if any(folder_in_blobs):
+        log.info('Processed folder exists for {}'.format(survey_destination_path))
+        return True
+    else:
+        log.info('Processed folder for {} does not exist'.format(survey_destination_path))
+        return False
+
+
 def list_files_to_transfer(sftp):
+    """ Given an sftp server, lists all files available in directory"""
+
     file_list = []
 
     for filename in sftp.listdir(survey_source_path):
