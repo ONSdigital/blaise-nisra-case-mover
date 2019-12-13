@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: nisra-mover-opn1911a-container
-            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover-sftp:COMMIT_SHA"
+            image: "eu.gcr.io/GOOGLE_CLOUD_PROJECT/blaise-nisra-case-mover-sftp:COMMIT_SHA"
             env:
               - name: SURVEY_DESTINATION_PATH
                 value: 'opn/opn1911a/'
