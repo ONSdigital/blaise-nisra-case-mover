@@ -49,7 +49,8 @@ def main():
                 if file_blob is None:
                     upload_blob(source_file_name=file,
                                 destination_blob_name=blob_destination_path)
-                elif file_same_as_bucket_file(file, file_blob) or file_same_as_bucket_file(file, file_blob_processed):
+                elif file_same_as_bucket_file(file, file_blob) or (file_blob_processed is not None and
+                                                                   file_same_as_bucket_file(file, file_blob_processed)):
                     log.info('Ignoring file {} because its unchanged'.format(file))
                 else:
                     upload_blob(source_file_name=file,
