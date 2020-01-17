@@ -42,6 +42,3 @@ Three SSH steps are carried out:
 5. The k8s repository carries out the deployment. If successful it copies the new bsm.yaml to the dev branch in the k8s repo.
 
 6. Upon successful build of step 4 and 5 - it copies and does a commit (push) of the manifest (containing the bcv.yaml file) to the dev branch of the k8s repo ( A GCP Trigger on the dev branch initiates a build based on the cloudbuild-delivery.yaml ).
-
-
-
