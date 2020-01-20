@@ -21,7 +21,7 @@ spec:
                 valueFrom:
                   configMapKeyRef:
                     name: blaise-buckets
-                    key: ons-blaise-preprod-nisra
+                    key: bucket-name-nisra
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:
