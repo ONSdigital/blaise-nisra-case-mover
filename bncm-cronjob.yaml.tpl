@@ -18,10 +18,7 @@ spec:
               - name: SURVEY_SOURCE_PATH_PREFIX
                 value: 'ONS/'
               - name: NISRA_BUCKET_NAME
-                valueFrom:
-                  configMapKeyRef:
-                    name: blaise-buckets
-                    key: bucket-name-nisra
+                value: 'nisra-transfer'
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:
