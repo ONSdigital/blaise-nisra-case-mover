@@ -1,6 +1,28 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
+- id: 'Build initial image'
+  name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}', '.' ]
+
+# run the unit tests in the image
+- id: 'Image Unit Tests'
+  name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'run'
+    - '--entrypoint=sh'
+    - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
+    - '-c'
+    - |
+        cd /deploy
+        pytest --collect-only
+        pytest --verbose
+        RETVAL=$?
+        if [ $${RETVAL} -ne 0 ]; then
+          echo "tests failed"
+          exit 1
+        else
+          echo "tests passed"
+          exit 0
+        fi
 
 # This step pushes the image to Container Registry
 # The PROJECT_ID and SHORT_SHA variables are automatically
