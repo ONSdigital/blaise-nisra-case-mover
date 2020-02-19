@@ -33,6 +33,10 @@ steps:
   - 'push'
   - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
 
+- name: 'gcr.io/cloud-builders/gsutil'
+  id: Copy key for decryption
+  args: ['cp', 'gs://ons-blaise-${_ENV}-git-ssh-key/*' , '.']
+
 # SSH key needed to allow gcloud to push changes (SHORT_SHA) to other repositories
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Decrypt ssh key
@@ -41,7 +45,7 @@ steps:
     - decrypt
     - --ciphertext-file=id_rsa.enc
     - --plaintext-file=/root/.ssh/id_rsa
-    - --location=global
+    - --location=europe-west2
     - --keyring=git-keyring
     - --key=github-key
   volumes:
