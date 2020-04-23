@@ -126,7 +126,7 @@ steps:
     Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA} Built from commit ${COMMIT_SHA}
     Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
     git remote -v && \
-    git push origin candidate
+    git push origin dev
   volumes:
     - name: 'ssh'
       path: /root/.ssh
