@@ -1,10 +1,13 @@
 steps:
-- id: 'Build initial image'
+- id: Build image
   name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}', '.' ]
+  args: [ 'build',
+          '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest',
+          '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}',
+          '.' ]
 
 # run the unit tests in the image
-- id: 'Image Unit Tests'
+- id: Image Unit Tests
   name: 'gcr.io/cloud-builders/docker'
   args:
     - 'run'
@@ -28,33 +31,41 @@ steps:
 # The PROJECT_ID and SHORT_SHA variables are automatically
 # replaced by Cloud Build.
 - name: 'gcr.io/cloud-builders/docker'
-  id: Push to gcr
+  id: Push image to GCR
   args:
   - 'push'
   - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
 
+# Add latest tag to GCR
+- name: 'gcr.io/cloud-builders/docker'
+  id: Add latest tag to GCR
+  args:
+  - 'push'
+  - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest'
+
+
 - name: 'gcr.io/cloud-builders/gsutil'
-  id: Copy key for decryption
-  args: ['cp', 'gs://ons-blaise-${_ENV}-git-ssh-key/*' , '.']
+  id: Get encrypted Github ssh key
+  args: ['cp', 'gs://ons-blaise-${_ENV}-git-ssh-key-bucket/*' , '.']
 
 # SSH key needed to allow gcloud to push changes (SHORT_SHA) to other repositories
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Decrypt ssh key
+  id: Unencrypt Github ssh key
   args:
     - kms
     - decrypt
-    - --ciphertext-file=id_rsa.enc
+    - --ciphertext-file=ssh.enc
     - --plaintext-file=/root/.ssh/id_rsa
     - --location=europe-west2
-    - --keyring=git-keyring
-    - --key=github-key
+    - --keyring=git-deploy
+    - --key=git-deploy
   volumes:
     - name: 'ssh'
       path: /root/.ssh
 
 # Set up git with key and domain
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Add github to known hosts
+  id: Connect to Github
   entrypoint: 'bash'
   args:
     - '-c'
@@ -74,31 +85,33 @@ steps:
   id: Clone k8s repository
   args:
     - clone
-    - git@github.com:ONSdigital/blaise-nisra-case-mover-sftp-k8s.git
+    - git@github.com:ONSdigital/blaise-deploy-k8s.git
   volumes:
     - name: 'ssh'
       path: /root/.ssh
 
 # This step clones the blaise-nisra-case-mover-sftp-k8s repository
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Configure user
+  id: Checkout dev branch and configure user
   entrypoint: /bin/sh
   args:
   - '-c'
   - |
-    cd blaise-nisra-case-mover-sftp-k8s && \
-    git checkout candidate && \
+    cd blaise-deploy-k8s && \
+    git checkout dev && \
     git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)') && \
     git config --list
+
 # This step generates the new manifest
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Generate manifest
+  id: Create yaml from temaplate with image tag
   entrypoint: /bin/sh
   args:
   - '-c'
   - |
      sed "s/GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" bncm-cronjob.yaml.tpl | \
-     sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-nisra-case-mover-sftp-k8s/bncm-cronjob.yaml
+     sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-deploy-k8s/services/blaise-nisra-case-mover-sftp/bncm-cronjob.yaml
+
 # This step pushes the manifest back to blaise-nisra-case-mover-sftp-k8s
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Push manifest
@@ -107,14 +120,16 @@ steps:
   - '-c'
   - |
     set -x && \
-    cd blaise-nisra-case-mover-sftp-k8s && \
+    cd blaise-deploy-k8s/services/blaise-nisra-case-mover-sftp && \
     git add bncm-cronjob.yaml && \
-    git commit -m "Deploying image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA}
-    Built from commit ${COMMIT_SHA} of repository blaise-nisra-case-mover-sftp
+    git commit -m "Deploying blaise-nisra-case-mover-sftp:${SHORT_SHA}
+    Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA} Built from commit ${COMMIT_SHA}
     Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
     git remote -v && \
-    git push origin candidate
+    git push origin dev
   volumes:
     - name: 'ssh'
       path: /root/.ssh
-images: ['eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}']
+images:
+  - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
+  - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest'
