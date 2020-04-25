@@ -99,8 +99,8 @@ steps:
   args:
   - '-c'
   - |
-     sed "s/GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" bncm-cronjob.yaml.tpl | \
-     sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-deploy-k8s/services/blaise-nisra-case-mover-sftp/bncm-cronjob.yaml
+     sed "s/GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" bncm.yaml.tpl | \
+     sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-deploy-k8s/services/blaise-nisra-case-mover-sftp/bncm.yaml
 
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Commit changes back to k8s repo
@@ -110,7 +110,7 @@ steps:
   - |
     set -x && \
     cd blaise-deploy-k8s/services/blaise-nisra-case-mover-sftp && \
-    git add bncm-cronjob.yaml && \
+    git add bncm.yaml && \
     git commit -m "Deploying blaise-nisra-case-mover-sftp:${SHORT_SHA}
     Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA} Built from commit ${COMMIT_SHA}
     Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
