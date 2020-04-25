@@ -94,7 +94,7 @@ steps:
     git config --list
 
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Create yaml from temaplate with image tag
+  id: Create yaml from temaplate replacing image tag
   entrypoint: /bin/sh
   args:
   - '-c'
