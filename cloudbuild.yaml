@@ -1,14 +1,14 @@
 steps:
-- id: Build image
-  name: 'gcr.io/cloud-builders/docker'
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: Build images
   args: [ 'build',
           '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest',
           '-t', 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}',
           '.' ]
 
-# run the unit tests in the image
-- id: Image Unit Tests
-  name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/cloud-builders/docker'
+  id: Run tests
   args:
     - 'run'
     - '--entrypoint=sh'
@@ -27,30 +27,24 @@ steps:
           exit 0
         fi
 
-# This step pushes the image to Container Registry
-# The PROJECT_ID and SHORT_SHA variables are automatically
-# replaced by Cloud Build.
 - name: 'gcr.io/cloud-builders/docker'
-  id: Push image to GCR
+  id: Push short sha tag image to GCR
   args:
   - 'push'
   - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
 
-# Add latest tag to GCR
 - name: 'gcr.io/cloud-builders/docker'
-  id: Add latest tag to GCR
+  id: Push latest tag image to GCR
   args:
   - 'push'
   - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest'
 
-
 - name: 'gcr.io/cloud-builders/gsutil'
-  id: Get encrypted Github ssh key
+  id: Get encrypted GitHub SSH key
   args: ['cp', 'gs://ons-blaise-${_ENV}-git-ssh-key-bucket/*' , '.']
 
-# SSH key needed to allow gcloud to push changes (SHORT_SHA) to other repositories
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Unencrypt Github ssh key
+  id: Unencrypt GitHub SSH key
   args:
     - kms
     - decrypt
@@ -63,9 +57,8 @@ steps:
     - name: 'ssh'
       path: /root/.ssh
 
-# Set up git with key and domain
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Connect to Github
+  id: Connect to GitHub
   entrypoint: 'bash'
   args:
     - '-c'
@@ -80,9 +73,8 @@ steps:
     - name: 'ssh'
       path: /root/.ssh
 
-# Connect to the repository
 - name: 'gcr.io/cloud-builders/git'
-  id: Clone k8s repository
+  id: Clone deploy-k8s repo
   args:
     - clone
     - git@github.com:ONSdigital/blaise-deploy-k8s.git
@@ -90,7 +82,6 @@ steps:
     - name: 'ssh'
       path: /root/.ssh
 
-# This step clones the blaise-nisra-case-mover-sftp-k8s repository
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Checkout dev branch and configure user
   entrypoint: /bin/sh
@@ -102,7 +93,6 @@ steps:
     git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)') && \
     git config --list
 
-# This step generates the new manifest
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Create yaml from temaplate with image tag
   entrypoint: /bin/sh
@@ -112,9 +102,8 @@ steps:
      sed "s/GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" bncm-cronjob.yaml.tpl | \
      sed "s/COMMIT_SHA/${SHORT_SHA}/g" > blaise-deploy-k8s/services/blaise-nisra-case-mover-sftp/bncm-cronjob.yaml
 
-# This step pushes the manifest back to blaise-nisra-case-mover-sftp-k8s
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: Push manifest
+  id: Commit changes back to k8s repo
   entrypoint: /bin/sh
   args:
   - '-c'
@@ -130,6 +119,7 @@ steps:
   volumes:
     - name: 'ssh'
       path: /root/.ssh
+      
 images:
   - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}'
   - 'eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest'
