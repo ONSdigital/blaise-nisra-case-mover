@@ -10,7 +10,7 @@ spec:
       template:
         spec:
           containers:
-          - name: nisra-mover-opn2001a-container
+          - name: nisra-mover-opn2001a
             image: "eu.gcr.io/GOOGLE_CLOUD_PROJECT/blaise-nisra-case-mover-sftp:COMMIT_SHA"
             env:
               - name: SURVEY_DESTINATION_PATH
