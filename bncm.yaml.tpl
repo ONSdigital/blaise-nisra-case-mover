@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: nisra-mover-opn2001a
+  name: nisra-mover-opn2004a
 spec:
   schedule: "*/60 * * * *"
   successfulJobsHistoryLimit: 5
