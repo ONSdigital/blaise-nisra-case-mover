@@ -27,16 +27,16 @@ spec:
               - name: SFTP_USERNAME
                 valueFrom:
                   secretKeyRef:
-                    name: nisrasftp
+                    name: nisra-sftp
                     key: SFTP_USERNAME
               - name: SFTP_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: nisrasftp
+                    name: nisra-sftp
                     key: SFTP_PASSWORD
               - name: SFTP_PORT
                 valueFrom:
                   secretKeyRef:
-                    name: nisrasftp
+                    name: nisra-sftp
                     key: SFTP_PORT
           restartPolicy: OnFailure
