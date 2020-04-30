@@ -22,7 +22,7 @@ spec:
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:
-                    name: nisrasftp
+                    name: nisra-sftp
                     key: SFTP_HOST
               - name: SFTP_USERNAME
                 valueFrom:
