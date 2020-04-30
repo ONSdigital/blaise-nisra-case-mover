@@ -41,7 +41,7 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gsutil'
   id: Get encrypted GitHub SSH key
-  args: ['cp', 'gs://ons-blaise-${_ENV}-git-ssh-key-bucket/*' , '.']
+  args: ['cp', 'gs://ons-blaise-${_ENV}-github-deploy-key/*' , '.']
 
 - name: 'gcr.io/cloud-builders/gcloud'
   id: Unencrypt GitHub SSH key
