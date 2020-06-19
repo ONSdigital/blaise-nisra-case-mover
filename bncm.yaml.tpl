@@ -18,7 +18,7 @@ spec:
               - name: SURVEY_SOURCE_PATH_PREFIX
                 value: 'ONS/'
               - name: NISRA_BUCKET_NAME
-                value: 'nisra-transfer'
+                value: 'GOOGLE_CLOUD_PROJECT-nisra'
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:
