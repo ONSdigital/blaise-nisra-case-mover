@@ -1,0 +1,36 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    id: Build images
+    args:
+      [
+        "build",
+        "-t",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest",
+        "-t",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: Run tests
+    args:
+      - "run"
+      - "--entrypoint=sh"
+      - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
+      - "-c"
+      - |
+        cd /deploy
+        pytest --collect-only
+        pytest --verbose
+        RETVAL=$?
+        if [ $${RETVAL} -ne 0 ]; then
+          echo "tests failed"
+          exit 1
+        else
+          echo "tests passed"
+          exit 0
+        fi
+
+images:
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest"

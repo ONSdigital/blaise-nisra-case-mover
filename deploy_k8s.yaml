@@ -1,0 +1,106 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    id: Build images
+    args:
+      [
+        "build",
+        "-t",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest",
+        "-t",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: Run tests
+    args:
+      - "run"
+      - "--entrypoint=sh"
+      - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
+      - "-c"
+      - |
+        cd /deploy
+        pytest --collect-only
+        pytest --verbose
+        RETVAL=$?
+        if [ $${RETVAL} -ne 0 ]; then
+          echo "tests failed"
+          exit 1
+        else
+          echo "tests passed"
+          exit 0
+        fi
+
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: Get encrypted GitHub SSH key
+    args: ["cp", "gs://ons-blaise-${_ENV}-github-deploy-key/*", "."]
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Unencrypt GitHub gitops deploy token
+    args:
+      - kms
+      - decrypt
+      - --ciphertext-file=git_ops_token.enc
+      - --plaintext-file=/root/.ssh/deploy_token
+      - --location=europe-west2
+      - --keyring=git-deploy
+      - --key=git-deploy
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Clone blaise-setup-gcp repo
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -x && \
+        OAUTH_TOKEN=$(cat /root/.ssh/deploy_token) && \
+        git clone https://$${OAUTH_TOKEN}@github.com/ONSdigital/blaise-setup-gcp.git
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Configure user
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -x && \
+        cd blaise-setup-gcp && \
+        git config user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)') && \
+        git config --list
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Update tag in the environment variables file blaise-setup-gcp/env/{env}.tfvars
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -x && \
+        sed "s/^\(blaise_nisra_case_mover_sftp_image = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_sftp_image = \"${SHORT_SHA}\"/g" blaise-setup-gcp/env/${_ENV}.tfvars -i
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Commit changes back to blaise-setup-gcp repo using oauth token
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -x && \
+        OAUTH_TOKEN=$(cat /root/.ssh/deploy_token) && \
+        cd blaise-setup-gcp/env && \
+        git add ${_ENV}.tfvars && \
+        git commit -m "Deploying blaise-nisra-case-mover-sftp:${SHORT_SHA}
+        Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA} Built from commit ${COMMIT_SHA}
+        Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
+        git remote -v && \
+        git push https://$${OAUTH_TOKEN}@github.com/ONSdigital/blaise-setup-gcp.git
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
+
+images:
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest"
