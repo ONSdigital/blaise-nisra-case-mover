@@ -80,7 +80,7 @@ steps:
       - "-c"
       - |
         set -x && \
-        sed "s/^\(blaise_nisra_case_mover_sftp_image = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_sftp_image = \"${SHORT_SHA}\"/g" blaise-setup-gcp/env/${_ENV}.tfvars -i
+        sed "s/^\(blaise_nisra_case_mover_sftp_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_sftp_image_tag = \"${SHORT_SHA}\"/g" blaise-setup-gcp/env/${_ENV}.tfvars -i
 
   - name: "gcr.io/cloud-builders/gcloud"
     id: Commit changes back to blaise-setup-gcp repo using oauth token
