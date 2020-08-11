@@ -11,8 +11,10 @@ spec:
         spec:
           containers:
           - name: nisra-mover-opn
-            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover:COMMIT_SHA"
+            image: "eu.gcr.io/ons-blaise-dev/blaise-nisra-case-mover:COMMIT_SHA"
             env:
+              - name: INSTRUMENT_SOURCE_PATH
+                value: ''
               - name: SURVEY_SOURCE_PATH
                 value: 'ONS/OPN/'
               - name: INSTRUMENT_DESTINATION_PATH

@@ -1,8 +1,9 @@
 import fnmatch
 import hashlib
+import re
+
 import pybase64
 import pysftp
-import re
 from google.cloud import storage
 
 from config import *
@@ -48,7 +49,12 @@ def main():
                 process_instrument_files(sftp, survey_source_path + instrument_source_path[-9:], instrument_files,
                                          instrument_destination_path + instrument_source_path[-9:])
 
+        sftp.close()
+        log.info('SFTP connection closed')
+
     except Exception as ex:
+        sftp.close()
+        log.info('SFTP connection closed')
         log.error('Exception - ', ex)
         raise
 

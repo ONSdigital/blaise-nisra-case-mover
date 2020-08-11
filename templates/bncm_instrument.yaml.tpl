@@ -11,10 +11,12 @@ spec:
         spec:
           containers:
           - name: bncm-opn2004a
-            image: "eu.gcr.io/blaisepoc/blaise-nisra-case-mover:COMMIT_SHA"
+            image: "eu.gcr.io/ons-blaise-dev/blaise-nisra-case-mover:COMMIT_SHA"
             env:
               - name: INSTRUMENT_SOURCE_PATH
                 value: 'ONS/OPN/opn2004a/'
+              - name: SURVEY_SOURCE_PATH
+                value: ''
               - name: INSTRUMENT_DESTINATION_PATH
                 value: 'ONS/'
               - name: NISRA_BUCKET_NAME
