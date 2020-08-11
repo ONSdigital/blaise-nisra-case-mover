@@ -5,9 +5,9 @@ steps:
       [
         "build",
         "-t",
-        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:latest",
         "-t",
-        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:${SHORT_SHA}",
         ".",
       ]
 
@@ -16,7 +16,7 @@ steps:
     args:
       - "run"
       - "--entrypoint=sh"
-      - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
+      - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:${SHORT_SHA}"
       - "-c"
       - |
         cd /deploy
@@ -80,7 +80,7 @@ steps:
       - "-c"
       - |
         set -x && \
-        sed "s/^\(blaise_nisra_case_mover_sftp_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_sftp_image_tag = \"${SHORT_SHA}\"/g" blaise-setup-gcp/env/${_ENV}.tfvars -i
+        sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" blaise-setup-gcp/env/${_ENV}.tfvars -i
 
   - name: "gcr.io/cloud-builders/gcloud"
     id: Commit changes back to blaise-setup-gcp repo using oauth token
@@ -92,8 +92,8 @@ steps:
         OAUTH_TOKEN=$(cat /root/.ssh/deploy_token) && \
         cd blaise-setup-gcp/env && \
         git add ${_ENV}.tfvars && \
-        git commit -m "Deploying blaise-nisra-case-mover-sftp:${SHORT_SHA}
-        Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover-sftp:${SHORT_SHA} Built from commit ${COMMIT_SHA}
+        git commit -m "Deploying blaise-nisra-case-mover:${SHORT_SHA}
+        Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover:${SHORT_SHA} Built from commit ${COMMIT_SHA}
         Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
         git remote -v && \
         git push https://$${OAUTH_TOKEN}@github.com/ONSdigital/blaise-setup-gcp.git
@@ -102,5 +102,5 @@ steps:
         path: /root/.ssh
 
 images:
-  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
-  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest"
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:${SHORT_SHA}"
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:latest"
