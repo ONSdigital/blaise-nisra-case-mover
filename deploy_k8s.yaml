@@ -80,7 +80,24 @@ steps:
       - "-c"
       - |
         set -x && \
-        sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" blaise-setup-gcp/env/${_ENV}.tfvars -i
+        cd blaise-setup-gcp && \
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "Checking if this is the master branch..."
+        if [ $${BRANCH} = "master" ]; then
+          echo "master branch detected updating the sandbox variables template..."
+          sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" env/sandbox.tfvars.template -i
+          echo "Adding the sandbox.tfvars.template, ready for commit..."
+          git add env/sandbox.tfvars.template
+          echo "Updating the $_ENV.tfvars file..."
+          sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" env/${_ENV}.tfvars -i
+          echo "Add the $_ENV.tfvars to the git index, ready for commit..."
+          git add env/$_ENV.tfvars
+        else
+          echo "Updating the $_ENV.tfvars file..."
+          sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" env/${_ENV}.tfvars -i
+          echo "Add the $_ENV.tfvars file, ready for commit..."
+          git add env/$_ENV.tfvars         
+        fi
 
   - name: "gcr.io/cloud-builders/gcloud"
     id: Commit changes back to blaise-setup-gcp repo using oauth token
@@ -90,12 +107,12 @@ steps:
       - |
         set -x && \
         OAUTH_TOKEN=$(cat /root/.ssh/deploy_token) && \
-        cd blaise-setup-gcp/env && \
-        git add ${_ENV}.tfvars && \
-        git commit -m "Deploying blaise-nisra-case-mover:${SHORT_SHA}
-        Image gcr.io/${PROJECT_ID}/blaise-nisra-case-mover:${SHORT_SHA} Built from commit ${COMMIT_SHA}
-        Author: $(git log --format='%an <%ae>' -n 1 HEAD)" && \
-        git remote -v && \
+        cd blaise-setup-gcp/env
+        git status
+        git commit -m "Deploying blaise_nisra_case_mover:${SHORT_SHA}
+        Image gcr.io/${PROJECT_ID}/blaise_nisra_case_mover:${SHORT_SHA} Built from commit ${COMMIT_SHA}
+        Author: $(git log --format='%an <%ae>' -n 1 HEAD)"
+        git remote -v
         git push https://$${OAUTH_TOKEN}@github.com/ONSdigital/blaise-setup-gcp.git
     volumes:
       - name: "ssh"
