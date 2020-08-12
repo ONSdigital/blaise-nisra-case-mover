@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir pytest
 
 COPY . .
 
-CMD [ "python", "blaise_nisra_case_mover_sftp.py" ]
+CMD [ "python", "blaise_nisra_case_mover.py" ]

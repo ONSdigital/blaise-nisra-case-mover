@@ -1,24 +1,26 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: nisra-mover-opn2004a
+  name: nisra-mover-opn
 spec:
-  schedule: "*/60 * * * *"
+  schedule: "10,40 * * * *"
   successfulJobsHistoryLimit: 5
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: nisra-mover-opn2004a
-            image: "eu.gcr.io/GOOGLE_CLOUD_PROJECT/blaise-nisra-case-mover-sftp:COMMIT_SHA"
+          - name: nisra-mover-opn
+            image: "eu.gcr.io/ons-blaise-dev/blaise-nisra-case-mover:COMMIT_SHA"
             env:
-              - name: SURVEY_DESTINATION_PATH
-                value: 'opn/opn2004a/'
-              - name: SURVEY_SOURCE_PATH_PREFIX
+              - name: INSTRUMENT_SOURCE_PATH
+                value: ''
+              - name: SURVEY_SOURCE_PATH
+                value: 'ONS/OPN/'
+              - name: INSTRUMENT_DESTINATION_PATH
                 value: 'ONS/'
               - name: NISRA_BUCKET_NAME
-                value: 'GOOGLE_CLOUD_PROJECT-nisra'
+                value: 'ons-blaise-dev-nisra'
               - name: SFTP_HOST
                 valueFrom:
                   secretKeyRef:

@@ -4,11 +4,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    version="0.0.1",
-    description="A package to copy survey files using SFTP connection",
+    version="1",
+    description="Copy survey instruments from NISRA SFTP server to GCP storage bucket",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ONSdigital/Blaise_NISRA_Case_Mover_SFTP",
+    url="https://github.com/ONSdigital/blaise-nisra-case-mover",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

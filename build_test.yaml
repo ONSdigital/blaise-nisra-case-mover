@@ -5,9 +5,9 @@ steps:
       [
         "build",
         "-t",
-        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:latest",
         "-t",
-        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}",
+        "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:${SHORT_SHA}",
         ".",
       ]
 
@@ -16,7 +16,7 @@ steps:
     args:
       - "run"
       - "--entrypoint=sh"
-      - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
+      - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:${SHORT_SHA}"
       - "-c"
       - |
         cd /deploy
@@ -32,5 +32,5 @@ steps:
         fi
 
 images:
-  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:${SHORT_SHA}"
-  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover-sftp:latest"
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:${SHORT_SHA}"
+  - "eu.gcr.io/$PROJECT_ID/blaise-nisra-case-mover:latest"
