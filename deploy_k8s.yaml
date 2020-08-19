@@ -80,10 +80,9 @@ steps:
       - "-c"
       - |
         set -x && \
-        cd blaise-setup-gcp && \
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
         echo "Checking if this is the master branch..."
-        if [ $${BRANCH} = "master" ]; then
+        if [ ${_GIT_BRANCH} = "^master$" ]; then
+          cd blaise-setup-gcp
           echo "master branch detected updating the sandbox variables template..."
           sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" env/sandbox.tfvars.template -i
           echo "Adding the sandbox.tfvars.template, ready for commit..."
@@ -93,6 +92,7 @@ steps:
           echo "Add the $_ENV.tfvars to the git index, ready for commit..."
           git add env/$_ENV.tfvars
         else
+          cd blaise-setup-gcp
           echo "Updating the $_ENV.tfvars file..."
           sed "s/^\(blaise_nisra_case_mover_image_tag = \)\(\"[a-z0-9]\{7\}\)\"/blaise_nisra_case_mover_image_tag = \"${SHORT_SHA}\"/g" env/${_ENV}.tfvars -i
           echo "Add the $_ENV.tfvars file, ready for commit..."
