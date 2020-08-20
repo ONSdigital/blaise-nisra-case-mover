@@ -38,9 +38,9 @@ steps:
       - "-c"
       - |
         echo Writing ${SHORT_SHA} to file.
-        echo -n ${SHORT_SHA} >> bsm.txt
+        echo -n ${SHORT_SHA} >> bncm.txt
         echo Copying file to ${_ENV} bucket.
-        gsutil cp bsm.txt gs://ons-blaise-${_ENV}-image-tags/tags/bsm.txt
+        gsutil cp bncm.txt gs://ons-blaise-${_ENV}-image-tags/tags/bncm.txt
     
   - name: "gcr.io/cloud-builders/gcloud"
     id: Trigger Terraform Apply
