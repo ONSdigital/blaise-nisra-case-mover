@@ -20,7 +20,7 @@ spec:
               - name: SURVEY_SOURCE_PATH
                 value: ''
               - name: INSTRUMENT_DESTINATION_PATH
-                value: 'ONS/'
+                value: 'OPN/'
               - name: NISRA_BUCKET_NAME
                 value: 'ons-blaise-dev-nisra'
               - name: SFTP_HOST
