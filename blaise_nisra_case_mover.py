@@ -53,7 +53,7 @@ def main():
 
     except Exception as ex:
         log.info('SFTP connection closed')
-        log.error('Exception - ', ex)
+        log.error('Exception - %s', ex)
         raise
 
 
@@ -143,7 +143,7 @@ def connect_to_bucket():
         log.info('Connected to bucket - ' + bucket_name)
         return bucket
     except Exception as ex:
-        log.error('Exception - ', ex)
+        log.error('Exception - %s', ex)
         raise
 
 
