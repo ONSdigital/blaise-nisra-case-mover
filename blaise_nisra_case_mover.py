@@ -7,7 +7,7 @@ import pysftp
 from google.cloud import storage
 
 from config import *
-# from config_local import *
+from config_local import *
 from util.service_logging import log
 
 # workaround to prevent file transfer timeouts
@@ -149,8 +149,8 @@ def check_if_files_match(local_file, bucket_file):
 
 
 def upload_instrument(sftp, source_path, instrument_name, dest_path):
-    log.info('Uploading instrument - ')
-    instrument_files = get_instrument_files(sftp, survey_source_path + instrument_name)
+    log.info('Uploading instrument - ' + instrument_name)
+    instrument_files = get_instrument_files(sftp, source_path)
     for instrument_file in instrument_files:
         log.info('Downloading instrument file from SFTP - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
