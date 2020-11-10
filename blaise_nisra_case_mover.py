@@ -70,7 +70,7 @@ def process_instrument(sftp, source_path, dest_path):
     log.info('Processing instrument - ' + instrument_name)
     delete_local_instrument_files()
     create_processed_folder(dest_path + instrument_name)
-    instrument_files = get_instrument_files(sftp, survey_source_path + instrument_name)
+    instrument_files = get_instrument_files(sftp, source_path)
     for instrument_file in instrument_files:
         if instrument_file.lower().endswith('bdbx'):
             log.info('Database file found - ' + instrument_file)
