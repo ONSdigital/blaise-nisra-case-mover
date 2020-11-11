@@ -13,8 +13,6 @@ if 'AUDIT_TRAIL' in os.environ:
     extension_list = '*.db'
 else:
     extension_list = ['*.blix',
-                      '*.badi',
                       '*.bdbx',
                       '*.bdix',
-                      '*.bmix',
-                      '*.manifest']
+                      '*.bmix']
