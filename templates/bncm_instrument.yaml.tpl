@@ -14,7 +14,7 @@ spec:
             image: "eu.gcr.io/ons-blaise-dev/blaise-nisra-case-mover:COMMIT_SHA"
             env:
               - name: INSTRUMENT_SOURCE_PATH
-                value: 'ONS/OPN/opn2004a/'
+                value: 'ONS/OPN/OPN2101A/'
               - name: SURVEY_SOURCE_PATH
                 value: ''
               - name: INSTRUMENT_DESTINATION_PATH

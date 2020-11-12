@@ -103,5 +103,14 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-#pycharm
+# pycharm
 .idea/
+
+*.json
+
+# blaise
+*.bdbx
+*.bdix
+*.bmix
+*.blix
+processed
