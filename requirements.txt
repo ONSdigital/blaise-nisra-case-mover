@@ -33,3 +33,4 @@ pytest~=4.6.2
 setuptools~=41.0.1
 python-dotenv~=0.10.3
 Flask==1.1.2
+python-crontab==2.5.1

@@ -1,0 +1,15 @@
+service: nisra-case-mover
+runtime: python37
+
+env_variables:
+  SFTP_PORT: 22
+  SFTP_HOST: ''
+  SFTP_USERNAME: ''
+  SFTP_PASSWORD: ! ''
+  INSTRUMENT_SOURCE_PATH: ''
+  SURVEY_SOURCE_PATH: ''
+  INSTRUMENT_DESTINATION_PATH: ''
+  NISRA_BUCKET_NAME: ''
+
+vpc_access_connector:
+  name: projects/ons-blaise-dev-el-43/locations/europe-west2/connectors/vpcconnect
