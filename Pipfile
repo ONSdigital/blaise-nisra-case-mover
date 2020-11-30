@@ -10,6 +10,7 @@ pysftp = "*"
 python-crontab = "*"
 google-cloud-storage = "*"
 pybase64 = "*"
+Flask = "==1.1.2"
 
 [requires]
 python_version = "3.7"

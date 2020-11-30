@@ -7,14 +7,22 @@ import pysftp
 from google.cloud import storage
 
 from config import *
-from config_local import *
 from util.service_logging import log
+from flask import Flask
 
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
 storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
+app = Flask(__name__)
 
+@app.route('/')
+def health_check():
+    app.logger.debug(f"health_check from ")
+    return ":)", 200
+
+
+@app.route('/main')
 def main():
     log.info('Application started')
     log.info('instrument_source_path - ' + instrument_source_path)
@@ -166,5 +174,7 @@ def upload_file(source, dest):
     log.info('Uploaded file - ' + source)
 
 
+# if __name__ == "__main__":
+#     main()
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0")
