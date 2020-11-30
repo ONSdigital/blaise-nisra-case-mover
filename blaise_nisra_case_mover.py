@@ -16,13 +16,8 @@ storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
 app = Flask(__name__)
 
+
 @app.route('/')
-def health_check():
-    app.logger.debug(f"health_check from ")
-    return ":)", 200
-
-
-@app.route('/main')
 def main():
     log.info('Application started')
     log.info('instrument_source_path - ' + instrument_source_path)
@@ -114,6 +109,8 @@ def create_processed_folder(instrument_dest):
         log.info('Creating processed folder for ' + instrument_dest)
         open('processed', 'w').close()
         upload_file('processed', instrument_dest + 'processed/')
+
+        log.info('Created processed folder for ' + instrument_dest)
 
 
 def get_instrument_files(sftp, source_path):
