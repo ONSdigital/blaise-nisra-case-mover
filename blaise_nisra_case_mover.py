@@ -30,6 +30,8 @@ def main():
     log.info('sftp_port - ' + os.getenv('SFTP_PORT'))
     log.info('sftp_username - ' + os.getenv('SFTP_USERNAME'))
 
+
+
     try:
         log.info('Connecting to SFTP server')
         cnopts = pysftp.CnOpts()

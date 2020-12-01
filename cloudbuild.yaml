@@ -10,7 +10,6 @@ steps:
        sed "s#_SFTP_HOST#${_SFTP_HOST}#g" | \
        sed "s#_SFTP_USERNAME#${_SFTP_USERNAME}#g" | \
        sed "s#_SFTP_PASSWORD#${_SFTP_PASSWORD}#g" | \
-       sed "s#_INSTRUMENT_SOURCE_PATH#${_INSTRUMENT_SOURCE_PATH}#g" | \
        sed "s#_SURVEY_SOURCE_PATH#${_SURVEY_SOURCE_PATH}#g" | \
        sed "s#_INSTRUMENT_DESTINATION_PATH#${_INSTRUMENT_DESTINATION_PATH}#g" | \
        sed "s#_NISRA_BUCKET_NAME#${_NISRA_BUCKET_NAME}#g" > app.yaml
