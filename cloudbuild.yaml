@@ -1,21 +1,6 @@
 # This step generates the new manifest
 steps:
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: test
-    entrypoint: /bin/sh
-    args:
-      - '-c'
-      - |
-        ls
-
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: test2
-    entrypoint: /bin/sh
-    args:
-      - '-c'
-      - |
-        pwd
-  - name: 'gcr.io/cloud-builders/gcloud'
     id: Generate manifest
     entrypoint: 'bash'
     args:
