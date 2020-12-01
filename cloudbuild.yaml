@@ -1,0 +1,25 @@
+# This step generates the new manifest
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Generate manifest
+    entrypoint: /bin/sh
+    args:
+    - '-c'
+    - |
+       sed "s/_PROJECT_ID/${_PROJECT_ID}/g" templates/app.yaml.tpl | \
+       sed "s/_SFTP_HOST/${_SFTP_HOST}/g" | \
+       sed "s/_SFTP_USERNAME/${_SFTP_USERNAME}/g" | \
+       sed "s/_SFTP_PASSWORD/${_SFTP_PASSWORD}/g" | \
+       sed "s/_INSTRUMENT_SOURCE_PATH/${_INSTRUMENT_SOURCE_PATH}/g" | \
+       sed "s/_SURVEY_SOURCE_PATH/${_SURVEY_SOURCE_PATH}/g" | \
+       sed "s/_INSTRUMENT_DESTINATION_PATH/${_INSTRUMENT_DESTINATION_PATH}/g" | \
+       sed "s/_NISRA_BUCKET_NAME/${_NISRA_BUCKET_NAME}/g" > app.yaml | \
+       cat app.yaml
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: test
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        cat app.yaml
