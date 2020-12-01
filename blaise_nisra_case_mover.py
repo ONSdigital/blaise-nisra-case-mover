@@ -30,8 +30,6 @@ def main():
     log.info('sftp_port - ' + os.getenv('SFTP_PORT'))
     log.info('sftp_username - ' + os.getenv('SFTP_USERNAME'))
 
-
-
     try:
         log.info('Connecting to SFTP server')
         cnopts = pysftp.CnOpts()
@@ -50,7 +48,7 @@ def main():
                 for instrument_folder in instrument_folders:
                     process_instrument(sftp, survey_source_path + instrument_folder + '/', instrument_destination_path)
 
-            if instrument_source_path != '' or instrument_source_path is not None:
+            if instrument_source_path != '':
                 process_instrument(sftp, instrument_source_path, instrument_destination_path)
 
         log.info('SFTP connection closed')
