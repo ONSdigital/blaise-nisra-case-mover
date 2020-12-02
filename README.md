@@ -8,11 +8,17 @@ The service can be configured to process data at instrument level or survey leve
 
 ### Run Locally
 
-Uncomment the following line in the blaise_nisra_case_mover.py file.
-
+Change the following line in the blaise_nisra_case_mover.py file.
+From:
 ```python
-# from config_local import *
+from config import *
 ```
+To:
+```python
+from config_local import *
+```
+**Make sure not to commit this change**
+
 
 Create a .env file with the following environment variables:
 
