@@ -23,6 +23,11 @@ steps:
         cat app.yaml
 
   - name: "gcr.io/cloud-builders/gcloud"
+    id: Deploy service
     args: ["app", "deploy"]
     timeout: "1600s"
 
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Schedule cron job for service
+    args: ["app", "deploy", "cron.yaml"]
+    timeout: "1600s"
