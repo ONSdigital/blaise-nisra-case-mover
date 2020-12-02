@@ -2,4 +2,4 @@ cron:
   - description: "nisra case mover"
     url: /
     schedule: every 60 minutes from 00:45 to 23:45
-    service: nisra-case-mover
+    target: nisra-case-mover
