@@ -52,6 +52,7 @@ def main():
                 process_instrument(sftp, instrument_source_path, instrument_destination_path)
 
         log.info('SFTP connection closed')
+        return ""
 
     except Exception as ex:
         log.info('SFTP connection closed')
