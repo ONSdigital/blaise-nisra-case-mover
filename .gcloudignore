@@ -12,6 +12,10 @@
 # below:
 .git
 .gitignore
+.env
+venv/*
+key.json
+tmp/*
 
 # Python pycache:
 __pycache__/
