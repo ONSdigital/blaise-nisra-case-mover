@@ -60,20 +60,25 @@ def main():
     except Exception as ex:
         log.info('SFTP connection closed')
         log.error('Exception - %s', ex)
-        raise
+        abort(500)
 
 
 def get_instrument_folders(sftp, source_path):
     survey_folder_list = []
-    try:
-        for folder in sftp.listdir(source_path):
-            if re.compile(instrument_regex).match(folder):
-                log.info('Instrument folder found - ' + folder)
-                survey_folder_list.append(folder)
-        return survey_folder_list
-    except IOError as ex:
-        log.exception("Failed to list directories in bucket")
-        abort(500)
+    for folder in sftp.listdir(source_path):
+        if re.compile(instrument_regex).match(folder):
+            log.info('Instrument folder found - ' + folder)
+            survey_folder_list.append(folder)
+    return survey_folder_list
+    # try:
+    #     for folder in sftp.listdir(source_path):
+    #         if re.compile(instrument_regex).match(folder):
+    #             log.info('Instrument folder found - ' + folder)
+    #             survey_folder_list.append(folder)
+    #     return survey_folder_list
+    # except IOError as ex:
+    #     log.exception("Failed to list directories in bucket")
+    #     abort(500)
 
 
 def process_instrument(sftp, source_path, dest_path):
