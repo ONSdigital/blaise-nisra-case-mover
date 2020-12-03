@@ -8,7 +8,7 @@ from google.cloud import storage
 
 from config import *
 from util.service_logging import log
-from flask import Flask
+from flask import Flask, abort
 
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
@@ -65,11 +65,16 @@ def main():
 
 def get_instrument_folders(sftp, source_path):
     survey_folder_list = []
-    for folder in sftp.listdir(source_path):
-        if re.compile(instrument_regex).match(folder):
-            log.info('Instrument folder found - ' + folder)
-            survey_folder_list.append(folder)
-    return survey_folder_list
+    try:
+        for folder in sftp.listdir(source_path):
+            if re.compile(instrument_regex).match(folder):
+                log.info('Instrument folder found - ' + folder)
+                survey_folder_list.append(folder)
+        return survey_folder_list
+    except IOError as ex:
+        log.exception("Failed to list directories in bucket")
+        abort(500)
+
 
 
 def process_instrument(sftp, source_path, dest_path):
