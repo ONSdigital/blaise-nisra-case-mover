@@ -7,14 +7,17 @@ import pysftp
 from google.cloud import storage
 
 from config import *
-from config_local import *
 from util.service_logging import log
+from flask import Flask
 
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
 storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
+app = Flask(__name__)
 
+
+@app.route('/')
 def main():
     log.info('Application started')
     log.info('instrument_source_path - ' + instrument_source_path)
@@ -49,6 +52,7 @@ def main():
                 process_instrument(sftp, instrument_source_path, instrument_destination_path)
 
         log.info('SFTP connection closed')
+        return ""
 
     except Exception as ex:
         log.info('SFTP connection closed')
@@ -106,6 +110,8 @@ def create_processed_folder(instrument_dest):
         log.info('Creating processed folder for ' + instrument_dest)
         open('processed', 'w').close()
         upload_file('processed', instrument_dest + 'processed/')
+
+        log.info('Created processed folder for ' + instrument_dest)
 
 
 def get_instrument_files(sftp, source_path):
@@ -166,5 +172,7 @@ def upload_file(source, dest):
     log.info('Uploaded file - ' + source)
 
 
+# if __name__ == "__main__":
+#     main()
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0")
