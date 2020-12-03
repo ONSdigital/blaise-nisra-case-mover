@@ -23,11 +23,6 @@ def internal_server_error(exception):
     return "Exception occurred", 500
 
 
-@app.errorhandler(500)
-def error():
-    return "Failed", 500
-
-
 @app.route('/')
 def main():
     log.info('Application started')
