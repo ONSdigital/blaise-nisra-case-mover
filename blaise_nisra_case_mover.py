@@ -70,15 +70,6 @@ def get_instrument_folders(sftp, source_path):
             log.info('Instrument folder found - ' + folder)
             survey_folder_list.append(folder)
     return survey_folder_list
-    # try:
-    #     for folder in sftp.listdir(source_path):
-    #         if re.compile(instrument_regex).match(folder):
-    #             log.info('Instrument folder found - ' + folder)
-    #             survey_folder_list.append(folder)
-    #     return survey_folder_list
-    # except IOError as ex:
-    #     log.exception("Failed to list directories in bucket")
-    #     abort(500)
 
 
 def process_instrument(sftp, source_path, dest_path):
@@ -188,8 +179,3 @@ def upload_file(source, dest):
 def internal_error(error):
     log.exception("Exception occurred")
     return "Exception occurred", 500
-
-# if __name__ == "__main__":
-#     main()
-if __name__ == "__main__":
-    app.run(host="0.0.0.0")
