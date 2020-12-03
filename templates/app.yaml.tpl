@@ -13,3 +13,7 @@ env_variables:
 
 vpc_access_connector:
   name: projects/_PROJECT_ID/locations/europe-west2/connectors/vpcconnect
+
+basic_scaling:
+  idle_timeout: 60s
+  max_instances: 1
