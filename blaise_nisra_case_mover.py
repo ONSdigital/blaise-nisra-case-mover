@@ -16,6 +16,9 @@ storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
 app = Flask(__name__)
 
+@app.errorhandler()
+def error():
+    return "Failed", 500
 
 @app.route('/')
 def main():
