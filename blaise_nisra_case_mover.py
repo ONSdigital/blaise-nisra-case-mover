@@ -78,6 +78,9 @@ def process_instrument(sftp, source_path, dest_path):
     delete_local_instrument_files()
     create_processed_folder(dest_path + instrument_name)
     instrument_files = get_instrument_files(sftp, source_path)
+    if len(instrument_files) == 0:
+        log.info(f"No instrument files found in folder: {instrument_name}")
+        return f"No instrument files found in folder: {instrument_name}"
     for instrument_file in instrument_files:
         if instrument_file.lower().endswith('bdbx'):
             log.info('Database file found - ' + instrument_file)
