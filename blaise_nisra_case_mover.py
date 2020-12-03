@@ -16,9 +16,11 @@ storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
 app = Flask(__name__)
 
-@app.errorhandler()
+
+@app.errorhandler(500)
 def error():
     return "Failed", 500
+
 
 @app.route('/')
 def main():
@@ -77,7 +79,6 @@ def get_instrument_folders(sftp, source_path):
     except IOError as ex:
         log.exception("Failed to list directories in bucket")
         abort(500)
-
 
 
 def process_instrument(sftp, source_path, dest_path):
