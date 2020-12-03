@@ -179,8 +179,8 @@ def upload_file(source, dest):
     log.info('Uploaded file - ' + source)
 
 
-@app.errorhandler(Exception)
-def internal_server_error(exception):
+@app.errorhandler(500)
+def internal_error(error):
     log.exception("Exception occurred")
     return "Exception occurred", 500
 
