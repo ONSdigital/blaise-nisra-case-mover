@@ -4,8 +4,10 @@ RUN pip install pipenv==8.2.7
 
 WORKDIR /usr/src/app
 
-COPY Pipfile Pipfile.lock ./
-RUN pipenv install --deploy --system
+COPY requirements.txt requirements.txt
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 # FIXME: add pytest to the pipenv file
 RUN pip install --no-cache-dir pytest
