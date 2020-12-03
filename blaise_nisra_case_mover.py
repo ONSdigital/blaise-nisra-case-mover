@@ -17,6 +17,12 @@ storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 app = Flask(__name__)
 
 
+@app.errorhandler(Exception)
+def internal_server_error(exception):
+    log.exception("Exception occurred")
+    return "Exception occurred", 500
+
+
 @app.errorhandler(500)
 def error():
     return "Failed", 500
