@@ -45,6 +45,9 @@ def main():
             if survey_source_path != '':
                 log.info('Processing survey - ' + survey_source_path)
                 instrument_folders = get_instrument_folders(sftp, survey_source_path)
+                if len(instrument_folders) == 0:
+                    log.info("No instrument folders found")
+                    return "No instrument folders found"
                 for instrument_folder in instrument_folders:
                     process_instrument(sftp, survey_source_path + instrument_folder + '/', instrument_destination_path)
 
