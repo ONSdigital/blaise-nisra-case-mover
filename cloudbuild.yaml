@@ -39,7 +39,13 @@ steps:
       - '-c'
       - |
         versions=$(gcloud app versions list --service "nisra-case-mover" --sort-by '~version' --format 'value(VERSION.ID)' --project "${_PROJECT_ID}" | tail -n +11)
-        echo "$versions"
-        if [ -n "$versions" ]; then
-          gcloud app versions delete "$versions" --service "nisra-case-mover" --project "${_PROJECT_ID}" --quiet
-        fi
+
+        SAVEIFS=$IFS          # Save current IFS
+        IFS=$'\n'             # Change IFS to new line
+        versions=($versions)  # split to array $versions
+        IFS=$SAVEIFS          # Restore IFS
+
+        for (( i=0; i<${#versions[@]}; i++ ))
+        do
+          gcloud app versions delete ${versions[$i]} --service "nisra-case-mover" --project "${_PROJECT_ID}" --quiet
+        done
