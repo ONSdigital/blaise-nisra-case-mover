@@ -44,3 +44,5 @@ gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-b" --proje
 Refer to the .tfstate file for the environment to locate the password.
 
 Create a service account that has permission to the bucket and generate a JSON key, place this in a key.json file within the project.
+
+Copyright (c) 2021 Crown Copyright (Government Digital Service)
