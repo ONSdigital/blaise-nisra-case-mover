@@ -7,14 +7,17 @@ import pysftp
 from google.cloud import storage
 
 from config import *
-from config_local import *
 from util.service_logging import log
+from flask import Flask, abort
 
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
 storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
+app = Flask(__name__)
 
+
+@app.route('/')
 def main():
     log.info('Application started')
     log.info('instrument_source_path - ' + instrument_source_path)
@@ -42,6 +45,9 @@ def main():
             if survey_source_path != '':
                 log.info('Processing survey - ' + survey_source_path)
                 instrument_folders = get_instrument_folders(sftp, survey_source_path)
+                if len(instrument_folders) == 0:
+                    log.info("No instrument folders found")
+                    return "No instrument folders found, Exiting", 200
                 for instrument_folder in instrument_folders:
                     process_instrument(sftp, survey_source_path + instrument_folder + '/', instrument_destination_path)
 
@@ -49,11 +55,12 @@ def main():
                 process_instrument(sftp, instrument_source_path, instrument_destination_path)
 
         log.info('SFTP connection closed')
+        return "", 200
 
     except Exception as ex:
         log.info('SFTP connection closed')
         log.error('Exception - %s', ex)
-        raise
+        abort(500)
 
 
 def get_instrument_folders(sftp, source_path):
@@ -71,6 +78,9 @@ def process_instrument(sftp, source_path, dest_path):
     delete_local_instrument_files()
     create_processed_folder(dest_path + instrument_name)
     instrument_files = get_instrument_files(sftp, source_path)
+    if len(instrument_files) == 0:
+        log.info(f"No instrument files found in folder: {instrument_name}")
+        return f"No instrument files found in folder: {instrument_name}"
     for instrument_file in instrument_files:
         if instrument_file.lower().endswith('bdbx'):
             log.info('Database file found - ' + instrument_file)
@@ -106,6 +116,8 @@ def create_processed_folder(instrument_dest):
         log.info('Creating processed folder for ' + instrument_dest)
         open('processed', 'w').close()
         upload_file('processed', instrument_dest + 'processed/')
+
+        log.info('Created processed folder for ' + instrument_dest)
 
 
 def get_instrument_files(sftp, source_path):
@@ -166,5 +178,7 @@ def upload_file(source, dest):
     log.info('Uploaded file - ' + source)
 
 
-if __name__ == "__main__":
-    main()
+@app.errorhandler(500)
+def internal_error(error):
+    log.exception("Exception occurred")
+    return "Exception occurred", 500
