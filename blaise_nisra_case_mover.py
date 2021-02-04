@@ -45,14 +45,16 @@ def main():
                 instrument_folders = get_instrument_folders(sftp, survey_source_path)
                 if len(instrument_folders) == 0:
                     log.info("No instrument folders found")
-                    return "No instrument folders found, Exiting", 200
+                    return "No instrument folders found, exiting", 200
                 for instrument_folder in instrument_folders:
                     process_instrument(sftp, survey_source_path + instrument_folder + '/')
 
+        sftp.close()
         log.info('SFTP connection closed')
         return "", 200
 
     except Exception as ex:
+        sftp.close()
         log.info('SFTP connection closed')
         log.error('Exception - %s', ex)
         abort(500)
@@ -83,7 +85,7 @@ def process_instrument(sftp, source_path):
             instrument_file_blob = bucket.get_blob(instrument_name + instrument_file)
             log.info('Checking if database file has already been processed...')
             if not check_if_files_match(instrument_file, instrument_file_blob):
-                upload_instrument(sftp, source_path, instrument_name)
+                upload_instrument(sftp, source_path, instrument_name, instrument_files)
 
 
 def delete_local_instrument_files():
@@ -134,9 +136,8 @@ def check_if_files_match(local_file, bucket_file):
         return False
 
 
-def upload_instrument(sftp, source_path, instrument_name):
+def upload_instrument(sftp, source_path, instrument_name, instrument_files):
     log.info('Uploading instrument - ' + instrument_name)
-    instrument_files = get_instrument_files(sftp, source_path)
     for instrument_file in instrument_files:
         log.info('Downloading instrument file from SFTP - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
