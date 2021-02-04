@@ -55,6 +55,7 @@ def main():
 
         sftp.close()
         log.info('SFTP connection closed')
+        log.info('Process Complete')
         return "Process Complete", 200
 
     except Exception as ex:
