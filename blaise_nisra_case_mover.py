@@ -20,9 +20,7 @@ app = Flask(__name__)
 @app.route('/')
 def main():
     log.info('Application started')
-    log.info('instrument_source_path - ' + instrument_source_path)
     log.info('survey_source_path - ' + survey_source_path)
-    log.info('instrument_destination_path - ' + instrument_destination_path)
     log.info('bucket_name - ' + bucket_name)
     log.info('instrument_regex - ' + instrument_regex)
     log.info('extension_list - ' + str(extension_list))
@@ -49,10 +47,7 @@ def main():
                     log.info("No instrument folders found")
                     return "No instrument folders found, Exiting", 200
                 for instrument_folder in instrument_folders:
-                    process_instrument(sftp, survey_source_path + instrument_folder + '/', instrument_destination_path)
-
-            if instrument_source_path != '':
-                process_instrument(sftp, instrument_source_path, instrument_destination_path)
+                    process_instrument(sftp, survey_source_path + instrument_folder + '/')
 
         log.info('SFTP connection closed')
         return "", 200
@@ -72,11 +67,10 @@ def get_instrument_folders(sftp, source_path):
     return survey_folder_list
 
 
-def process_instrument(sftp, source_path, dest_path):
+def process_instrument(sftp, source_path):
     instrument_name = source_path[-9:]
     log.info('Processing instrument - ' + instrument_name)
     delete_local_instrument_files()
-    create_processed_folder(dest_path + instrument_name)
     instrument_files = get_instrument_files(sftp, source_path)
     if len(instrument_files) == 0:
         log.info(f"No instrument files found in folder: {instrument_name}")
@@ -86,13 +80,10 @@ def process_instrument(sftp, source_path, dest_path):
             log.info('Database file found - ' + instrument_file)
             sftp.get(source_path + instrument_file, instrument_file)
             bucket = connect_to_bucket()
-            instrument_file_blob = bucket.get_blob(dest_path + instrument_name + instrument_file)
-            instrument_file_blob_processed = bucket.get_blob(
-                dest_path + instrument_name + 'processed/' + instrument_file)
+            instrument_file_blob = bucket.get_blob(instrument_name + instrument_file)
             log.info('Checking if database file has already been processed...')
-            if not check_if_files_match(instrument_file, instrument_file_blob) and not check_if_files_match(
-                    instrument_file, instrument_file_blob_processed):
-                upload_instrument(sftp, source_path, instrument_name, dest_path)
+            if not check_if_files_match(instrument_file, instrument_file_blob):
+                upload_instrument(sftp, source_path, instrument_name)
 
 
 def delete_local_instrument_files():
@@ -101,23 +92,6 @@ def delete_local_instrument_files():
         if any(fnmatch.fnmatch(file, pattern) for pattern in extension_list):
             log.info("Deleting local instrument file - " + file)
             os.remove(file)
-
-
-def create_processed_folder(instrument_dest):
-    storage_client = storage.Client()
-    blobs = storage_client.list_blobs(bucket_name, prefix=instrument_dest)
-    blob_names = [blob.name for blob in blobs]
-    processed_folder_found = False
-    for blob_name in blob_names:
-        if blob_name == instrument_dest + 'processed/':
-            log.info('Processed folder already exists for ' + instrument_dest)
-            processed_folder_found = True
-    if not processed_folder_found:
-        log.info('Creating processed folder for ' + instrument_dest)
-        open('processed', 'w').close()
-        upload_file('processed', instrument_dest + 'processed/')
-
-        log.info('Created processed folder for ' + instrument_dest)
 
 
 def get_instrument_files(sftp, source_path):
@@ -160,14 +134,14 @@ def check_if_files_match(local_file, bucket_file):
         return False
 
 
-def upload_instrument(sftp, source_path, instrument_name, dest_path):
+def upload_instrument(sftp, source_path, instrument_name):
     log.info('Uploading instrument - ' + instrument_name)
     instrument_files = get_instrument_files(sftp, source_path)
     for instrument_file in instrument_files:
         log.info('Downloading instrument file from SFTP - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
-        log.info('Uploading instrument file to bucket - ' + dest_path + instrument_name + instrument_file)
-        upload_file(instrument_file, dest_path + instrument_name + instrument_file)
+        log.info('Uploading instrument file to bucket - ' + instrument_name + instrument_file)
+        upload_file(instrument_file, instrument_name + instrument_file)
 
 
 def upload_file(source, dest):
