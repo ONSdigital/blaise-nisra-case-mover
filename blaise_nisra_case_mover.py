@@ -24,34 +24,38 @@ def main():
     log.info('bucket_name - ' + bucket_name)
     log.info('instrument_regex - ' + instrument_regex)
     log.info('extension_list - ' + str(extension_list))
-    log.info('sftp_host - ' + os.getenv('SFTP_HOST'))
-    log.info('sftp_port - ' + os.getenv('SFTP_PORT'))
-    log.info('sftp_username - ' + os.getenv('SFTP_USERNAME'))
+    log.info('sftp_host - ' + os.getenv('SFTP_HOST', 'ENV VAR NOT SET'))
+    log.info('sftp_port - ' + os.getenv('SFTP_PORT', 'ENV VAR NOT SET'))
+    log.info('sftp_username - ' + os.getenv('SFTP_USERNAME', 'ENV VAR NOT SET'))
 
     try:
         log.info('Connecting to SFTP server')
         cnopts = pysftp.CnOpts()
         cnopts.hostkeys = None
 
-        with pysftp.Connection(os.getenv('SFTP_HOST'),
-                               username=os.getenv('SFTP_USERNAME'),
-                               password=os.getenv('SFTP_PASSWORD'),
-                               port=int(os.getenv('SFTP_PORT')),
+        with pysftp.Connection(os.getenv('SFTP_HOST', ''),
+                               username=os.getenv('SFTP_USERNAME', ''),
+                               password=os.getenv('SFTP_PASSWORD', ''),
+                               port=int(os.getenv('SFTP_PORT', '')),
                                cnopts=cnopts) as sftp:
             log.info('Connected to SFTP server')
 
-            if survey_source_path != '':
-                log.info('Processing survey - ' + survey_source_path)
-                instrument_folders = get_instrument_folders(sftp, survey_source_path)
-                if len(instrument_folders) == 0:
-                    log.info("No instrument folders found")
-                    return "No instrument folders found, exiting", 200
-                for instrument_folder in instrument_folders:
-                    process_instrument(sftp, survey_source_path + instrument_folder + '/')
+            if survey_source_path == '':
+                log.exception('survey_source_path is blank')
+                sftp.close()
+                return "survey_source_path is blank, exiting", 500
+
+            log.info('Processing survey - ' + survey_source_path)
+            instrument_folders = get_instrument_folders(sftp, survey_source_path)
+            if len(instrument_folders) == 0:
+                log.info("No instrument folders found")
+                return "No instrument folders found, exiting", 200
+            for instrument_folder in instrument_folders:
+                process_instrument(sftp, survey_source_path + instrument_folder + '/')
 
         sftp.close()
         log.info('SFTP connection closed')
-        return "", 200
+        return "Process Complete", 200
 
     except Exception as ex:
         sftp.close()
@@ -78,14 +82,16 @@ def process_instrument(sftp, source_path):
         log.info(f"No instrument files found in folder: {instrument_name}")
         return f"No instrument files found in folder: {instrument_name}"
     for instrument_file in instrument_files:
-        if instrument_file.lower().endswith('bdbx'):
-            log.info('Database file found - ' + instrument_file)
-            sftp.get(source_path + instrument_file, instrument_file)
-            bucket = connect_to_bucket()
-            instrument_file_blob = bucket.get_blob(instrument_name + instrument_file)
-            log.info('Checking if database file has already been processed...')
-            if not check_if_files_match(instrument_file, instrument_file_blob):
-                upload_instrument(sftp, source_path, instrument_name, instrument_files)
+        if not instrument_file.lower().endswith('bdbx'):
+            continue
+
+        log.info('Database file found - ' + instrument_file)
+        sftp.get(source_path + instrument_file, instrument_file)
+        bucket = connect_to_bucket()
+        instrument_file_blob = bucket.get_blob(instrument_name + instrument_file)
+        log.info('Checking if database file has already been processed...')
+        if not check_if_files_match(instrument_file, instrument_file_blob):
+            upload_instrument(sftp, source_path, instrument_name, instrument_files)
 
 
 def delete_local_instrument_files():
@@ -122,17 +128,19 @@ def check_if_files_match(local_file, bucket_file):
         local_file_data = local_file_to_check.read()
         local_file_md5 = hashlib.md5(local_file_data).digest()
         log.info('Local file MD5 - ' + local_file + ' - ' + str(local_file_md5))
-    if bucket_file is not None:
-        bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash)
-        log.info('Bucket file MD5 - ' + bucket_file.name + ' - ' + str(bucket_file_md5))
-        if local_file_md5 == bucket_file_md5:
-            log.info('Files match - ' + local_file + ' - ' + bucket_file.name)
-            return True
-        else:
-            log.info('Files do not match - ' + local_file + ' - ' + bucket_file.name)
-            return False
+
+    if bucket_file is None:
+        log.info(f'Bucket file {bucket_file} does not exist')
+        return False
+
+    bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash)
+    log.info('Bucket file MD5 - ' + bucket_file.name + ' - ' + str(bucket_file_md5))
+
+    if local_file_md5 == bucket_file_md5:
+        log.info('Files match - ' + local_file + ' - ' + bucket_file.name)
+        return True
     else:
-        log.info('Bucket file does not exist')
+        log.info('Files do not match - ' + local_file + ' - ' + bucket_file.name)
         return False
 
 
@@ -155,5 +163,5 @@ def upload_file(source, dest):
 
 @app.errorhandler(500)
 def internal_error(error):
-    log.exception("Exception occurred")
+    log.exception("Exception occurred", error)
     return "Exception occurred", 500
