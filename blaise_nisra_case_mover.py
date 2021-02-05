@@ -1,20 +1,20 @@
 import fnmatch
 import hashlib
+import json
 import re
-
 import pybase64
 import pysftp
-from google.cloud import storage
+import requests
+from paramiko import SSHException
 
 from config import *
 from util.service_logging import log
-from flask import Flask, abort
-
-# workaround to prevent file transfer timeouts
-storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
-storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
+from flask import Flask
+from GoogleStorage import GoogleStorage
 
 app = Flask(__name__)
+
+googleStorage = GoogleStorage(bucket_name, log)
 
 
 @app.route('/')
@@ -24,19 +24,23 @@ def main():
     log.info('bucket_name - ' + bucket_name)
     log.info('instrument_regex - ' + instrument_regex)
     log.info('extension_list - ' + str(extension_list))
-    log.info('sftp_host - ' + os.getenv('SFTP_HOST', 'ENV VAR NOT SET'))
-    log.info('sftp_port - ' + os.getenv('SFTP_PORT', 'ENV VAR NOT SET'))
-    log.info('sftp_username - ' + os.getenv('SFTP_USERNAME', 'ENV VAR NOT SET'))
+    log.info('sftp_host - ' + SFTP_HOST)
+    log.info('sftp_port - ' + SFTP_PORT)
+    log.info('sftp_username - ' + SFTP_USERNAME)
+
+    googleStorage.initialise_bucket_connection()
+    if googleStorage.bucket is None:
+        return 'Connection to bucket failed', 500
 
     try:
         log.info('Connecting to SFTP server')
         cnopts = pysftp.CnOpts()
         cnopts.hostkeys = None
 
-        with pysftp.Connection(os.getenv('SFTP_HOST', ''),
-                               username=os.getenv('SFTP_USERNAME', ''),
-                               password=os.getenv('SFTP_PASSWORD', ''),
-                               port=int(os.getenv('SFTP_PORT', '')),
+        with pysftp.Connection(host=SFTP_HOST,
+                               username=SFTP_USERNAME,
+                               password=SFTP_PASSWORD,
+                               port=int(SFTP_PORT),
                                cnopts=cnopts) as sftp:
             log.info('Connected to SFTP server')
 
@@ -58,11 +62,14 @@ def main():
         log.info('Process Complete')
         return "Process Complete", 200
 
+    except SSHException:
+        log.error('SFTP connection failed')
+        return "SFTP connection failed", 500
     except Exception as ex:
+        log.error('Exception - %s', ex)
         sftp.close()
         log.info('SFTP connection closed')
-        log.error('Exception - %s', ex)
-        abort(500)
+        return "Exception occurred", 500
 
 
 def get_instrument_folders(sftp, source_path):
@@ -88,10 +95,8 @@ def process_instrument(sftp, source_path):
 
         log.info('Database file found - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
-        bucket = connect_to_bucket()
-        instrument_file_blob = bucket.get_blob(instrument_name + instrument_file)
         log.info('Checking if database file has already been processed...')
-        if not check_if_files_match(instrument_file, instrument_file_blob):
+        if not check_if_matching_file_in_bucket(instrument_file, instrument_name + instrument_file):
             upload_instrument(sftp, source_path, instrument_name, instrument_files)
 
 
@@ -112,27 +117,16 @@ def get_instrument_files(sftp, source_path):
     return instrument_file_list
 
 
-def connect_to_bucket():
-    try:
-        log.info('Connecting to bucket - ' + bucket_name)
-        storage_client = storage.Client()
-        bucket = storage_client.get_bucket(bucket_name)
-        log.info('Connected to bucket - ' + bucket_name)
-        return bucket
-    except Exception as ex:
-        log.error('Exception - %s', ex)
-        raise
+def check_if_matching_file_in_bucket(local_file, bucket_file_location):
+    bucket_file = googleStorage.get_blob(bucket_file_location)
+    if bucket_file is None:
+        log.info(f'File {bucket_file} not found in bucket')
+        return False
 
-
-def check_if_files_match(local_file, bucket_file):
     with open(local_file, 'rb') as local_file_to_check:
         local_file_data = local_file_to_check.read()
         local_file_md5 = hashlib.md5(local_file_data).digest()
         log.info('Local file MD5 - ' + local_file + ' - ' + str(local_file_md5))
-
-    if bucket_file is None:
-        log.info(f'Bucket file {bucket_file} does not exist')
-        return False
 
     bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash)
     log.info('Bucket file MD5 - ' + bucket_file.name + ' - ' + str(bucket_file_md5))
@@ -151,15 +145,20 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         log.info('Downloading instrument file from SFTP - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
         log.info('Uploading instrument file to bucket - ' + instrument_name + instrument_file)
-        upload_file(instrument_file, instrument_name + instrument_file)
+        googleStorage.upload_file(instrument_file, instrument_name + instrument_file)
+
+    send_request_to_API(instrument_name)
 
 
-def upload_file(source, dest):
-    bucket = connect_to_bucket()
-    blob_destination = bucket.blob(dest)
-    log.info('Uploading file - ' + source)
-    blob_destination.upload_from_filename(source)
-    log.info('Uploaded file - ' + source)
+def send_request_to_API(instrument_name):
+    data = {"InstrumentDataPath": instrument_name}
+    log.info(f'Sending request to BLAISE_API_URL for {instrument_name}')
+    request = requests.post(
+        f"http://{BLAISE_API_URL}/api/vi/serverpark/{SERVER_PARK}/instruments/{instrument_name}data",
+        headers={"content-type": "application/json"},
+        data=json.dumps(data),
+    )
+    log.info(f'Response from BLAISE_API_URL status code: {request.status_code}')
 
 
 @app.errorhandler(500)
