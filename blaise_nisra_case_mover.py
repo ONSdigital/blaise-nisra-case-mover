@@ -82,27 +82,27 @@ def get_instrument_folders(sftp, source_path):
 
 
 def process_instrument(sftp, source_path):
-    instrument_name = source_path[-9:]
+    instrument_name = source_path[-9:].strip("/")
     log.info('Processing instrument - ' + instrument_name)
     delete_local_instrument_files()
     instrument_files = get_instrument_files(sftp, source_path)
     if len(instrument_files) == 0:
         log.info(f"No instrument files found in folder: {instrument_name}")
         return f"No instrument files found in folder: {instrument_name}"
-    filtered_instrument_files = [instrument_file for instrument_file in instrument_files if
-                                 instrument_file.lower().endswith('bdbx')]
-    if len(filtered_instrument_files) == 0:
-        return "My error"
-    for instrument_file in filtered_instrument_files:
-
-        log.info('Database file found - ' + instrument_file)
-        sftp.get(source_path + instrument_file, instrument_file)
+    if check_instrument_database_file_exists(instrument_files, instrument_name) is True:
+        sftp.get(source_path + instrument_name + ".bdbx", instrument_name + ".bdbx")
         log.info('Checking if database file has already been processed...')
-        if not check_if_matching_file_in_bucket(instrument_file, instrument_name + instrument_file):
+        if not check_if_matching_file_in_bucket(instrument_name + ".bdbx", instrument_name + "/" + instrument_name + ".bdbx"):
             upload_instrument(sftp, source_path, instrument_name, instrument_files)
 
 
 def check_instrument_database_file_exists(instrument_files, instrument_name):
+    if instrument_files == []:
+        return False
+    for instrument_file in instrument_files:
+        if instrument_file.lower() == instrument_name.lower() + ".bdbx":
+            log.info('Database file found - ' + instrument_file)
+            return True
     return False
 
 
@@ -150,10 +150,10 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
     for instrument_file in instrument_files:
         log.info('Downloading instrument file from SFTP - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
-        log.info('Uploading instrument file to bucket - ' + instrument_name + instrument_file)
-        googleStorage.upload_file(instrument_file, instrument_name + instrument_file)
+        log.info('Uploading instrument file to bucket - ' + instrument_name + "/" + instrument_file)
+        googleStorage.upload_file(instrument_file, instrument_name + "/" + instrument_file)
 
-    send_request_to_API(instrument_name)
+    #send_request_to_API(instrument_name)
 
 
 def send_request_to_API(instrument_name):

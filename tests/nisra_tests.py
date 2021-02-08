@@ -56,7 +56,7 @@ def test_process_instrument_no_bdbx_file(mock_upload_instrument,
                                                    "OPN2101A.bdix",
                                                    "OPN2101A.bmix",
                                                    "framesock.blix"]
-    response = process_instrument(mock_sftp, "OPN2101A.bdbx")
+    response = process_instrument(mock_sftp, "")
     mock_upload_instrument.assert_not_called()
     mock_delete_local_instrument_files.assert_called_once()
     assert response == "No bdbx found"
@@ -65,25 +65,25 @@ def test_check_instrument_database_file_exists_returns_false_if_list_is_empty():
     file_list = []
     instrument_name = "OPN2101A"
     response = check_instrument_database_file_exists(file_list, instrument_name)
-    assert response == False
+    assert response is False
 
 
 def test_check_instrument_database_file_exists_returns_false_if_no_instrument_database_found():
     file_list = ["foobar.bdix", "framework.bdbx"]
     instrument_name = "OPN2101A"
     response = check_instrument_database_file_exists(file_list, instrument_name)
-    assert response == False
+    assert response is False
 
 
 def test_check_instrument_database_file_exists_returns_true_if_instrument_database_found():
     file_list = ["OPN2101A.bdbx"]
     instrument_name = "OPN2101A"
     response = check_instrument_database_file_exists(file_list, instrument_name)
-    assert response == True
+    assert response is True
 
 
 def test_check_instrument_database_file_exists_returns_false_if_different_database_found():
     file_list = ["OPN2004A.bdbx"]
     instrument_name = "OPN2104A"
     response = check_instrument_database_file_exists(file_list, instrument_name)
-    assert response == False
+    assert response is False
