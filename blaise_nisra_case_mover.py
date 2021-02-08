@@ -7,7 +7,7 @@ import pysftp
 import requests
 from paramiko import SSHException
 
-from config import *
+from config_local import *
 from util.service_logging import log
 from flask import Flask
 from GoogleStorage import GoogleStorage
@@ -89,9 +89,11 @@ def process_instrument(sftp, source_path):
     if len(instrument_files) == 0:
         log.info(f"No instrument files found in folder: {instrument_name}")
         return f"No instrument files found in folder: {instrument_name}"
-    for instrument_file in instrument_files:
-        if not instrument_file.lower().endswith('bdbx'):
-            continue
+    filtered_instrument_files = [instrument_file for instrument_file in instrument_files if
+                                 instrument_file.lower().endswith('bdbx')]
+    if len(filtered_instrument_files) == 0:
+        return "My error"
+    for instrument_file in filtered_instrument_files:
 
         log.info('Database file found - ' + instrument_file)
         sftp.get(source_path + instrument_file, instrument_file)
