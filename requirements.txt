@@ -34,3 +34,4 @@ setuptools~=41.0.1
 python-dotenv~=0.10.3
 Flask==1.1.2
 python-crontab==2.5.1
+behave~=1.2.6

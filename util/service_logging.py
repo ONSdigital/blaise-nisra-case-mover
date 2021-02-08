@@ -1,6 +1,6 @@
+import logging
 import logging.config
 from os import path
-import logging
 
 
 def __init():

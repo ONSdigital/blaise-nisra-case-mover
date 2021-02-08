@@ -1,19 +1,19 @@
 import os
+
 from dotenv import load_dotenv
-from os import environ
 
 load_dotenv()
 
-survey_source_path = os.getenv('SURVEY_SOURCE_PATH', 'ENV_NOT_SET')
-bucket_name = os.getenv('NISRA_BUCKET_NAME', 'ENV_NOT_SET')
-SFTP_HOST = os.getenv('SFTP_HOST', 'ENV_NOT_SET')
-SFTP_USERNAME = os.getenv('SFTP_USERNAME', 'ENV_NOT_SET')
-SFTP_PASSWORD = os.getenv('SFTP_PASSWORD', 'ENV_NOT_SET')
-SFTP_PORT = os.getenv('SFTP_PORT', 'ENV_NOT_SET')
-BLAISE_API_URL = os.getenv('BLAISE_API_URL', 'ENV_NOT_SET')
-SERVER_PARK = os.getenv('SERVER_PARK', 'ENV_NOT_SET')
+survey_source_path = os.getenv('survey_source_path', 'env_var_not_set')
+bucket_name = os.getenv('nisra_bucket_name', 'env_var_not_set')
+sftp_host = os.getenv('sftp_host', 'env_var_not_set')
+sftp_username = os.getenv('sftp_username', 'env_var_not_set')
+sftp_password = os.getenv('sftp_password', 'env_var_not_set')
+sftp_port = os.getenv('sftp_port', 'env_var_not_set')
+blaise_api_url = os.getenv('blaise_api_url', 'env_var_not_set')
+server_park = os.getenv('server_park', 'env_var_not_set')
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'key.json'
+os.environ["google_application_credentials"] = 'key.json'
 
 instrument_regex = '^[a-zA-Z]{3}[0-9][0-9][0-9][0-9][a-zA-Z]$'
 
