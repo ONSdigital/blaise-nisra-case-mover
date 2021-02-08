@@ -102,6 +102,10 @@ def process_instrument(sftp, source_path):
             upload_instrument(sftp, source_path, instrument_name, instrument_files)
 
 
+def check_instrument_database_file_exists(instrument_files, instrument_name):
+    return False
+
+
 def delete_local_instrument_files():
     files = [file for file in os.listdir('.') if os.path.isfile(file)]
     for file in files:
