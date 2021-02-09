@@ -22,6 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pytest --cov=./ tests/*
     - name: Codecov
       uses: codecov/codecov-action@v1
