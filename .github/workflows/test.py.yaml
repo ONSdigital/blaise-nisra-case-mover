@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pytest-cov
-        py.test --cov-report=xml --cov=myproj tests/*
+        pytest --cov=./
     - name: Codecov
       uses: codecov/codecov-action@v1
       with:
