@@ -202,3 +202,7 @@ def test_instrument_uploaded(mock_google_storage, mock_sftp):
     assert mock_google_storage.call_count == len(instrument_files)
     for file in instrument_files:
         mock_google_storage.assert_any_call(file, f"{instrument_name}/{file}")
+
+
+# def test_send_request_to_api():
+#
