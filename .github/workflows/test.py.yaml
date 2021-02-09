@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install pytest-cov
-        pytest --cov=./
+        pytest --cov=./ tests/*
     - name: Codecov
       uses: codecov/codecov-action@v1
       with:
