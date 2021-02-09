@@ -1,5 +1,7 @@
 # blaise-nisra-case-mover
 
+[![codecov](https://codecov.io/gh/ONSdigital/blaise-nisra-case-mover/branch/main/graph/badge.svg)](https://codecov.io/gh/ONSdigital/blaise-nisra-case-mover)
+
 NISRA host an online Blaise web collection solution on our behalf. They periodically upload the results to an SFTP
 server.
 
