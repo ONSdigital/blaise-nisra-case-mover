@@ -138,8 +138,8 @@ def check_if_matching_file_in_bucket(local_file, bucket_file_location):
         local_file_md5 = hashlib.md5(local_file_data).digest()
         log.info('Local file MD5 - ' + local_file + ' - ' + str(local_file_md5))
 
-    bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash)
-    log.info('Bucket file MD5 - ' + bucket_file.name + ' - ' + str(bucket_file_md5))
+    bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash).decode("utf-8")
+    log.info('Bucket file MD5 - ' + bucket_file.name + ' - ' + bucket_file_md5)
 
     if local_file_md5 == bucket_file_md5:
         log.info('Files match - ' + local_file + ' - ' + bucket_file.name)
@@ -147,6 +147,10 @@ def check_if_matching_file_in_bucket(local_file, bucket_file_location):
     else:
         log.info('Files do not match - ' + local_file + ' - ' + bucket_file.name)
         return False
+
+
+
+
 
 
 def upload_instrument(sftp, source_path, instrument_name, instrument_files):

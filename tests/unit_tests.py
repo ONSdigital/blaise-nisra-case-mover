@@ -63,6 +63,37 @@ def test_check_instrument_database_file_exists_returns_true_if_correct_instrumen
     assert check_instrument_database_file_exists(file_list, instrument_name) is True
 
 
+@patch.object(GoogleStorage, "get_blob", return_value=None)
+def test_check_if_matching_file_in_bucket_returns_false_if_no_files(mock_get_blob):
+    assert check_if_matching_file_in_bucket("OPN2101A", "OPN2101A") is False
+
+
+@patch.object(GoogleStorage, "get_blob")
+@patch.object(hashlib, "md5")
+@patch("builtins.open")
+def test_check_if_matching_file_in_bucket_returns_true_if_files_match(mock_open,
+                                                                      mock_hashlib,
+                                                                      mock_get_blob):
+    mock_md5 = mock.MagicMock()
+    mock_md5.digest.return_value = "123456789"
+    mock_hashlib.return_value = mock_md5
+    mock_get_blob.return_value = mock.MagicMock(md5_hash=pybase64.b64encode(b"123456789"), name="OPN2101A")
+    assert check_if_matching_file_in_bucket("OPN2101A", "OPN2101A") is True
+
+
+@patch.object(GoogleStorage, "get_blob")
+@patch.object(hashlib, "md5")
+@patch("builtins.open")
+def test_check_if_matching_file_in_bucket_returns_false_hash_is_different(mock_open,
+                                                                      mock_hashlib,
+                                                                      mock_get_blob):
+    mock_md5 = mock.MagicMock()
+    mock_md5.digest.return_value = "ONS"
+    mock_hashlib.return_value = mock_md5
+    mock_get_blob.return_value = mock.MagicMock(md5_hash=pybase64.b64encode(b"123456789"), name="OPN2101A")
+    assert check_if_matching_file_in_bucket("OPN2101A", "OPN2101A") is False
+
+
 @patch("blaise_nisra_case_mover.delete_local_instrument_files")
 @patch("blaise_nisra_case_mover.get_instrument_files")
 @patch("blaise_nisra_case_mover.check_if_matching_file_in_bucket")
