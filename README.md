@@ -12,26 +12,10 @@ run on a cron schedule.
 
 ### Run Locally
 
-Change the following line in the blaise_nisra_case_mover.py file. From:
-
-```python
-from config import *
-```
-
-To:
-
-```python
-from config_local import *
-```
-
-**Make sure not to commit this change**
-
 Create a .env file with the following environment variables:
 
 ```
-INSTRUMENT_SOURCE_PATH = ''
 SURVEY_SOURCE_PATH = 'ONS/OPN/'
-INSTRUMENT_DESTINATION_PATH = 'OPN/'
 NISRA_BUCKET_NAME = 'ons-blaise-<env>-nisra'
 SFTP_PORT = '2222'
 SFTP_HOST = 'localhost'
