@@ -149,17 +149,13 @@ def check_if_matching_file_in_bucket(local_file, bucket_file_location):
         return False
 
 
-
-
-
-
 def upload_instrument(sftp, source_path, instrument_name, instrument_files):
-    log.info('Uploading instrument - ' + instrument_name)
+    log.info(f'Uploading instrument - {instrument_name}')
     for instrument_file in instrument_files:
-        log.info('Downloading instrument file from SFTP - ' + instrument_file)
+        log.info(f'Downloading instrument file from SFTP - {instrument_file}')
         sftp.get(source_path + instrument_file, instrument_file)
-        log.info('Uploading instrument file to bucket - ' + instrument_name + '/' + instrument_file)
-        googleStorage.upload_file(instrument_file, instrument_name + '/' + instrument_file)
+        log.info(f'Uploading instrument file to bucket - {instrument_name}/{instrument_file}')
+        googleStorage.upload_file(instrument_file, f"{instrument_name}/{instrument_file}")
     # send_request_to_api(instrument_name)
 
 
