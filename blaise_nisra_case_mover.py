@@ -60,7 +60,7 @@ def main():
                 log.info("No instrument folders found")
                 return "No instrument folders found, exiting", 200
             for instrument_folder in instrument_folders:
-                process_instrument(sftp, survey_source_path + instrument_folder + "/")
+                process_instrument(sftp, f"{survey_source_path}{instrument_folder}/")
 
         sftp.close()
         log.info("SFTP connection closed")
@@ -88,7 +88,7 @@ def get_instrument_folders(sftp, source_path):
 
 def process_instrument(sftp, source_path):
     instrument_name = source_path[-9:].strip("/")
-    instrument_db_file = instrument_name + ".bdbx"
+    instrument_db_file = f"{instrument_name}.bdbx"
     log.info(f"Processing instrument - {instrument_name}")
     delete_local_instrument_files()
     instrument_files = get_instrument_files(sftp, source_path)
@@ -101,7 +101,7 @@ def process_instrument(sftp, source_path):
     sftp.get(source_path + instrument_db_file, instrument_db_file)
     log.info("Checking if database file has already been processed...")
     if not check_if_matching_file_in_bucket(
-        instrument_db_file, instrument_name + "/" + instrument_db_file
+        instrument_db_file, f"{instrument_name}/{instrument_db_file}"
     ):
         upload_instrument(sftp, source_path, instrument_name, instrument_files)
 
