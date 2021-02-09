@@ -29,7 +29,7 @@ def main():
     log.info(f"sftp_port - {sftp_port}")
     log.info(f"sftp_username - {sftp_username}")
     log.info(f"server_park - {os.getenv('SERVER_PARK', 'env_var_not_set')}")
-    log.info(f"blaise_api_url - {blaise_api_url}")
+    log.info(f"blaise_api_url - {os.getenv('BLAISE_API_URL', 'env_var_not_set')}")
 
     googleStorage.initialise_bucket_connection()
     if googleStorage.bucket is None:
@@ -174,6 +174,7 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
 
 def send_request_to_api(instrument_name):
     server_park = os.getenv("SERVER_PARK", "env_var_not_set")
+    blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     data = {"InstrumentDataPath": instrument_name}
     log.info(f"Sending request to {blaise_api_url} for instrument {instrument_name}")
     request = requests.post(

@@ -10,7 +10,6 @@ sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
 sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
 sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
 sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
-blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
 
 instrument_regex = "^[a-zA-Z]{3}[0-9][0-9][0-9][0-9][a-zA-Z]$"
 
