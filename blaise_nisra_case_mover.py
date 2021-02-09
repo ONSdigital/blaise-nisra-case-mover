@@ -28,7 +28,7 @@ def main():
     log.info(f"sftp_host - {sftp_host}")
     log.info(f"sftp_port - {sftp_port}")
     log.info(f"sftp_username - {sftp_username}")
-    log.info(f"server_park - {server_park}")
+    log.info(f"server_park - {os.getenv('SERVER_PARK', 'env_var_not_set')}")
     log.info(f"blaise_api_url - {blaise_api_url}")
 
     googleStorage.initialise_bucket_connection()
@@ -173,17 +173,12 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
 
 
 def send_request_to_api(instrument_name):
+    server_park = os.getenv("SERVER_PARK", "env_var_not_set")
     data = {"InstrumentDataPath": instrument_name}
     log.info(f"Sending request to {blaise_api_url} for instrument {instrument_name}")
     request = requests.post(
-        f"http://{blaise_api_url}/api/vi/serverpark/{server_park}/instruments/{instrument_name}data",
+        f"http://{blaise_api_url}/api/vi/serverpark/{server_park}/instruments/{instrument_name}/data",
         headers={"content-type": "application/json"},
         data=json.dumps(data),
     )
     log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
-
-
-@app.errorhandler(500)
-def internal_error(error):
-    log.exception("Exception occurred", error)
-    return "Exception occurred", 500

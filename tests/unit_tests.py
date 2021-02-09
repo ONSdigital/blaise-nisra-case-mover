@@ -204,5 +204,12 @@ def test_instrument_uploaded(mock_google_storage, mock_sftp):
         mock_google_storage.assert_any_call(file, f"{instrument_name}/{file}")
 
 
-# def test_send_request_to_api():
-#
+@mock.patch.dict(os.environ, {"SERVER_PARK": "ROUGE"})
+@patch.object(requests, "post")
+def test_send_request_to_api(mock_requests_post):
+    send_request_to_api("OPN2101A")
+    mock_requests_post.assert_called_once_with(
+        "http://localhost:90/api/vi/serverpark/ROUGE/instruments/OPN2101A/data",
+        data='{"InstrumentDataPath": "OPN2101A"}',
+        headers={"content-type": "application/json"},
+    )
