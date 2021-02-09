@@ -9,7 +9,7 @@ import requests
 from flask import Flask
 from paramiko import SSHException
 
-from config_local import *
+from config import *
 from google_storage import GoogleStorage
 from util.service_logging import log
 
@@ -28,6 +28,8 @@ def main():
     log.info('sftp_host - ' + sftp_host)
     log.info('sftp_port - ' + sftp_port)
     log.info('sftp_username - ' + sftp_username)
+    log.info('server_park - ' + server_park)
+    log.info('blaise_api_url - ' + blaise_api_url)
 
     googleStorage.initialise_bucket_connection()
     if googleStorage.bucket is None:

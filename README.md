@@ -37,6 +37,9 @@ SFTP_PORT = '2222'
 SFTP_HOST = 'localhost'
 SFTP_USERNAME = 'sftp-test'
 SFTP_PASSWORD = '<password>'
+BLAISE_API_URL='localhost:90'
+SERVER_PARK='gusty'
+FLASK_ENV=development
 ```
 
 This configuration will attempt to process all OPN instruments found on a local SFTP server.

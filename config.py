@@ -21,3 +21,8 @@ extension_list = ['*.blix',
                   '*.bmix']
 
 os.chdir("/tmp")
+
+if os.getenv('FLASK_ENV', 'Unknown') == 'development':
+    os.environ["google_application_credentials"] = 'key.json'
+    directory = os.path.dirname(__file__)
+    os.chdir(os.path.join(directory, 'tmp'))
