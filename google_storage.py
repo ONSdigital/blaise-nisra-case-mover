@@ -28,3 +28,10 @@ class GoogleStorage:
 
     def get_blob(self, blob_location):
         return self.bucket.get_blob(blob_location)
+
+    def list_blobs(self):
+        return list(self.bucket.list_blobs())
+
+    def delete_blobs(self, blob_list):
+        self.bucket.delete_blobs(blob_list)
+

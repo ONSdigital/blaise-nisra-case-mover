@@ -15,9 +15,11 @@ instrument_regex = "^[a-zA-Z]{3}[0-9][0-9][0-9][0-9][a-zA-Z]$"
 
 extension_list = ["*.blix", "*.bdbx", "*.bdix", "*.bmix"]
 
-if os.getenv("FLASK_ENV", "env_var_not_set") == "development":
-    os.environ["google_application_credentials"] = "key.json"
-    directory = os.path.dirname(__file__)
-    os.chdir(os.path.join(directory, "tmp"))
-else:
-    os.chdir("/tmp")
+# if os.getenv("FLASK_ENV", "env_var_not_set") == "development":
+#     os.environ["google_application_credentials"] = "key.json"
+#     directory = os.path.dirname(__file__)
+#     os.chdir(os.path.join(directory, "tmp"))
+# elif os.getenv("FLASK_ENV", "env_var_not_set") == "testing":
+#     os.environ["google_application_credentials"] = "key.json"
+# # else:
+    # os.chdir("/tmp")
