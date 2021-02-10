@@ -65,7 +65,7 @@ def test_check_if_matching_file_in_bucket_returns_false_if_no_files_in_bucket(mo
 @patch("builtins.open")
 def test_check_if_matching_file_in_bucket_returns_true_if_files_match(mock_open, mock_hashlib, mock_get_blob):
     mock_md5 = mock.MagicMock()
-    mock_md5.digest.return_value = "123456789"
+    mock_md5.digest.return_value = b"123456789"
     mock_hashlib.return_value = mock_md5
     mock_get_blob.return_value = mock.MagicMock(md5_hash=pybase64.b64encode(b"123456789"), name="OPN2101A")
     assert check_if_matching_file_in_bucket("OPN2101A.bdbx", "OPN2101A/OPN2101A.bdbx") is True

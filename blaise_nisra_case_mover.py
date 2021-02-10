@@ -147,7 +147,7 @@ def check_if_matching_file_in_bucket(local_file, bucket_file_location):
     except (OSError, IOError) as e:
         log.error(e, f"Failed to read local file - {local_file}")
 
-    bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash).decode("utf-8")
+    bucket_file_md5 = pybase64.b64decode(bucket_file.md5_hash)
     log.info(f"MD5 for Bucket file - {bucket_file.name} = {bucket_file_md5}")
 
     if local_file_md5 == bucket_file_md5:
@@ -169,7 +169,7 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         googleStorage.upload_file(
             instrument_file, f"{instrument_name}/{instrument_file}"
         )
-    # send_request_to_api(instrument_name)
+    send_request_to_api(instrument_name)
 
 
 def send_request_to_api(instrument_name):
