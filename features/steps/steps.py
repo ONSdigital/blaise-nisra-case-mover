@@ -69,15 +69,19 @@ def step_imp(context):
 
 
 @then("no data is copied to the GCP storage bucket")
-def step_imp(context):
+def step_no_data_is_copied_to_the_GCP_storage_bucket(context):
     pass
 
 
 @then("a call is made to the RESTful API to process the new data")
-def step_imp(context):
-    pass
+def step_a_call_is_made_to_the_RESTful_API_to_process_the_new_data(context):
+    context.mock_requests_post.assert_called_once_with(
+        "http://env_var_not_set/api/vi/serverpark/env_var_not_set/instruments/OPN2101A/data",
+        data='{"InstrumentDataPath": "OPN2101A"}',
+        headers={"content-type": "application/json"}
+    )
 
 
 @then("a call is not made to the RESTful API to process the new data")
-def step_imp(context):
+def step_a_call_is_not_made_to_the_RESTful_API_to_process_the_new_data(context):
     pass
