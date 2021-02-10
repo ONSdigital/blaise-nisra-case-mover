@@ -1,13 +1,42 @@
+import logging
+import os
+from pathlib import Path
+from unittest import mock
+
+import pysftp
 from behave import *
+
+from google_storage import GoogleStorage
+
+
+@given("there is no new OPN NISRA data on the NISRA SFTP")
+def step_there_is_no_new_OPN_NISRA_data_on_the_NISRA_SFTP(context):
+    pass
 
 
 @given("there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred")
-def step_imp(context):
-    pass
+def step_there_is_new_OPN_NISRA_data_on_the_NISRA_SFTP_that_hasnt_previously_been_transferred(context):
+    os.environ["google_application_credentials"] = "key.json"
+    googleStorage = GoogleStorage('ons-blaise-v2-dev-rich-01-test-data', logging)
+    googleStorage.initialise_bucket_connection()
+    if googleStorage.bucket is None:
+        print("Failed")
 
-    # for file in file_list:
-    #     blob = googleStorage.get_blob(f"opn2101a-nisra/{file}")
-    #     blob.download_to_filename(blob.name)
+    file_list = [
+        "FrameEthnicity.blix",
+        "FrameSOC2010.blix",
+        "FrameSOC2K.blix",
+        "OPN2101A.bdbx",
+        "OPN2101A.bmix",
+        "OPN2101A.bdix"
+    ]
+
+    if not Path("opn2101a-nisra").exists:
+        os.mkdir("opn2101a-nisra")
+
+    for file in file_list:
+        blob = googleStorage.get_blob(f"opn2101a-nisra/{file}")
+        blob.download_to_filename(blob.name)
 
     sftp_host = 'localhost'
     sftp_username = 'sftp-test'
@@ -33,7 +62,6 @@ def step_imp(context):
 @when("the nisra-mover service is run with an OPN configuration")
 def step_imp(context):
     pass
-
 
 @then("the new data is copied to the GCP storage bucket including all necessary support files")
 def step_imp(context):
