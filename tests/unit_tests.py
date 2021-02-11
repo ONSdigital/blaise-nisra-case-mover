@@ -205,7 +205,7 @@ def test_upload_instrument(mock_google_storage, mock_send_request_to_api, mock_s
 def test_send_request_to_api(mock_requests_post):
     send_request_to_api("OPN2101A")
     mock_requests_post.assert_called_once_with(
-        "http://MOCK_BLAISE_API_URL/api/vi/serverparks/MOCK_SERVER_PARK/instruments/OPN2101A/data",
-        data='{"InstrumentDataPath": "OPN2101A"}',
+        "http://MOCK_BLAISE_API_URL/api/v1/serverparks/MOCK_SERVER_PARK/instruments/OPN2101A/data",
+        data='{"instrumentDataPath": "OPN2101A"}',
         headers={"content-type": "application/json"},
     )
