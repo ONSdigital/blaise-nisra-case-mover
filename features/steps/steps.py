@@ -102,7 +102,7 @@ def step_a_call_is_made_to_the_RESTful_API_to_process_the_new_data(context):
     )
 
 
-@then("a call is not made to the RESTful API to process the new data")
+@then("a call is not made to the RESTful API")
 def step_a_call_is_not_made_to_the_RESTful_API_to_process_the_new_data(context):
     context.mock_requests_post.assert_not_called()
 

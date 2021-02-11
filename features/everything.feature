@@ -13,6 +13,6 @@ Feature: Nisra Case Mover
     Given there is no new OPN NISRA data on the NISRA SFTP
     When the nisra-mover service is run with an OPN configuration
     Then no data is copied to the GCP storage bucket
-    And a call is not made to the RESTful API to process the new data
+    And a call is not made to the RESTful API
 
 
