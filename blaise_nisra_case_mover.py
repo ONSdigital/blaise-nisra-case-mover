@@ -37,15 +37,14 @@ def main():
 
     try:
         log.info("Connecting to SFTP server")
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
+        # cnopts = pysftp.CnOpts()
+        # cnopts.hostkeys = None
 
         with pysftp.Connection(
             host=sftp_host,
             username=sftp_username,
             password=sftp_password,
-            port=int(sftp_port),
-            cnopts=cnopts,
+            port=int(sftp_port)
         ) as sftp:
             log.info("Connected to SFTP server")
 

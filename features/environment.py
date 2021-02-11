@@ -1,4 +1,5 @@
 import logging
+import os
 
 import pysftp
 
@@ -11,7 +12,7 @@ def before_feature(context, feature):
     context.client = app.test_client()
 
 def after_scenario(context, scenario):
-    googleStorage = GoogleStorage('ons-blaise-v2-dev-rich-01-nisra', logging)
+    googleStorage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
     googleStorage.initialise_bucket_connection()
     if googleStorage.bucket is None:
         print("Failed")
@@ -20,19 +21,15 @@ def after_scenario(context, scenario):
 
     googleStorage.delete_blobs(blobs)
 
-    sftp_host = 'localhost'
-    sftp_username = 'sftp-test'
-    sftp_password = 'DUMMY_PASSWORD'
-    sftp_port = '2222'
-
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
+    sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
+    sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
+    sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
+    sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
 
     with pysftp.Connection(
             host=sftp_host,
             username=sftp_username,
             password=sftp_password,
             port=int(sftp_port),
-            cnopts=cnopts,
     ) as sftp:
         sftp.execute("rm -rf ~/ONS/OPN/OPN2101A")

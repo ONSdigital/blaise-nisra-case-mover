@@ -1,6 +1,5 @@
 import logging
 import os
-from pathlib import Path
 from unittest import mock
 
 import pysftp
@@ -17,7 +16,7 @@ def step_there_is_no_new_OPN_NISRA_data_on_the_NISRA_SFTP(context):
 @given("there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred")
 def step_there_is_new_OPN_NISRA_data_on_the_NISRA_SFTP_that_hasnt_previously_been_transferred(context):
     os.environ["google_application_credentials"] = "key.json"
-    googleStorage = GoogleStorage('ons-blaise-v2-dev-rich-01-test-data', logging)
+    googleStorage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"), logging)
     googleStorage.initialise_bucket_connection()
     if googleStorage.bucket is None:
         print("Failed")
@@ -31,27 +30,20 @@ def step_there_is_new_OPN_NISRA_data_on_the_NISRA_SFTP_that_hasnt_previously_bee
         "OPN2101A.bdix"
     ]
 
-    if not Path("opn2101a-nisra").exists:
-        os.mkdir("opn2101a-nisra")
-
     for file in file_list:
         blob = googleStorage.get_blob(f"opn2101a-nisra/{file}")
-        blob.download_to_filename(blob.name)
+        blob.download_to_filename(file)
 
-    sftp_host = 'localhost'
-    sftp_username = 'sftp-test'
-    sftp_password = 'DUMMY_PASSWORD'
-    sftp_port = '2222'
-
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
+    sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
+    sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
+    sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
+    sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
 
     with pysftp.Connection(
             host=sftp_host,
             username=sftp_username,
             password=sftp_password,
-            port=int(sftp_port),
-            cnopts=cnopts,
+            port=int(sftp_port)
     ) as sftp:
 
         try:
@@ -60,7 +52,7 @@ def step_there_is_new_OPN_NISRA_data_on_the_NISRA_SFTP_that_hasnt_previously_bee
             sftp.mkdir("ONS/OPN/OPN2101A/")
 
         for file in file_list:
-            sftp.put(f"opn2101a-nisra-test/{file}", f"ONS/OPN/OPN2101A/{file}")
+            sftp.put(f"{file}", f"ONS/OPN/OPN2101A/{file}")
 
 
 @when("the nisra-mover service is run with an OPN configuration")
@@ -73,7 +65,7 @@ def step_the_nisra_mover_service_is_run_with_an_OPN_configuration(context):
 
 @then("the new data is copied to the GCP storage bucket including all necessary support files")
 def step_the_new_data_is_copied_to_the_GCP_storage_bucket_including_all_necessary_support_files(context):
-    googleStorage = GoogleStorage('ons-blaise-v2-dev-rich-01-nisra', logging)
+    googleStorage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
     googleStorage.initialise_bucket_connection()
     if googleStorage.bucket is None:
         print("Failed")
@@ -105,8 +97,10 @@ def step_no_data_is_copied_to_the_GCP_storage_bucket(context):
 
 @then("a call is made to the RESTful API to process the new data")
 def step_a_call_is_made_to_the_RESTful_API_to_process_the_new_data(context):
+    server_park = os.getenv("SERVER_PARK", "env_var_not_set")
+    blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     context.mock_requests_post.assert_called_once_with(
-        "http://env_var_not_set/api/vi/serverpark/env_var_not_set/instruments/OPN2101A/data",
+        f"http://{blaise_api_url}/api/vi/serverpark/{server_park}/instruments/OPN2101A/data",
         data='{"InstrumentDataPath": "OPN2101A"}',
         headers={"content-type": "application/json"}
     )
