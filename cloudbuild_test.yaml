@@ -25,7 +25,7 @@ steps:
         export SURVEY_SOURCE_PATH='ONS/OPN/'
         export NISRA_BUCKET_NAME=${_NISRA_BUCKET_NAME}
         export SFTP_PORT=${_SFTP_PORT}
-        export SFTP_HOST=${_SFTP_HOST}
+        export SFTP_HOST='localhost'
         export SFTP_USERNAME=${_SFTP_USERNAME}
         export SFTP_PASSWORD=${_SFTP_PASSWORD}
         export TEST_DATA_BUCKET=${_TEST_DATA_BUCKET}
