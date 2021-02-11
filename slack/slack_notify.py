@@ -1,8 +1,8 @@
-import os
-import subprocess
 import json
-import urllib.request
+import os
 import urllib.error
+import urllib.request
+
 
 def slack_alert():
     attachments = []
@@ -13,7 +13,11 @@ def slack_alert():
         'text': '\n' + os.getenv('REPO_NAME')
     })
 
-    text = 'Commit <https://github.com/ONSdigital/' + os.getenv('REPO_NAME') + '/commit/' + os.getenv('COMMIT_SHA') + '|' + os.getenv('SHORT_SHA') + '> of ' + os.getenv('REPO_NAME') + ' has been deployed to *' + os.getenv('PROJECT_ID') + '*, to view the cloud build job click <https://console.cloud.google.com/cloud-build/builds/' + os.getenv('BUILD_ID') + '?project=' + os.getenv('PROJECT_ID') + '|here>'
+    text = 'Commit <https://github.com/ONSdigital/' + os.getenv('REPO_NAME') + '/commit/' + os.getenv(
+        'COMMIT_SHA') + '|' + os.getenv('SHORT_SHA') + '> of ' + os.getenv(
+        'REPO_NAME') + ' has been deployed to *' + os.getenv(
+        'PROJECT_ID') + '*, to view the cloud build job click <https://console.cloud.google.com/cloud-build/builds/' + os.getenv(
+        'BUILD_ID') + '?project=' + os.getenv('PROJECT_ID') + '|here>'
     print(text)
 
     message = {
@@ -31,6 +35,7 @@ def slack_alert():
     except urllib.error.HTTPError as e:
         print(e.read().decode('utf-8'))
         raise e
+
 
 if __name__ == '__main__':
     try:

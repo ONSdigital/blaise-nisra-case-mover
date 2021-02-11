@@ -4,15 +4,17 @@ steps:
     id: Generate manifest
     entrypoint: 'bash'
     args:
-    - '-c'
-    - |
-       sed "s#_PROJECT_ID#${_PROJECT_ID}#g" templates/app.yaml.tpl | \
-       sed "s#_SFTP_HOST#${_SFTP_HOST}#g" | \
-       sed "s#_SFTP_USERNAME#${_SFTP_USERNAME}#g" | \
-       sed "s#_SFTP_PASSWORD#${_SFTP_PASSWORD}#g" | \
-       sed "s#_SURVEY_SOURCE_PATH#${_SURVEY_SOURCE_PATH}#g" | \
-       sed "s#_INSTRUMENT_DESTINATION_PATH#${_INSTRUMENT_DESTINATION_PATH}#g" | \
-       sed "s#_NISRA_BUCKET_NAME#${_NISRA_BUCKET_NAME}#g" > app.yaml
+      - '-c'
+      - |
+        sed "s#_PROJECT_ID#${_PROJECT_ID}#g" templates/app.yaml.tpl | \
+        sed "s#_SFTP_HOST#${_SFTP_HOST}#g" | \
+        sed "s#_SFTP_PORT#${_SFTP_PORT}#g" | \
+        sed "s#_SFTP_USERNAME#${_SFTP_USERNAME}#g" | \
+        sed "s#_SFTP_PASSWORD#${_SFTP_PASSWORD}#g" | \
+        sed "s#_SURVEY_SOURCE_PATH#${_SURVEY_SOURCE_PATH}#g" | \
+        sed "s#_BLAISE_API_URL#${_BLAISE_API_URL}#g" | \
+        sed "s#_SERVER_PARK#${_SERVER_PARK}#g" | \
+        sed "s#_NISRA_BUCKET_NAME#${_NISRA_BUCKET_NAME}#g" > app.yaml
 
   - name: 'gcr.io/cloud-builders/gcloud'
     id: Print Output
@@ -24,14 +26,14 @@ steps:
 
   - name: "gcr.io/cloud-builders/gcloud"
     id: Deploy service
-    args: ["app", "deploy"]
+    args: [ "app", "deploy" ]
     timeout: "1600s"
 
   - name: "gcr.io/cloud-builders/gcloud"
     id: Schedule cron job for service
-    args: ["app", "deploy", "cron.yaml"]
+    args: [ "app", "deploy", "cron.yaml" ]
     timeout: "1600s"
-  
+
   - name: 'gcr.io/cloud-builders/gcloud'
     id: Clean Up Old Versions
     entrypoint: 'bash'
@@ -48,12 +50,12 @@ steps:
 
   - name: "gcr.io/cloud-builders/gcloud"
     id: "Slack Notify"
-    waitFor: ["Deploy service"]
+    waitFor: [ "Deploy service" ]
     entrypoint: "/bin/bash"
     args:
       - "-c"
       - |
-        python3 -u slack/slack-notify.py;
+        python3 -u slack/slack_notify.py;
     env:
       - 'PROJECT_ID=$PROJECT_ID'
       - 'BUILD_ID=$BUILD_ID'
