@@ -23,7 +23,7 @@ steps:
         python3 -m pip install --upgrade setuptools
         python3 -m pip install -r requirements.txt
         export SURVEY_SOURCE_PATH='ONS/OPN/'
-        export NISRA_BUCKET_NAME=${_NISRA_BUCKET_NAME}
+        export NISRA_BUCKET_NAME=${_NISRA_BUCKET_NAME}-test
         export SFTP_PORT=${_SFTP_PORT}
         export SFTP_HOST='localhost'
         export SFTP_USERNAME=${_SFTP_USERNAME}
