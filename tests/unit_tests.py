@@ -180,8 +180,10 @@ def test_process_instrument_doesnt_upload_instrument_if_database_files_do_match(
     mock_delete_local_instrument_files.assert_called_once()
 
 
+@patch("blaise_nisra_case_mover.send_request_to_api")
 @patch.object(GoogleStorage, "upload_file")
-def test_upload_instrument(mock_google_storage, mock_sftp):
+def test_upload_instrument(mock_google_storage, mock_send_request_to_api, mock_sftp):
+    mock_send_request_to_api.return_value.status_code = 200
     instrument_name = "OPN2101A"
     instrument_files = [
         "OPN2101A.bdix",
@@ -193,6 +195,8 @@ def test_upload_instrument(mock_google_storage, mock_sftp):
     assert mock_google_storage.call_count == len(instrument_files)
     for instrument_file in instrument_files:
         mock_google_storage.assert_any_call(instrument_file, f"{instrument_name}/{instrument_file}")
+
+    mock_send_request_to_api.assert_called_once()
 
 
 @mock.patch.dict(os.environ, {"BLAISE_API_URL": "MOCK_BLAISE_API_URL"})
