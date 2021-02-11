@@ -174,10 +174,10 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
 def send_request_to_api(instrument_name):
     server_park = os.getenv("SERVER_PARK", "env_var_not_set")
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
-    data = {"InstrumentDataPath": instrument_name}
+    data = {"instrumentDataPath": instrument_name}
     log.info(f"Sending request to {blaise_api_url} for instrument {instrument_name}")
     request = requests.post(
-        f"http://{blaise_api_url}/api/vi/serverpark/{server_park}/instruments/{instrument_name}/data",
+        f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
         headers={"content-type": "application/json"},
         data=json.dumps(data),
     )
