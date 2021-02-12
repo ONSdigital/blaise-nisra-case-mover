@@ -51,7 +51,7 @@ gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-b" --proje
 
 Refer to the .tfstate file for the environment to locate the password, you can find this with the name `sftp_password`.
 
-To access the GCP buckets remotely, [obtain a JSON service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for the Default App Engine Service account which has access to the Nisra and test data bucket, place this in a key.json file at the root of
+To access the GCP buckets remotely, [obtain a JSON service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for the Default App Engine Service account which has access to the Nisra and test data bucket, save this as `key.json` and place at the root of
 the project.
 
 ##### Create a virtual environment:
