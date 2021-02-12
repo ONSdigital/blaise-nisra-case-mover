@@ -10,11 +10,26 @@ This service downloads the data from the SFTP and re-uploads it to a GCP storage
 
 ### Setup for Local development
 
+
+| Environment Variable | Description                                                                                                                                                                                                                                    | Example                            |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| SURVEY_SOURCE_PATH   | Where on the sftp sever should the system look for the intstruments.                                                                                                                                                                           | ONS/OPN/                           |
+| NISRA_BUCKET_NAME    | Name of the bucket to upload the downloaded SFTP files too.                                                                                                                                                                                    | ons-blaise-<env>-nisra             |
+| TEST_DATA_BUCKET     | Not needed for running Case Mover, but used for behave intergration tests, this is where the Test data is pulled from.                                                                                                                         | ons-blaise-<br><env><br>-test-data |
+| SFTP_PORT            | Connection information to SFTP server.                                                                                                                                                                                                         | 22                                 |
+| SFTP_HOST            | Connection information to SFTP server.                                                                                                                                                                                                         | localhost:22                       |
+| SFTP_USERNAME        | Connection information to SFTP server.                                                                                                                                                                                                         | sftp-test                          |
+| SFTP_PASSWORD        | Connection information to SFTP server.                                                                                                                                                                                                         | t4734rfsdfyds7                     |
+| BLAISE_API_URL       | Url the [Blaise Rest API](https://github.com/ONSdigital/blaise-api-rest) is running on, this is called once new data is uploaded to the Bucket.<br>For local development, you can port forward to the restapi VM simualrly to the SFTP server. | localhost:90                       |
+| SERVER_PARK          | Main server park for Blaise, this is passed to the call to the Blaise Rest API.                                                                                                                                                                | gusty                              |
+| FLASK_ENV            | For local development set this to `development` so that the system will use your local key.json for authenication with GCP Buckets.                                                                                                            | development                        |
+
 Create a .env file with the following environment variables:
 
 ```
 SURVEY_SOURCE_PATH = 'ONS/OPN/'
 NISRA_BUCKET_NAME = 'ons-blaise-<env>-nisra'
+TEST_DATA_BUCKET = 'ons-blaise-<env>-test-data'
 SFTP_PORT = '2222'
 SFTP_HOST = 'localhost'
 SFTP_USERNAME = 'sftp-test'
@@ -34,9 +49,9 @@ The GCP environments have an SFTP server for testing purposes. Run the following
 gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-b" --project "ons-blaise-<env>" --local-host-port=localhost:2222
 ```
 
-Refer to the .tfstate file for the environment to locate the password.
+Refer to the .tfstate file for the environment to locate the password, you can find this with the name `sftp_password`.
 
-Create a service account that has permission to the bucket (or use the App Engine Service account which has access) and [obtain a JSON service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys), place this in a key.json file at the root of
+To access the GCP buckets remotely, [obtain a JSON service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for the Default App Engine Service account which has access to the Nisra and test data bucket, place this in a key.json file at the root of
 the project.
 
 ##### Create a virtual environment:
