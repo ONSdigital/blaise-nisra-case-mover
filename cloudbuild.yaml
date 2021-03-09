@@ -1,0 +1,66 @@
+# This step generates the new manifest
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Generate manifest
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        sed "s#_PROJECT_ID#${_PROJECT_ID}#g" templates/app.yaml.tpl | \
+        sed "s#_SFTP_HOST#${_SFTP_HOST}#g" | \
+        sed "s#_SFTP_PORT#${_SFTP_PORT}#g" | \
+        sed "s#_SFTP_USERNAME#${_SFTP_USERNAME}#g" | \
+        sed "s#_SFTP_PASSWORD#${_SFTP_PASSWORD}#g" | \
+        sed "s#_SURVEY_SOURCE_PATH#${_SURVEY_SOURCE_PATH}#g" | \
+        sed "s#_BLAISE_API_URL#${_BLAISE_API_URL}#g" | \
+        sed "s#_SERVER_PARK#${_SERVER_PARK}#g" | \
+        sed "s#_NISRA_BUCKET_NAME#${_NISRA_BUCKET_NAME}#g" > app.yaml
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Print Output
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        cat app.yaml
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Deploy service
+    args: [ "app", "deploy" ]
+    timeout: "1600s"
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Schedule cron job for service
+    args: [ "app", "deploy", "cron.yaml" ]
+    timeout: "1600s"
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Clean Up Old Versions
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        versions=$(gcloud app versions list --service "nisra-case-mover" --sort-by '~version' --format 'value(VERSION.ID)' --project "${_PROJECT_ID}" | tail -n +11)
+        versions=($versions)  # split to array $versions
+
+        for (( i=0; i<${#versions[@]}; i++ ))
+        do
+          gcloud app versions delete ${versions[$i]} --service "nisra-case-mover" --project "${_PROJECT_ID}" --quiet
+        done
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "Slack Notify"
+    waitFor: [ "Deploy service" ]
+    entrypoint: "/bin/bash"
+    args:
+      - "-c"
+      - |
+        python3 -u slack/slack_notify.py;
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'REPO_NAME=$REPO_NAME'
+      - 'COMMIT_SHA=$COMMIT_SHA'
+      - 'SHORT_SHA=$SHORT_SHA'
+      - 'SLACK_CHANNEL=$_SLACK_CHANNEL'
+      - 'SLACK_WEBHOOK=$_SLACK_WEBHOOK'
