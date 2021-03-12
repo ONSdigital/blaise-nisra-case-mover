@@ -73,7 +73,9 @@ def step_the_new_data_is_copied_to_the_GCP_storage_bucket_including_all_necessar
     file_list.sort()
     bucket_items.sort()
 
-    assert bucket_items == file_list
+    check = all(item in bucket_items for item in file_list)
+
+    assert check is True
 
 
 @then("no data is copied to the GCP storage bucket")
