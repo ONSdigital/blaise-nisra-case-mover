@@ -17,7 +17,7 @@ vpc_access_connector:
   name: projects/_PROJECT_ID/locations/europe-west2/connectors/vpcconnect
 
 basic_scaling:
-  idle_timeout: 15m
+  idle_timeout: 10m
   max_instances: 1
 
 handlers:
