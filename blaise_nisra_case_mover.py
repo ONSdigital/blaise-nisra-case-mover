@@ -70,8 +70,7 @@ def main():
         log.error("SFTP connection failed")
         return "SFTP connection failed", 500
     except Exception as ex:
-        log.error("Exception - %s", ex)
-        log.exception()
+        log.exception("Exception - %s", ex)
         sftp.close()
         log.info("SFTP connection closed")
         return "Exception occurred", 500
@@ -172,7 +171,7 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
     try:
         send_request_to_api(instrument_name)
     except Exception as ex:
-        log.error("Exception - %s", ex)
+        log.error("API Exception - %s", ex)
         sftp.close()
         log.info("SFTP connection closed")
 
