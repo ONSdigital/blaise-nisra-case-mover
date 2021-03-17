@@ -71,6 +71,7 @@ def main():
         return "SFTP connection failed", 500
     except Exception as ex:
         log.error("Exception - %s", ex)
+        log.exception()
         sftp.close()
         log.info("SFTP connection closed")
         return "Exception occurred", 500
