@@ -103,7 +103,6 @@ def process_instrument(sftp, source_path):
         instrument_db_file, f"{instrument_name}/{instrument_db_file}"
     ):
         upload_instrument(sftp, source_path, instrument_name, instrument_files)
-    send_request_to_api(instrument_name)
 
 
 def check_instrument_database_file_exists(instrument_files, instrument_name):
@@ -169,6 +168,7 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         googleStorage.upload_file(
             instrument_file, f"{instrument_name}/{instrument_file}"
         )
+    send_request_to_api(instrument_name)
 
 
 def send_request_to_api(instrument_name):
