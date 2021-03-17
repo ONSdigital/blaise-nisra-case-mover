@@ -103,6 +103,7 @@ def process_instrument(sftp, source_path):
         instrument_db_file, f"{instrument_name}/{instrument_db_file}"
     ):
         upload_instrument(sftp, source_path, instrument_name, instrument_files)
+    send_request_to_api(instrument_name)
 
 
 def check_instrument_database_file_exists(instrument_files, instrument_name):
@@ -168,7 +169,6 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         googleStorage.upload_file(
             instrument_file, f"{instrument_name}/{instrument_file}"
         )
-    send_request_to_api(instrument_name)
 
 
 def send_request_to_api(instrument_name):
@@ -176,9 +176,9 @@ def send_request_to_api(instrument_name):
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     data = {"instrumentDataPath": instrument_name}
     log.info(f"Sending request to {blaise_api_url} for instrument {instrument_name}")
-    request = requests.post(
+    requests.post(
         f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
         headers={"content-type": "application/json"},
         data=json.dumps(data),
     )
-    log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
+    # log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
