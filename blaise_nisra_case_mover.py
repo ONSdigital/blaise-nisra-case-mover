@@ -184,6 +184,6 @@ def send_request_to_api(instrument_name):
     requests.post(
         f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
         headers={"content-type": "application/json"},
-        data=json.dumps(data),
+        data=json.dumps(data), timeout=1  # add comment here explaining why the timeout
     )
     # log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
