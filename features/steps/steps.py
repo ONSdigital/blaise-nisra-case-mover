@@ -34,7 +34,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     for blob in nisra_google_storage.list_blobs():
         file_generation_list.append(blob.generation)
 
-    # context.file_generation_list = file_generation_list.sort()
+    context.file_generation_list = file_generation_list.sort()
 
 
 @given("there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred")
