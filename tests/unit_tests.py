@@ -207,5 +207,5 @@ def test_send_request_to_api(mock_requests_post):
     mock_requests_post.assert_called_once_with(
         "http://MOCK_BLAISE_API_URL/api/v1/serverparks/MOCK_SERVER_PARK/instruments/OPN2101A/data",
         data='{"instrumentDataPath": "OPN2101A"}',
-        headers={"content-type": "application/json"},
+        headers={"content-type": "application/json"}, timeout=1
     )
