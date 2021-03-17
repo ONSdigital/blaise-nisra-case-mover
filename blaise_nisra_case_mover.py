@@ -168,7 +168,12 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         googleStorage.upload_file(
             instrument_file, f"{instrument_name}/{instrument_file}"
         )
-    send_request_to_api(instrument_name)
+    try:
+        send_request_to_api(instrument_name)
+    except Exception as ex:
+        log.error("Exception - %s", ex)
+        sftp.close()
+        log.info("SFTP connection closed")
 
 
 def send_request_to_api(instrument_name):
