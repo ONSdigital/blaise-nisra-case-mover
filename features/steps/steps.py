@@ -20,9 +20,9 @@ file_list = [
 @given("there is no new OPN NISRA data on the NISRA SFTP")
 def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     copy_opn2101a_files_to_sftp()
-
     nisra_google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
     nisra_google_storage.initialise_bucket_connection()
+
     if nisra_google_storage.bucket is None:
         print("Failed")
 
@@ -30,6 +30,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
         nisra_google_storage.upload_file(file, f"OPN2101A/{file}")
 
     file_generation_list = []
+
     for blob in nisra_google_storage.list_blobs():
         file_generation_list.append(blob.generation)
 
@@ -53,6 +54,7 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(context):
     google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
     google_storage.initialise_bucket_connection()
+
     if google_storage.bucket is None:
         print("Failed")
 
@@ -82,6 +84,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
 def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
     google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
     google_storage.initialise_bucket_connection()
+
     if google_storage.bucket is None:
         print("Failed")
 
@@ -106,7 +109,7 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
 
 
 @then("a call is not made to the RESTful API")
-def step_a_call_is_not_made_to_the_restful_api_to_process_the_new_data(context):
+def step_a_call_is_not_made_to_the_restful_api(context):
     context.mock_requests_post.assert_not_called()
 
 
@@ -114,16 +117,19 @@ def copy_opn2101a_files_to_sftp():
     os.environ["google_application_credentials"] = "key.json"
     google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"), logging)
     google_storage.initialise_bucket_connection()
+
     if google_storage.bucket is None:
         print("Failed")
 
     for file in file_list:
         blob = google_storage.get_blob(f"opn2101a-nisra/{file}")
         blob.download_to_filename(file)
+
     sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
     sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
     sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
     sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
+
     with pysftp.Connection(
             host=sftp_host,
             username=sftp_username,
