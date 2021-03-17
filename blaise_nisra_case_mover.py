@@ -70,7 +70,7 @@ def main():
         log.error("SFTP connection failed")
         return "SFTP connection failed", 500
     except Exception as ex:
-        log.error("Exception - %s", ex)
+        log.exception("Exception - %s", ex)
         sftp.close()
         log.info("SFTP connection closed")
         return "Exception occurred", 500
@@ -168,7 +168,12 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         googleStorage.upload_file(
             instrument_file, f"{instrument_name}/{instrument_file}"
         )
-    send_request_to_api(instrument_name)
+    try:
+        send_request_to_api(instrument_name)
+    except Exception as ex:
+        log.error("API Exception - %s", ex)
+        sftp.close()
+        log.info("SFTP connection closed")
 
 
 def send_request_to_api(instrument_name):
@@ -176,9 +181,9 @@ def send_request_to_api(instrument_name):
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     data = {"instrumentDataPath": instrument_name}
     log.info(f"Sending request to {blaise_api_url} for instrument {instrument_name}")
-    request = requests.post(
+    requests.post(
         f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
         headers={"content-type": "application/json"},
         data=json.dumps(data),
     )
-    log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
+    # log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
