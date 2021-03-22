@@ -97,6 +97,7 @@ def process_instrument(sftp, source_path):
     if not check_instrument_database_file_exists(instrument_files, instrument_name):
         log.info(f"Instrument database file not found - {instrument_db_file}")
         return f"Instrument database file not found - {instrument_db_file}"
+    instrument_db_file = get_actual_instrument_database_file_name(instrument_files, instrument_name)
     sftp.get(source_path + instrument_db_file, instrument_db_file)
     log.info("Checking if database file has already been processed...")
     if not check_if_matching_file_in_bucket(
@@ -113,6 +114,15 @@ def check_instrument_database_file_exists(instrument_files, instrument_name):
         if instrument_file.lower() == instrument_name.lower() + ".bdbx":
             log.info(f"Database file found - {instrument_file}")
             return True
+    return False
+
+
+def get_actual_instrument_database_file_name(instrument_files, instrument_name):
+    if not instrument_files:
+        return False
+    for instrument_file in instrument_files:
+        if instrument_file.lower() == instrument_name.lower() + ".bdbx":
+            return instrument_file
     return False
 
 
