@@ -21,7 +21,7 @@ class GoogleStorage:
             self.log.error("Connection to bucket failed - %s", ex)
 
     def upload_file(self, source, dest):
-        blob_destination = self.bucket.blob(dest)
+        blob_destination = self.bucket.blob(dest.upper())
         self.log.info(f"Uploading file - {source}")
         blob_destination.upload_from_filename(source)
         self.log.info(f"Uploaded file - {source}")
