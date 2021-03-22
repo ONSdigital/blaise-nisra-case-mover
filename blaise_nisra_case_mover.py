@@ -182,6 +182,8 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
 
 
 def send_request_to_api(instrument_name):
+    # added 10 second timeout exception pass to the api request because the connection to the api was timing out
+    # before it completed the work. this also allows parallel requests to be made to the api.
     server_park = os.getenv("SERVER_PARK", "env_var_not_set")
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     data = {"instrumentDataPath": instrument_name}
@@ -190,7 +192,7 @@ def send_request_to_api(instrument_name):
         requests.post(
             f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
             headers={"content-type": "application/json"},
-            data=json.dumps(data), timeout=10  # add comment here explaining why the timeout
+            data=json.dumps(data), timeout=10
         )
     except requests.exceptions.ReadTimeout:
         pass
