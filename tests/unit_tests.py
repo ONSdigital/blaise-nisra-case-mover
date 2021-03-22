@@ -228,7 +228,7 @@ def test_upload_instrument(mock_google_storage, mock_sftp):
     upload_instrument(mock_sftp, "ONS/OPN/OPN2101A/", instrument_name, instrument_files)
     assert mock_google_storage.call_count == len(instrument_files)
     for instrument_file in instrument_files:
-        mock_google_storage.assert_any_call(instrument_file, f"{instrument_name}/{instrument_file}")
+        mock_google_storage.assert_any_call(instrument_file, f"{instrument_name}/{instrument_file}".upper())
 
 
 @mock.patch.dict(os.environ, {"BLAISE_API_URL": "MOCK_BLAISE_API_URL"})

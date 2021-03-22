@@ -177,7 +177,7 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
             f"Uploading instrument file to bucket - {instrument_name}/{instrument_file}"
         )
         googleStorage.upload_file(
-            instrument_file, f"{instrument_name}/{instrument_file}"
+            instrument_file, f"{instrument_name}/{instrument_file}".upper()
         )
 
 
