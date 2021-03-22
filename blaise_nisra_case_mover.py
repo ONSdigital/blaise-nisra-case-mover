@@ -137,7 +137,7 @@ def delete_local_instrument_files():
 def get_instrument_files(sftp, source_path):
     instrument_file_list = []
     for instrument_file in sftp.listdir(source_path):
-        if any(fnmatch.fnmatch(instrument_file, pattern) for pattern in extension_list):
+        if any(fnmatch.fnmatch(instrument_file.lower(), pattern) for pattern in extension_list):
             log.info(f"Instrument file found - {instrument_file}")
             instrument_file_list.append(instrument_file)
     return instrument_file_list
