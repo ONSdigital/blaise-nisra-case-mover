@@ -101,7 +101,7 @@ def process_instrument(sftp, source_path):
     sftp.get(source_path + instrument_db_file, instrument_db_file)
     log.info("Checking if database file has already been processed...")
     if not check_if_matching_file_in_bucket(
-        instrument_db_file, f"{instrument_name}/{instrument_db_file}"
+        instrument_db_file, f"{instrument_name}/{instrument_db_file}".upper()
     ):
         upload_instrument(sftp, source_path, instrument_name, instrument_files)
         send_request_to_api(instrument_name)
