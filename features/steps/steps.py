@@ -59,12 +59,12 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
         print("Failed")
 
     bucket_file_list = [
-        "OPN2101A/FrameEthnicity.blix",
-        "OPN2101A/FrameSOC2010.blix",
-        "OPN2101A/FrameSOC2K.blix",
-        "OPN2101A/OPN2101A.bdbx",
-        "OPN2101A/OPN2101A.bmix",
-        "OPN2101A/OPN2101A.bdix"
+        "OPN2101A/FRAMEETHNICITY.BLIX",
+        "OPN2101A/FRAMESOC2010.BLIX",
+        "OPN2101A/FRAMESOC2K.BLIX",
+        "OPN2101A/OPN2101A.BDBX",
+        "OPN2101A/OPN2101A.BMIX",
+        "OPN2101A/OPN2101A.BDIX"
     ]
 
     bucket_items = []
