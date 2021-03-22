@@ -21,13 +21,13 @@ def test_get_instrument_files(mock_sftp):
                                       "oPn2101A.BdIx",
                                       "oPn2101A.BmIx",
                                       "oPn2101A.pdf",
-                                      "FrameSOC.blix",
+                                      "FrameSOC.blix"
                                       ]
     assert get_instrument_files(mock_sftp, "") == [
         "oPn2101A.BdBx",
         "oPn2101A.BdIx",
         "oPn2101A.BmIx",
-        "FrameSOC.blix",
+        "FrameSOC.blix"
     ]
 
 
@@ -103,7 +103,7 @@ def test_process_instrument_if_no_instrument_files(
         mock_check_instrument_database_file_exists,
         mock_get_instrument_files,
         mock_delete_local_instrument_files,
-        mock_sftp,
+        mock_sftp
 ):
     mock_send_request_to_api.assert_not_called()
     mock_get_instrument_files.return_value = []
@@ -132,7 +132,7 @@ def test_process_instrument_if_no_instrument_database_file(
         mock_check_instrument_database_file_exists,
         mock_get_instrument_files,
         mock_delete_local_instrument_files,
-        mock_sftp,
+        mock_sftp
 ):
     mock_send_request_to_api.assert_not_called()
     mock_upload_instrument.assert_not_called()
@@ -143,7 +143,7 @@ def test_process_instrument_if_no_instrument_database_file(
         "OPN2101A.bdix",
         "OPN2101A.bmix",
         "FrameSOC.blix",
-        "foobar.bdbx",
+        "foobar.bdbx"
     ]
     assert (
             process_instrument(mock_sftp, "ONS/OPN/OPN2101A/")
@@ -167,7 +167,7 @@ def test_process_instrument_uploads_instrument_if_database_files_do_not_match(
         mock_check_instrument_database_file_exists,
         mock_get_instrument_files,
         mock_delete_local_instrument_files,
-        mock_sftp,
+        mock_sftp
 ):
     mock_check_if_matching_file_in_bucket.return_value = False
     mock_get_actual_instrument_database_file_name.return_value = "oPN2101A.bDbx"
@@ -176,7 +176,7 @@ def test_process_instrument_uploads_instrument_if_database_files_do_not_match(
         "OPN2101A.bDix",
         "OPN2101A.bmix",
         "OPN2101A.blix",
-        "oPN2101A.bDbx",
+        "oPN2101A.bDbx"
     ]
     process_instrument(mock_sftp, "ONS/OPN/OPN2101A/")
     mock_send_request_to_api.assert_called_once_with("OPN2101A")
@@ -184,7 +184,7 @@ def test_process_instrument_uploads_instrument_if_database_files_do_not_match(
         mock_sftp,
         "ONS/OPN/OPN2101A/",
         "OPN2101A",
-        ["OPN2101A.bDix", "OPN2101A.bmix", "OPN2101A.blix", "oPN2101A.bDbx"],
+        ["OPN2101A.bDix", "OPN2101A.bmix", "OPN2101A.blix", "oPN2101A.bDbx"]
     )
     mock_delete_local_instrument_files.assert_called_once()
 
@@ -204,7 +204,7 @@ def test_process_instrument_doesnt_upload_instrument_if_database_files_do_match(
         mock_check_instrument_database_file_exists,
         mock_get_instrument_files,
         mock_delete_local_instrument_files,
-        mock_sftp,
+        mock_sftp
 ):
     mock_send_request_to_api.assert_not_called()
     mock_check_instrument_database_file_exists.return_value = True
@@ -223,7 +223,7 @@ def test_upload_instrument(mock_google_storage, mock_sftp):
         "OPN2101A.bDix",
         "OPN2101A.bmix",
         "OPN2101A.blix",
-        "OPN2101A.bdbx",
+        "OPN2101A.bdbx"
     ]
     upload_instrument(mock_sftp, "ONS/OPN/OPN2101A/", instrument_name, instrument_files)
     assert mock_google_storage.call_count == len(instrument_files)
