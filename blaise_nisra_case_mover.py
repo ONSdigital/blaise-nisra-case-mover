@@ -144,7 +144,6 @@ def get_instrument_files(sftp, source_path):
 
 
 def check_if_matching_file_in_bucket(local_file, bucket_file_location):
-    print("bucket_file_location - " + bucket_file_location)
     bucket_file = google_storage.get_blob(bucket_file_location)
     if bucket_file is None:
         log.info(f"File {bucket_file} not found in bucket")
