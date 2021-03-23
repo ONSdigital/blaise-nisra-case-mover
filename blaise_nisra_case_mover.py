@@ -15,7 +15,7 @@ from util.service_logging import log
 
 app = Flask(__name__)
 
-googleStorage = GoogleStorage(bucket_name, log)
+google_storage = GoogleStorage(bucket_name, log)
 
 
 @app.route("/")
@@ -31,8 +31,8 @@ def main():
     log.info(f"server_park - {os.getenv('SERVER_PARK', 'env_var_not_set')}")
     log.info(f"blaise_api_url - {os.getenv('BLAISE_API_URL', 'env_var_not_set')}")
 
-    googleStorage.initialise_bucket_connection()
-    if googleStorage.bucket is None:
+    google_storage.initialise_bucket_connection()
+    if google_storage.bucket is None:
         return "Connection to bucket failed", 500
 
     try:
@@ -144,7 +144,8 @@ def get_instrument_files(sftp, source_path):
 
 
 def check_if_matching_file_in_bucket(local_file, bucket_file_location):
-    bucket_file = googleStorage.get_blob(bucket_file_location)
+    print("bucket_file_location - " + bucket_file_location)
+    bucket_file = google_storage.get_blob(bucket_file_location)
     if bucket_file is None:
         log.info(f"File {bucket_file} not found in bucket")
         return False
@@ -176,7 +177,7 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         log.info(
             f"Uploading instrument file to bucket - {instrument_name}/{instrument_file}"
         )
-        googleStorage.upload_file(
+        google_storage.upload_file(
             instrument_file, f"{instrument_name}/{instrument_file}".upper()
         )
 

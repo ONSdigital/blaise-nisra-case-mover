@@ -12,14 +12,14 @@ def before_feature(context, feature):
     context.client = app.test_client()
 
 def after_scenario(context, scenario):
-    googleStorage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
-    googleStorage.initialise_bucket_connection()
-    if googleStorage.bucket is None:
+    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
+    google_storage.initialise_bucket_connection()
+    if google_storage.bucket is None:
         print("Failed")
 
-    blobs = googleStorage.list_blobs()
+    blobs = google_storage.list_blobs()
 
-    googleStorage.delete_blobs(blobs)
+    google_storage.delete_blobs(blobs)
 
     sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
     sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")

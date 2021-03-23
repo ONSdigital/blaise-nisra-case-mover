@@ -27,7 +27,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
         print("Failed")
 
     for file in file_list:
-        nisra_google_storage.upload_file(file, f"OPN2101A/{file}")
+        nisra_google_storage.upload_file(file, f"OPN2101A/{file}".upper())
 
     file_generation_list = []
 
@@ -114,7 +114,7 @@ def step_a_call_is_not_made_to_the_restful_api(context):
 
 
 def copy_opn2101a_files_to_sftp():
-    os.environ["google_application_credentials"] = "key.json"
+    os.environ["google_application_credentials"] = "S:\\work\\code\\blaise-nisra-case-mover\\key.json"
     google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"), logging)
     google_storage.initialise_bucket_connection()
 
