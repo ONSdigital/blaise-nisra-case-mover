@@ -15,7 +15,7 @@ from util.service_logging import log
 
 app = Flask(__name__)
 
-googleStorage = GoogleStorage(bucket_name, log)
+google_storage = GoogleStorage(bucket_name, log)
 
 
 @app.route("/")
@@ -31,8 +31,8 @@ def main():
     log.info(f"server_park - {os.getenv('SERVER_PARK', 'env_var_not_set')}")
     log.info(f"blaise_api_url - {os.getenv('BLAISE_API_URL', 'env_var_not_set')}")
 
-    googleStorage.initialise_bucket_connection()
-    if googleStorage.bucket is None:
+    google_storage.initialise_bucket_connection()
+    if google_storage.bucket is None:
         return "Connection to bucket failed", 500
 
     try:
@@ -70,7 +70,7 @@ def main():
         log.error("SFTP connection failed")
         return "SFTP connection failed", 500
     except Exception as ex:
-        log.exception("Exception - %s", ex)
+        log.error("Exception - %s", ex)
         sftp.close()
         log.info("SFTP connection closed")
         return "Exception occurred", 500
@@ -97,12 +97,14 @@ def process_instrument(sftp, source_path):
     if not check_instrument_database_file_exists(instrument_files, instrument_name):
         log.info(f"Instrument database file not found - {instrument_db_file}")
         return f"Instrument database file not found - {instrument_db_file}"
+    instrument_db_file = get_actual_instrument_database_file_name(instrument_files, instrument_name)
     sftp.get(source_path + instrument_db_file, instrument_db_file)
     log.info("Checking if database file has already been processed...")
     if not check_if_matching_file_in_bucket(
-        instrument_db_file, f"{instrument_name}/{instrument_db_file}"
+        instrument_db_file, f"{instrument_name}/{instrument_db_file}".upper()
     ):
         upload_instrument(sftp, source_path, instrument_name, instrument_files)
+        send_request_to_api(instrument_name)
 
 
 def check_instrument_database_file_exists(instrument_files, instrument_name):
@@ -112,6 +114,15 @@ def check_instrument_database_file_exists(instrument_files, instrument_name):
         if instrument_file.lower() == instrument_name.lower() + ".bdbx":
             log.info(f"Database file found - {instrument_file}")
             return True
+    return False
+
+
+def get_actual_instrument_database_file_name(instrument_files, instrument_name):
+    if not instrument_files:
+        return False
+    for instrument_file in instrument_files:
+        if instrument_file.lower() == instrument_name.lower() + ".bdbx":
+            return instrument_file
     return False
 
 
@@ -126,14 +137,14 @@ def delete_local_instrument_files():
 def get_instrument_files(sftp, source_path):
     instrument_file_list = []
     for instrument_file in sftp.listdir(source_path):
-        if any(fnmatch.fnmatch(instrument_file, pattern) for pattern in extension_list):
+        if any(fnmatch.fnmatch(instrument_file.lower(), pattern) for pattern in extension_list):
             log.info(f"Instrument file found - {instrument_file}")
             instrument_file_list.append(instrument_file)
     return instrument_file_list
 
 
 def check_if_matching_file_in_bucket(local_file, bucket_file_location):
-    bucket_file = googleStorage.get_blob(bucket_file_location)
+    bucket_file = google_storage.get_blob(bucket_file_location)
     if bucket_file is None:
         log.info(f"File {bucket_file} not found in bucket")
         return False
@@ -165,25 +176,23 @@ def upload_instrument(sftp, source_path, instrument_name, instrument_files):
         log.info(
             f"Uploading instrument file to bucket - {instrument_name}/{instrument_file}"
         )
-        googleStorage.upload_file(
-            instrument_file, f"{instrument_name}/{instrument_file}"
+        google_storage.upload_file(
+            instrument_file, f"{instrument_name}/{instrument_file}".upper()
         )
-    try:
-        send_request_to_api(instrument_name)
-    except Exception as ex:
-        log.error("API Exception - %s", ex)
-        sftp.close()
-        log.info("SFTP connection closed")
 
 
 def send_request_to_api(instrument_name):
+    # added 10 second timeout exception pass to the api request because the connection to the api was timing out
+    # before it completed the work. this also allows parallel requests to be made to the api.
     server_park = os.getenv("SERVER_PARK", "env_var_not_set")
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     data = {"instrumentDataPath": instrument_name}
     log.info(f"Sending request to {blaise_api_url} for instrument {instrument_name}")
-    requests.post(
-        f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
-        headers={"content-type": "application/json"},
-        data=json.dumps(data), timeout=1  # add comment here explaining why the timeout
-    )
-    # log.info(f"Status code response from {blaise_api_url} - {request.status_code}")
+    try:
+        requests.post(
+            f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/{instrument_name}/data",
+            headers={"content-type": "application/json"},
+            data=json.dumps(data), timeout=10
+        )
+    except requests.exceptions.ReadTimeout:
+        pass
