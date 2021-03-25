@@ -22,7 +22,7 @@ steps:
         apt-get install python3-pip -y
         python3 -m pip install --upgrade setuptools
         python3 -m pip install -r requirements.txt
-        export SURVEY_SOURCE_PATH='ONS/OPN/'
+        export SURVEY_SOURCE_PATH='TEST/OPN/'
         export NISRA_BUCKET_NAME=${_NISRA_BUCKET_NAME}-test
         export SFTP_PORT=${_SFTP_PORT}
         export SFTP_HOST='localhost'
