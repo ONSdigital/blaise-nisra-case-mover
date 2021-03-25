@@ -32,4 +32,4 @@ def after_scenario(context, scenario):
             password=sftp_password,
             port=int(sftp_port),
     ) as sftp:
-        sftp.execute("rm -rf ~/TEST/OPN/OPN2101A")
+        sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")

@@ -138,9 +138,9 @@ def copy_opn2101a_files_to_sftp():
     ) as sftp:
 
         try:
-            sftp.execute("rm -rf ~/TEST/OPN/OPN2101A")
+            sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
         finally:
-            sftp.mkdir("TEST/OPN/OPN2101A/")
+            sftp.mkdir("ONS/TEST/OPN2101A/")
 
         for file in file_list:
-            sftp.put(f"{file}", f"TEST/OPN/OPN2101A/{file}")
+            sftp.put(f"{file}", f"ONS/TEST/OPN2101A/{file}")
