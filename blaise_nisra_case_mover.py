@@ -104,7 +104,7 @@ def process_instrument(sftp, source_path):
         instrument_db_file, f"{instrument_name}/{instrument_db_file}".upper()
     ):
         upload_instrument(sftp, source_path, instrument_name, instrument_files)
-        send_request_to_api(instrument_name)
+        send_request_to_api(instrument_name.upper())
 
 
 def check_instrument_database_file_exists(instrument_files, instrument_name):
