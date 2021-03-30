@@ -3,7 +3,7 @@ import os
 from unittest import mock
 
 import pysftp
-from behave import *
+from behave import given, then, when
 
 from google_storage import GoogleStorage
 
@@ -13,14 +13,16 @@ file_list = [
     "FrameSOC2K.blix",
     "OPN2101A.bdbx",
     "OPN2101A.bmix",
-    "OPN2101A.bdix"
+    "OPN2101A.bdix",
 ]
 
 
 @given("there is no new OPN NISRA data on the NISRA SFTP")
 def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     copy_opn2101a_files_to_sftp()
-    nisra_google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
+    nisra_google_storage = GoogleStorage(
+        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
+    )
     nisra_google_storage.initialise_bucket_connection()
 
     if nisra_google_storage.bucket is None:
@@ -37,8 +39,12 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     context.file_generation_list = file_generation_list.sort()
 
 
-@given("there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred")
-def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(context):
+@given(
+    "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"
+)
+def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(
+    context,
+):
     copy_opn2101a_files_to_sftp()
 
 
@@ -46,13 +52,19 @@ def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_bee
 def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
     with mock.patch("requests.post") as mock_requests_post:
         mock_requests_post.return_value.status_code = 200
-        context.page = context.client.get('/')
+        context.page = context.client.get("/")
         context.mock_requests_post = mock_requests_post
 
 
-@then("the new data is copied to the GCP storage bucket including all necessary support files")
-def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(context):
-    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
+@then(
+    "the new data is copied to the GCP storage bucket including all necessary support files"
+)
+def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(
+    context,
+):
+    google_storage = GoogleStorage(
+        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
+    )
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -64,7 +76,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
         "OPN2101A/FRAMESOC2K.BLIX",
         "OPN2101A/OPN2101A.BDBX",
         "OPN2101A/OPN2101A.BMIX",
-        "OPN2101A/OPN2101A.BDIX"
+        "OPN2101A/OPN2101A.BDIX",
     ]
 
     bucket_items = []
@@ -82,7 +94,9 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
 
 @then("no data is copied to the GCP storage bucket")
 def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
-    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging)
+    google_storage = GoogleStorage(
+        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
+    )
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -104,7 +118,7 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
         f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/OPN2101A/data",
         data='{"instrumentDataPath": "OPN2101A"}',
         headers={"content-type": "application/json"},
-        timeout=10
+        timeout=10,
     )
 
 
@@ -114,8 +128,12 @@ def step_a_call_is_not_made_to_the_restful_api(context):
 
 
 def copy_opn2101a_files_to_sftp():
-    os.environ["google_application_credentials"] = "S:\\work\\code\\blaise-nisra-case-mover\\key.json"
-    google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"), logging)
+    os.environ[
+        "google_application_credentials"
+    ] = "S:\\work\\code\\blaise-nisra-case-mover\\key.json"
+    google_storage = GoogleStorage(
+        os.getenv("TEST_DATA_BUCKET", "env_var_not_set"), logging
+    )
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -131,10 +149,10 @@ def copy_opn2101a_files_to_sftp():
     sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
 
     with pysftp.Connection(
-            host=sftp_host,
-            username=sftp_username,
-            password=sftp_password,
-            port=int(sftp_port)
+        host=sftp_host,
+        username=sftp_username,
+        password=sftp_password,
+        port=int(sftp_port),
     ) as sftp:
 
         try:

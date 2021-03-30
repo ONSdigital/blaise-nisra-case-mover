@@ -34,4 +34,3 @@ class GoogleStorage:
 
     def delete_blobs(self, blob_list):
         self.bucket.delete_blobs(blob_list)
-
