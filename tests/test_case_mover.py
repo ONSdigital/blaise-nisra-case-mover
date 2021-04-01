@@ -8,7 +8,6 @@ from case_mover import CaseMover
 from gcs_stream_upload import GCSObjectStreamUpload
 from google_storage import GoogleStorage
 from models import Instrument
-from models.instruments import Instrument
 
 
 @mock.patch.object(GoogleStorage, "get_blob_md5")
@@ -116,7 +115,10 @@ def test_send_request_to_api(mock_requests_post, google_storage, config, mock_sf
     case_mover = CaseMover(google_storage, config, mock_sftp)
     case_mover.send_request_to_api("opn2101a")
     mock_requests_post.assert_called_once_with(
-        f"http://{config.blaise_api_url}/api/v1/serverparks/{config.server_park}/instruments/opn2101a/data",
+        (
+            f"http://{config.blaise_api_url}/api/v1/serverparks/"
+            + f"{config.server_park}/instruments/opn2101a/data"
+        ),
         json={"instrumentDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
         timeout=10,

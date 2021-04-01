@@ -1,3 +1,5 @@
+from typing import Dict
+
 import pysftp
 from flask import Flask
 from paramiko import SSHException
@@ -52,17 +54,7 @@ def main():
                 log.info("No instrument folders found")
                 return "No instrument folders found, exiting", 200
             for instrument_name, instrument in instruments.items():
-                log.info(
-                    f"Processing instrument - {instrument_name} - {instrument.sftp_path}"
-                )
-                if case_mover.compare_bdbx_md5(instrument):
-                    log.info(
-                        f"Instrument - {instrument_name} - has no changes to the databse file, skipping..."
-                    )
-                else:
-                    log.info(f"Syncing instrument - {instrument_name}")
-                    case_mover.sync_instrument(instrument)
-                    case_mover.send_request_to_api(instrument.gcp_folder())
+                process_instrument(case_mover, instrument_name, instrument)
         log.info("SFTP connection closed")
         log.info("Process complete")
         return "Process complete", 200
@@ -74,6 +66,21 @@ def main():
         log.error("Exception - %s", ex)
         log.info("SFTP connection closed")
         return "Exception occurred", 500
+
+
+def process_instrument(
+    case_mover: CaseMover, instrument_name: str, instrument: Instrument
+):
+    log.info(f"Processing instrument - {instrument_name} - {instrument.sftp_path}")
+    if case_mover.compare_bdbx_md5(instrument):
+        log.info(
+            f"Instrument - {instrument_name} - "
+            + "has no changes to the databse file, skipping..."
+        )
+    else:
+        log.info(f"Syncing instrument - {instrument_name}")
+        case_mover.sync_instrument(instrument)
+        case_mover.send_request_to_api(instrument.gcp_folder())
 
 
 def get_filtered_instruments(sftp: SFTP) -> Dict[str, Instrument]:

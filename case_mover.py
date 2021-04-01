@@ -46,15 +46,21 @@ class CaseMover:
                 blob_stream.write(sftp_file.read(self.config.bufsize))
 
     def send_request_to_api(self, instrument_name):
-        # added 10 second timeout exception pass to the api request because the connection to the api was timing out
-        # before it completed the work. this also allows parallel requests to be made to the api.
+        # added 10 second timeout exception pass to the api request
+        # because the connection to the api was timing out before
+        # it completed the work. this also allows parallel requests
+        # to be made to the api.
 
         log.info(
-            f"Sending request to {self.config.blaise_api_url} for instrument {instrument_name}"
+            f"Sending request to {self.config.blaise_api_url} "
+            + f"for instrument {instrument_name}"
         )
         try:
             requests.post(
-                f"http://{self.config.blaise_api_url}/api/v1/serverparks/{self.config.server_park}/instruments/{instrument_name}/data",
+                (
+                    f"http://{self.config.blaise_api_url}/api/v1/serverparks/"
+                    + f"{self.config.server_park}/instruments/{instrument_name}/data"
+                ),
                 headers={"content-type": "application/json"},
                 json={"instrumentDataPath": instrument_name},
                 timeout=10,

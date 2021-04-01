@@ -133,7 +133,8 @@ class SFTP:
                 filtered_instruments[instrument_name] = instrument
             else:
                 log.info(
-                    f"Instrument database file not found - {instrument_name} - not importing"
+                    "Instrument database file not found - "
+                    + f"{instrument_name} - not importing"
                 )
         return filtered_instruments
 
@@ -171,6 +172,7 @@ class SFTP:
         latest_instrument = sorted_conflicts[0]
         for conflict in sorted_conflicts[1:]:
             log.info(
-                f"Found newer instrument '{latest_instrument.sftp_path}' folder - Skipping this folder '{conflict.sftp_path}'"
+                f"Found newer instrument '{latest_instrument.sftp_path}' "
+                + f"folder - Skipping this folder '{conflict.sftp_path}'"
             )
         return latest_instrument

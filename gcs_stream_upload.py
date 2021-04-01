@@ -1,19 +1,21 @@
 from google.auth.transport.requests import AuthorizedSession
-from google.cloud import storage
 from google.resumable_media import common, requests
 
 from google_storage import GoogleStorage
 
-# This has been taken from the blog post: https://dev.to/sethmlarson/python-data-streaming-to-google-cloud-storage-with-resumable-uploads-458h
+# This has been taken from the blog post:
+# https://dev.to/sethmlarson/python-data-streaming-to-google-cloud-storage-with-resumable-uploads-458h  # noqa: E501
 # the idea is that by utilising resumable uploads we can stream data into a GCP file,
 # rather than having to hold the entire file in memory/ on disk
 # Usage:
 #
 # client = storage.Client()
 
-# with GCSObjectStreamUpload(client=client, bucket='test-bucket', blob='test-blob') as s:
+# with GCSObjectStreamUpload(google_storage=google_storage, blob='blob') as s:
 #     for _ in range(1024):
 #         s.write(b'x' * 1024)
+
+
 class GCSObjectStreamUpload(object):
     def __init__(
         self,
