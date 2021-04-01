@@ -1,3 +1,6 @@
+import binascii
+
+import pybase64
 from google.cloud import storage
 
 # workaround to prevent file transfer timeouts
@@ -10,11 +13,13 @@ class GoogleStorage:
         self.bucket_name = bucket_name
         self.log = log
         self.bucket = None
+        self.storage_client = None
 
     def initialise_bucket_connection(self):
         try:
             self.log.info(f"Connecting to bucket - {self.bucket_name}")
             storage_client = storage.Client()
+            self.storage_client = storage_client
             self.bucket = storage_client.get_bucket(self.bucket_name)
             self.log.info(f"Connected to bucket - {self.bucket_name}")
         except Exception as ex:
@@ -34,3 +39,11 @@ class GoogleStorage:
 
     def delete_blobs(self, blob_list):
         self.bucket.delete_blobs(blob_list)
+
+    def get_blob_md5(self, blob_location):
+        blob = self.bucket.get_blob(blob_location)
+        if not blob:
+            return None
+        return binascii.hexlify(pybase64.urlsafe_b64decode(blob.md5_hash)).decode(
+            "utf-8"
+        )
