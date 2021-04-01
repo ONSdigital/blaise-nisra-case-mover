@@ -21,7 +21,8 @@ steps:
         echo "----------------------------------------"
         apt-get install python3-pip -y
         python3 -m pip install --upgrade setuptools
-        python3 -m pip install -r requirements.txt
+        python3 -m pip install poetry
+        python3 -m poetry install
         export SURVEY_SOURCE_PATH='ONS/TEST/'
         export NISRA_BUCKET_NAME=${_NISRA_BUCKET_NAME}-test
         export SFTP_PORT=${_SFTP_PORT}
@@ -29,7 +30,9 @@ steps:
         export SFTP_USERNAME=${_SFTP_USERNAME}
         export SFTP_PASSWORD=${_SFTP_PASSWORD}
         export TEST_DATA_BUCKET=${_TEST_DATA_BUCKET}
-        gcloud compute start-iap-tunnel sftp-test 22 --local-host-port=localhost:${_SFTP_PORT} --zone europe-west2-b & sleep 5 && python3 -m behave
+        gcloud compute start-iap-tunnel sftp-test 22 --local-host-port=localhost:${_SFTP_PORT} --zone europe-west2-b &
+        sleep 5
+        python3 -m poetry run behave --format=progress2 tests/features
 
   - name: 'gcr.io/cloud-builders/gcloud'
     id: Generate manifest
@@ -51,4 +54,3 @@ steps:
     id: Deploy service for testing
     args: [ "app", "deploy", "--version", "pr-no-$_PR_NUMBER", "--no-promote" ]
     timeout: "1600s"
-

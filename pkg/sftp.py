@@ -7,7 +7,10 @@ import re
 from datetime import datetime, timezone
 from typing import Dict, List
 
+import pysftp
+
 from models import Instrument
+from pkg.config import Config
 from util.service_logging import log
 
 
@@ -25,7 +28,7 @@ class SFTPConfig:
         cls.password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
         cls.port = os.getenv("SFTP_PORT", "env_var_not_set")
         cls.survey_source_path = os.getenv("SURVEY_SOURCE_PATH", "env_var_not_set")
-        return cls
+        return cls()
 
     def log(self):
         log.info(f"survey_source_path - {self.survey_source_path}")
@@ -35,7 +38,12 @@ class SFTPConfig:
 
 
 class SFTP:
-    def __init__(self, sftp_connection, sftp_config, config) -> None:
+    def __init__(
+        self,
+        sftp_connection: pysftp.Connection,
+        sftp_config: SFTPConfig,
+        config: Config,
+    ) -> None:
         self.sftp_connection = sftp_connection
         self.sftp_config = sftp_config
         self.config = config
@@ -50,7 +58,9 @@ class SFTP:
                 )
         return instruments
 
-    def get_instrument_files(self, instruments: Dict[str, Instrument]):
+    def get_instrument_files(
+        self, instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
         for _, instrument in instruments.items():
             instrument.files = self._get_instrument_files_for_instrument(instrument)
         return instruments
@@ -87,7 +97,7 @@ class SFTP:
             md5sum.update(sftp_file.read(self.config.bufsize))
         return md5sum.hexdigest()
 
-    def _get_instrument_files_for_instrument(self, instrument):
+    def _get_instrument_files_for_instrument(self, instrument: Instrument) -> List[str]:
         instrument_file_list = []
         for instrument_file in self.sftp_connection.listdir_attr(instrument.sftp_path):
             file_extension = pathlib.Path(instrument_file.filename).suffix.lower()
@@ -141,7 +151,7 @@ class SFTP:
     def _get_conflicting_instruments(
         _self, instruments: Dict[str, Instrument]
     ) -> Dict[str, List[str]]:
-        conflicting_instruments = {}
+        conflicting_instruments: Dict[str, List[str]] = {}
         for folder_name in instruments.keys():
             conflict_key = folder_name.lower()
             if conflict_key not in conflicting_instruments:

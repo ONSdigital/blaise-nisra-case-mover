@@ -4,7 +4,8 @@ from unittest import mock
 
 import pysftp
 from behave import given, then, when
-from google_storage import GoogleStorage
+
+from pkg.google_storage import GoogleStorage
 
 file_list = [
     "FrameEthnicity.blix",
@@ -28,7 +29,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
         print("Failed")
 
     for file in file_list:
-        nisra_google_storage.upload_file(file, f"OPN2101A/{file}".upper())
+        nisra_google_storage.upload_file(file, f"opn2101a/{file}".lower())
 
     file_generation_list = []
 
@@ -39,9 +40,9 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
 
 
 @given(
-    "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"
+    "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"  # noqa: E501
 )
-def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(
+def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(  # noqa: E501
     context,
 ):
     copy_opn2101a_files_to_sftp()
@@ -56,9 +57,9 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
 
 
 @then(
-    "the new data is copied to the GCP storage bucket including all necessary support files"
+    "the new data is copied to the GCP storage bucket including all necessary support files"  # noqa: E501
 )
-def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(
+def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
     context,
 ):
     google_storage = GoogleStorage(
@@ -70,12 +71,12 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
         print("Failed")
 
     bucket_file_list = [
-        "OPN2101A/FRAMEETHNICITY.BLIX",
-        "OPN2101A/FRAMESOC2010.BLIX",
-        "OPN2101A/FRAMESOC2K.BLIX",
-        "OPN2101A/OPN2101A.BDBX",
-        "OPN2101A/OPN2101A.BMIX",
-        "OPN2101A/OPN2101A.BDIX",
+        "opn2101a/frameethnicity.blix",
+        "opn2101a/framesoc2010.blix",
+        "opn2101a/framesoc2k.blix",
+        "opn2101a/opn2101a.bdbx",
+        "opn2101a/opn2101a.bmix",
+        "opn2101a/opn2101a.bdix",
     ]
 
     bucket_items = []
@@ -88,7 +89,9 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
 
     check = all(item in bucket_items for item in bucket_file_list)
 
-    assert check is True
+    assert (
+        check is True
+    ), f"Bucket items {bucket_items}, did not match expected: {bucket_file_list}"
 
 
 @then("no data is copied to the GCP storage bucket")
@@ -114,8 +117,11 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
     server_park = os.getenv("SERVER_PARK", "env_var_not_set")
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     context.mock_requests_post.assert_called_once_with(
-        f"http://{blaise_api_url}/api/v1/serverparks/{server_park}/instruments/OPN2101A/data",
-        data='{"instrumentDataPath": "OPN2101A"}',
+        (
+            f"http://{blaise_api_url}/api/v1/serverparks/"
+            f"{server_park}/instruments/opn2101a/data"
+        ),
+        json={"instrumentDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
         timeout=10,
     )
@@ -147,11 +153,15 @@ def copy_opn2101a_files_to_sftp():
     sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
     sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
 
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
+
     with pysftp.Connection(
         host=sftp_host,
         username=sftp_username,
         password=sftp_password,
         port=int(sftp_port),
+        cnopts=cnopts,
     ) as sftp:
 
         try:

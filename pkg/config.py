@@ -3,14 +3,6 @@ import os
 from util.service_logging import log
 
 
-class SFTPConfig:
-    host = os.getenv("SFTP_HOST", "env_var_not_set")
-    username = os.getenv("SFTP_USERNAME", "env_var_not_set")
-    password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
-    port = os.getenv("SFTP_PORT", "env_var_not_set")
-    survey_source_path = os.getenv("SURVEY_SOURCE_PATH", "env_var_not_set")
-
-
 class Config:
     bucket_name = "env_var_not_set"
     server_park = "env_var_not_set"
@@ -24,7 +16,7 @@ class Config:
         cls.server_park = os.getenv("SERVER_PARK", "env_var_not_set")
         cls.blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
         cls.bucket_name = os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
-        return cls
+        return cls()
 
     def log(self):
         log.info(f"bucket_name - {self.bucket_name}")

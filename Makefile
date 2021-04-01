@@ -17,6 +17,7 @@ lint:
 	@poetry run black --check .
 	@poetry run isort --check .
 	@poetry run flake8 --max-line-length=88 .
+	@poetry run mypy --config-file ${mkfile_dir}/.mypy.ini .
 
 .PHONY: integration-test
 ## Run integration tests

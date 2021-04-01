@@ -2,12 +2,14 @@ import logging
 import os
 
 import pysftp
-from blaise_nisra_case_mover import app
-from google_storage import GoogleStorage
+
+from app.app import app, load_config
+from pkg.google_storage import GoogleStorage
 
 
 def before_feature(context, feature):
     app.testing = True
+    load_config(app)
     context.client = app.test_client()
 
 
@@ -27,11 +29,14 @@ def after_scenario(context, scenario):
     sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
     sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
     sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
 
     with pysftp.Connection(
         host=sftp_host,
         username=sftp_username,
         password=sftp_password,
         port=int(sftp_port),
+        cnopts=cnopts,
     ) as sftp:
         sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")

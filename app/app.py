@@ -1,7 +1,8 @@
 from flask import Flask
 
 from app.mover import mover
-from pkg.config import Config, SFTPConfig
+from pkg.config import Config
+from pkg.sftp import SFTPConfig
 from util.service_logging import log
 
 app = Flask(__name__)

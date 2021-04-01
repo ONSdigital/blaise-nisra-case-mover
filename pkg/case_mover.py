@@ -1,5 +1,4 @@
 import math
-import pathlib
 
 import requests
 
@@ -18,17 +17,16 @@ class CaseMover:
         self.sftp = sftp
 
     def compare_bdbx_md5(self, instrument: Instrument) -> bool:
-        blob_md5 = self.google_storage.get_blob_md5(
-            instrument.get_blob_filepaths()[".bdbx"]
-        )
+        blob_md5 = self.google_storage.get_blob_md5(instrument.get_bdbx_blob_filepath())
         return instrument.bdbx_md5 == blob_md5
 
     def sync_instrument(self, instrument: Instrument) -> None:
         blob_filepaths = instrument.get_blob_filepaths()
         for file in instrument.files:
-            extension = pathlib.Path(file).suffix.lower()
-            blob_filepath = blob_filepaths[extension]
-            self.sync_file(blob_filepath, f"{instrument.sftp_path}/{file}")
+            blob_filepath = blob_filepaths[file]
+            sftp_path = f"{instrument.sftp_path}/{file}"
+            log.info(f"Syncing file from SFTP: {sftp_path} to GCP: {blob_filepath}")
+            self.sync_file(blob_filepath, sftp_path)
 
     def sync_file(self, blob_filepath: str, sftp_path: str) -> None:
         with GCSObjectStreamUpload(

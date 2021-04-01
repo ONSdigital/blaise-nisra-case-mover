@@ -66,7 +66,7 @@ def handle_exception(exception):
 
 def process_instrument(
     case_mover: CaseMover, instrument_name: str, instrument: Instrument
-):
+) -> None:
     log.info(f"Processing instrument - {instrument_name} - {instrument.sftp_path}")
     if case_mover.compare_bdbx_md5(instrument):
         log.info(

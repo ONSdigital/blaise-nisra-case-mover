@@ -1,6 +1,6 @@
 import os
 
-from app.blaise_nisra_case_mover import app, load_config
+from app.app import app, load_config
 
 load_config(app)
 
