@@ -1,9 +1,9 @@
 import pysftp
-
 from case_mover import CaseMover
 from config import Config
 from google_storage import GoogleStorage
 from sftp import SFTP, SFTPConfig
+
 from util.service_logging import log
 
 sftp_config = SFTPConfig.from_env()

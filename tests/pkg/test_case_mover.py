@@ -4,10 +4,10 @@ from unittest import mock
 
 import requests
 
-from case_mover import CaseMover
-from gcs_stream_upload import GCSObjectStreamUpload
-from google_storage import GoogleStorage
 from models import Instrument
+from pkg.case_mover import CaseMover
+from pkg.gcs_stream_upload import GCSObjectStreamUpload
+from pkg.google_storage import GoogleStorage
 
 
 @mock.patch.object(GoogleStorage, "get_blob_md5")

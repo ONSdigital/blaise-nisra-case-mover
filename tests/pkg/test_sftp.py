@@ -3,7 +3,7 @@ from datetime import datetime
 from unittest import mock
 
 from models.instruments import Instrument
-from sftp import SFTP
+from pkg.sftp import SFTP
 
 
 def test_get_instrument_folders(mock_sftp_connection, sftp_config, config):

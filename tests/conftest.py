@@ -3,9 +3,9 @@ from unittest import mock
 
 import pytest
 
-from config import Config
-from google_storage import GoogleStorage
-from sftp import SFTP, SFTPConfig
+from pkg.config import Config
+from pkg.google_storage import GoogleStorage
+from pkg.sftp import SFTP, SFTPConfig
 from util.service_logging import log
 
 

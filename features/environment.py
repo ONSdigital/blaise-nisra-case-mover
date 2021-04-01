@@ -2,7 +2,6 @@ import logging
 import os
 
 import pysftp
-
 from blaise_nisra_case_mover import app
 from google_storage import GoogleStorage
 

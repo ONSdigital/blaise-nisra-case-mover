@@ -3,11 +3,11 @@ import pathlib
 
 import requests
 
-from config import Config
-from gcs_stream_upload import GCSObjectStreamUpload
-from google_storage import GoogleStorage
 from models import Instrument
-from sftp import SFTP
+from pkg.config import Config
+from pkg.gcs_stream_upload import GCSObjectStreamUpload
+from pkg.google_storage import GoogleStorage
+from pkg.sftp import SFTP
 from util.service_logging import log
 
 

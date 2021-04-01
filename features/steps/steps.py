@@ -4,7 +4,6 @@ from unittest import mock
 
 import pysftp
 from behave import given, then, when
-
 from google_storage import GoogleStorage
 
 file_list = [

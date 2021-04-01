@@ -1,7 +1,7 @@
 from google.auth.transport.requests import AuthorizedSession
 from google.resumable_media import common, requests
 
-from google_storage import GoogleStorage
+from pkg.google_storage import GoogleStorage
 
 # This has been taken from the blog post:
 # https://dev.to/sethmlarson/python-data-streaming-to-google-cloud-storage-with-resumable-uploads-458h  # noqa: E501
