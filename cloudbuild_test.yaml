@@ -8,14 +8,14 @@ steps:
       - |
         add-apt-repository ppa:deadsnakes/ppa
         apt-get update
-        apt-get install python3.6-dev -y
+        apt-get install python3.7-dev -y
         # bcrypt fails without this, had this issue https://stackoverflow.com/questions/58393840/fatal-error-ffi-h-no-such-file-or-directory-on-pip2-install-pyopenssl
         apt-get install libffi-dev -y
         # This is needed for the SSH Client to run
         apt-get install libssl-dev -y
         export CRYPTOGRAPHY_ALLOW_OPENSSL_102=true
         # Make Python3 commands use python 3.6 by default
-        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 0
+        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 0
         echo "----------------------------------------"
         python3 --version
         echo "----------------------------------------"
