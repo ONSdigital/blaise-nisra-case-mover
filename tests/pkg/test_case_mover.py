@@ -11,7 +11,7 @@ from pkg.google_storage import GoogleStorage
 
 
 @mock.patch.object(GoogleStorage, "get_blob_md5")
-def test_compare_bdbx_md5_when_match(
+def test_bdbx_md5_changed_when_match(
     mock_get_blob_md5, google_storage, config, mock_sftp
 ):
     mock_get_blob_md5.return_value = "my_lovely_md5"
@@ -24,12 +24,12 @@ def test_compare_bdbx_md5_when_match(
         ],
     )
     case_mover = CaseMover(google_storage, config, mock_sftp)
-    assert case_mover.compare_bdbx_md5(instrument) is True
+    assert case_mover.bdbx_md5_changed(instrument) is True
     mock_get_blob_md5.assert_called_with("opn2103a/opn2103a.bdbx")
 
 
 @mock.patch.object(GoogleStorage, "get_blob_md5")
-def test_compare_bdbx_md5_when_not_match(
+def test_bdbx_md5_changed_when_not_match(
     mock_get_blob_md5, google_storage, config, mock_sftp
 ):
     mock_get_blob_md5.return_value = "another_md5_which_is_less_lovely"
@@ -42,12 +42,12 @@ def test_compare_bdbx_md5_when_not_match(
         ],
     )
     case_mover = CaseMover(google_storage, config, mock_sftp)
-    assert case_mover.compare_bdbx_md5(instrument) is False
+    assert case_mover.bdbx_md5_changed(instrument) is False
     mock_get_blob_md5.assert_called_with("opn2103a/opn2103a.bdbx")
 
 
 @mock.patch.object(GoogleStorage, "get_blob_md5")
-def test_compare_bdbx_md5_when_no_gcp_file(
+def test_bdbx_md5_changed_when_no_gcp_file(
     mock_get_blob_md5, google_storage, config, mock_sftp
 ):
     mock_get_blob_md5.return_value = None
@@ -60,7 +60,7 @@ def test_compare_bdbx_md5_when_no_gcp_file(
         ],
     )
     case_mover = CaseMover(google_storage, config, mock_sftp)
-    assert case_mover.compare_bdbx_md5(instrument) is False
+    assert case_mover.bdbx_md5_changed(instrument) is False
     mock_get_blob_md5.assert_called_with("opn2103a/opn2103a.bdbx")
 
 

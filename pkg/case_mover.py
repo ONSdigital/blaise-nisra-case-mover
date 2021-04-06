@@ -16,7 +16,7 @@ class CaseMover:
         self.config = config
         self.sftp = sftp
 
-    def compare_bdbx_md5(self, instrument: Instrument) -> bool:
+    def bdbx_md5_changed(self, instrument: Instrument) -> bool:
         blob_md5 = self.google_storage.get_blob_md5(instrument.get_bdbx_blob_filepath())
         return instrument.bdbx_md5 == blob_md5
 

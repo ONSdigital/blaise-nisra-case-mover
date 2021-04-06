@@ -68,7 +68,7 @@ def process_instrument(
     case_mover: CaseMover, instrument_name: str, instrument: Instrument
 ) -> None:
     log.info(f"Processing instrument - {instrument_name} - {instrument.sftp_path}")
-    if case_mover.compare_bdbx_md5(instrument):
+    if case_mover.bdbx_md5_changed(instrument):
         log.info(
             f"Instrument - {instrument_name} - "
             + "has no changes to the databse file, skipping..."
