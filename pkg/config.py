@@ -13,10 +13,11 @@ class Config:
 
     @classmethod
     def from_env(cls):
-        cls.server_park = os.getenv("SERVER_PARK", "env_var_not_set")
-        cls.blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
-        cls.bucket_name = os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
-        return cls()
+        config = cls()
+        config.server_park = os.getenv("SERVER_PARK", "env_var_not_set")
+        config.blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
+        config.bucket_name = os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
+        return config
 
     def log(self):
         log.info(f"bucket_name - {self.bucket_name}")
