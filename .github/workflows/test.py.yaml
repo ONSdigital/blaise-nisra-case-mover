@@ -1,4 +1,4 @@
-name: Test coverage report 
+name: Test coverage report
 
 on:
   pull_request:
@@ -21,14 +21,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install pytest-cov
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pytest --cov=./ tests/*
+        pip install poetry
+        poetry install
+        poetry run pytest --cov=./ tests/*
     - name: Codecov
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: true
-
-
-
