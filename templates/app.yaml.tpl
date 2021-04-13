@@ -24,4 +24,5 @@ handlers:
 - url: /.*
   script: auto
   secure: always
+  login: admin
   redirect_http_response_code: 301
