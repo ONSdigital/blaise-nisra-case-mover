@@ -6,30 +6,30 @@
 
 NISRA host an online Blaise web collection solution on our behalf. They periodically upload the results to an SFTP server.
 
-This service downloads the data from the SFTP and re-uploads it to a GCP storage bucket, then calls the 
+This service downloads the data from the SFTP and re-uploads it to a GCP storage bucket, then calls the
 [Blaise Rest API](https://github.com/ONSdigital/blaise-api-rest) which will then pickup this data for further processing.
 
 
 ### Setup for Local development
 
 
-| Environment Variable | Description                                                                                                                                                                                                                                    | Example                            |
-|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
-| SURVEY_SOURCE_PATH   | Where on the sftp sever should the system look for the instruments.                                                                                                                                                                            | `ONS/OPN/`                         |
-| NISRA_BUCKET_NAME    | Name of the bucket to upload the downloaded SFTP files too.                                                                                                                                                                                    | `ons-blaise-env-nisra`             |
-| TEST_DATA_BUCKET     | Not needed for running Case Mover, but used for behave integration tests, this is where the Test data is pulled from.                                                                                                                          | `ons-blaise-env-test-data`         |
-| SFTP_PORT            | Connection information to SFTP server.                                                                                                                                                                                                         | `22`                               |
-| SFTP_HOST            | Connection information to SFTP server.                                                                                                                                                                                                         | `localhost`                        |
-| SFTP_USERNAME        | Connection information to SFTP server.                                                                                                                                                                                                         | `sftp-test`                        |
-| SFTP_PASSWORD        | Connection information to SFTP server.                                                                                                                                                                                                         | `t4734rfsdfyds7`                   |
-| BLAISE_API_URL       | Url the [Blaise Rest API](https://github.com/ONSdigital/blaise-api-rest) is running on, this is called once new data is uploaded to the Bucket.<br>For local development, you can port forward to the restapi VM similarly to the SFTP server. | `localhost:90`                     |
-| SERVER_PARK          | Main server park for Blaise, this is passed to the call to the Blaise Rest API.                                                                                                                                                                | `gusty`                            |
-| FLASK_ENV            | For local development set this to `development` so that the system will use your local key.json for authentication with GCP Buckets.                                                                                                           | `development`                      |
+| Environment Variable | Description                                                                                                                                                                                                                                    | Example                    |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| SURVEY_SOURCE_PATH   | Where on the sftp sever should the system look for the instruments.                                                                                                                                                                            | `ONS/OPN/`                 |
+| NISRA_BUCKET_NAME    | Name of the bucket to upload the downloaded SFTP files too.                                                                                                                                                                                    | `ons-blaise-env-nisra`     |
+| TEST_DATA_BUCKET     | Not needed for running Case Mover, but used for behave integration tests, this is where the Test data is pulled from.                                                                                                                          | `ons-blaise-env-test-data` |
+| SFTP_PORT            | Connection information to SFTP server.                                                                                                                                                                                                         | `22`                       |
+| SFTP_HOST            | Connection information to SFTP server.                                                                                                                                                                                                         | `localhost`                |
+| SFTP_USERNAME        | Connection information to SFTP server.                                                                                                                                                                                                         | `sftp-test`                |
+| SFTP_PASSWORD        | Connection information to SFTP server.                                                                                                                                                                                                         | `t4734rfsdfyds7`           |
+| BLAISE_API_URL       | Url the [Blaise Rest API](https://github.com/ONSdigital/blaise-api-rest) is running on, this is called once new data is uploaded to the Bucket.<br>For local development, you can port forward to the restapi VM similarly to the SFTP server. | `localhost:90`             |
+| SERVER_PARK          | Main server park for Blaise, this is passed to the call to the Blaise Rest API.                                                                                                                                                                | `gusty`                    |
+| FLASK_ENV            | For local development set this to `development` so that the system will use your local key.json for authentication with GCP Buckets.                                                                                                           | `development`              |
 
 Create a .env file with the following environment variables:
 
 ```
-SURVEY_SOURCE_PATH = 'ONS/OPN/'
+SURVEY_SOURCE_PATH = './ONS/OPN/'
 NISRA_BUCKET_NAME = 'ons-blaise-<env>-nisra'
 TEST_DATA_BUCKET = 'ons-blaise-<env>-test-data'
 SFTP_PORT = '2222'
@@ -60,12 +60,12 @@ the project.
 
 On macOS
 ```
-python3 -m venv venv  
+python3 -m venv venv
 source venv/bin/activate
 ```
 On Windows
 ```
-python -m venv venv  
+python -m venv venv
 venv\Scripts\activate
 ```
 
@@ -75,14 +75,14 @@ Start the Flask sever:
 python main.py
 ```
 
-By default, this will start the server on port 5000, open a browser and navigate to http://localhost:5000, to start the main process. 
+By default, this will start the server on port 5000, open a browser and navigate to http://localhost:5000, to start the main process.
 
 
 ### Testing
 
 #### Unit tests
 
-To run the unit test for the project, from the root of the project, run: 
+To run the unit test for the project, from the root of the project, run:
 ```bash
 pytest --cov=./ tests/*
 ```
@@ -97,7 +97,7 @@ behave
 ```
 
 You will see the logs outputted from Nisra Case Mover as it runs. With a summary outputted at the end.
-```bash 
+```bash
 1 feature passed, 0 failed, 0 skipped
 2 scenarios passed, 0 failed, 0 skipped
 8 steps passed, 0 failed, 0 skipped, 0 undefined
