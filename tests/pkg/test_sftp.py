@@ -1,4 +1,5 @@
 import io
+import stat
 from datetime import datetime
 from unittest import mock
 
@@ -6,13 +7,16 @@ from models.instruments import Instrument
 from pkg.sftp import SFTP
 
 
-def test_get_instrument_folders(mock_sftp_connection, sftp_config, config):
-    mock_sftp_connection.listdir.return_value = [
-        "OPN2101A",
-        "LMS2101A",
-        "lMS2101A",
-        "lMS2101a",
-        "foobar",
+def test_get_instrument_folders(
+    mock_sftp_connection, sftp_config, config, mock_list_dir_attr
+):
+    mock_sftp_connection.listdir_attr.return_value = [
+        mock_list_dir_attr(filename="OPN2101A", st_mtime=1, st_mode=stat.S_IFDIR),
+        mock_list_dir_attr(filename="LMS2101A", st_mtime=1, st_mode=stat.S_IFDIR),
+        mock_list_dir_attr(filename="lMS2101A", st_mtime=1, st_mode=stat.S_IFDIR),
+        mock_list_dir_attr(filename="lMS2101a", st_mtime=1, st_mode=stat.S_IFDIR),
+        mock_list_dir_attr(filename="lMS2101a.zip", st_mtime=1, st_mode=stat.S_IFREG),
+        mock_list_dir_attr(filename="foobar", st_mtime=1, st_mode=stat.S_IFDIR),
     ]
     sftp = SFTP(mock_sftp_connection, sftp_config, config)
     assert sftp.get_instrument_folders() == {

@@ -7,7 +7,7 @@ class Config:
     bucket_name = "env_var_not_set"
     server_park = "env_var_not_set"
     blaise_api_url = "env_var_not_set"
-    instrument_regex = "^[a-zA-Z]{3}[0-9][0-9][0-9][0-9]"
+    valid_surveys = ["OPN", "LMS"]
     extension_list = [".blix", ".bdbx", ".bdix", ".bmix"]
     bufsize = 10 * 1024 * 1024  # 10Mb
 
@@ -21,7 +21,16 @@ class Config:
 
     def log(self):
         log.info(f"bucket_name - {self.bucket_name}")
-        log.info(f"instrument_regex - {self.instrument_regex}")
+        log.info(f"valid_surveys - {self.valid_surveys}")
         log.info(f"extension_list - {str(self.extension_list)}")
         log.info(f"server_park - {self.server_park}")
         log.info(f"blaise_api_url - {self.blaise_api_url}")
+
+    def valid_survey_name(self, survey_name: str) -> bool:
+        survey_prefix = survey_name.upper()[:3]
+        survey_number = survey_name[3:7]
+        return (
+            survey_prefix in self.valid_surveys
+            and survey_number.isnumeric()
+            and len(survey_name) >= 7
+        )

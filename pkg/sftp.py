@@ -3,7 +3,7 @@ import math
 import operator
 import os
 import pathlib
-import re
+import stat
 from datetime import datetime, timezone
 from typing import Dict, List
 
@@ -50,8 +50,13 @@ class SFTP:
 
     def get_instrument_folders(self) -> Dict[str, Instrument]:
         instruments = {}
-        for folder in self.sftp_connection.listdir(self.sftp_config.survey_source_path):
-            if re.compile(self.config.instrument_regex).match(folder):
+        for folder_attr in self.sftp_connection.listdir_attr(
+            self.sftp_config.survey_source_path
+        ):
+            if not stat.S_ISDIR(folder_attr.st_mode):
+                continue
+            folder = folder_attr.filename
+            if self.config.valid_survey_name(folder):
                 log.info(f"Instrument folder found - {folder}")
                 instruments[folder] = Instrument(
                     sftp_path=f"{self.sftp_config.survey_source_path}/{folder}"

@@ -60,7 +60,7 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
 @when(
     "the nisra-mover service is run with the survey_source_path of {survey_source_path}"
 )
-def step_the_nisra_mover_service_is_run_with_an_opn_configuration(
+def step_the_nisra_mover_service_is_run_with_survey_source_path(
     context, survey_source_path
 ):
     with mock.patch("requests.post") as mock_requests_post:

@@ -1,3 +1,4 @@
+import stat
 from dataclasses import dataclass
 from unittest import mock
 
@@ -53,12 +54,13 @@ def mock_stat():
 
 @pytest.fixture
 def mock_list_dir_attr():
-    def inner(filename, st_mtime):
+    def inner(filename, st_mtime, st_mode=stat.S_IFREG):
         @dataclass
         class MockListDirAttr:
             filename: str
             st_mtime: int
+            st_mode: int
 
-        return MockListDirAttr(filename=filename, st_mtime=st_mtime)
+        return MockListDirAttr(filename=filename, st_mtime=st_mtime, st_mode=st_mode)
 
     return inner
