@@ -6,5 +6,5 @@ cron:
 
   - description: "nisra case mover LMS"
     url: /?survey_source_path=./ONS/LMS
-    schedule: every 60 minutes from 00:45 to 23:45
+    schedule: every monday 09:00
     target: nisra-case-mover
