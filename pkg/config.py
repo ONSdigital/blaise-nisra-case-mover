@@ -7,7 +7,7 @@ class Config:
     bucket_name = "env_var_not_set"
     server_park = "env_var_not_set"
     blaise_api_url = "env_var_not_set"
-    instrument_regex = "^[a-zA-Z]{3}[0-9][0-9][0-9][0-9][a-zA-Z]$"
+    instrument_regex = "^[a-zA-Z]{3}[0-9][0-9][0-9][0-9]"
     extension_list = [".blix", ".bdbx", ".bdix", ".bmix"]
     bufsize = 10 * 1024 * 1024  # 10Mb
 
