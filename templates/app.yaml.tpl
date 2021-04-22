@@ -18,7 +18,9 @@ vpc_access_connector:
 
 basic_scaling:
   idle_timeout: 1800s
-  max_instances: 1
+  max_instances: 2
+
+instance_class: B4
 
 handlers:
 - url: /.*
