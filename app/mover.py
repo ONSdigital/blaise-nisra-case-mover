@@ -1,7 +1,7 @@
 from typing import Dict
 
 import pysftp
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, request
 from paramiko import SSHException
 
 from models import Instrument
@@ -15,8 +15,11 @@ mover = Blueprint("batch", __name__, url_prefix="/")
 
 @mover.route("/")
 def main():
+    survey_source_path = request.args.get("survey_source_path")
     config = current_app.nisra_config
     sftp_config = current_app.sftp_config
+    if survey_source_path:
+        sftp_config.survey_source_path = survey_source_path
     google_storage = init_google_storage(config)
     if google_storage.bucket is None:
         return "Connection to bucket failed", 500

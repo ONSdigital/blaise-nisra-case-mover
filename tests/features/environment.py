@@ -10,6 +10,7 @@ from pkg.google_storage import GoogleStorage
 def before_feature(context, feature):
     app.testing = True
     load_config(app)
+    context.app = app
     context.client = app.test_client()
 
 
