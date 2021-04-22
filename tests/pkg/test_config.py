@@ -28,7 +28,7 @@ def test_config_log(caplog):
         (
             "util.service_logging",
             logging.INFO,
-            "instrument_regex - ^[a-zA-Z]{3}[0-9][0-9][0-9][0-9][a-zA-Z]$",
+            "instrument_regex - ^[a-zA-Z]{3}[0-9][0-9][0-9][0-9]",
         ),
         (
             "util.service_logging",
