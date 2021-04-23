@@ -1,5 +1,7 @@
 import os
 
+from paramiko.common import DEFAULT_WINDOW_SIZE
+
 from util.service_logging import log
 
 
@@ -9,7 +11,7 @@ class Config:
     blaise_api_url = "env_var_not_set"
     valid_surveys = ["OPN", "LMS"]
     extension_list = [".blix", ".bdbx", ".bdix", ".bmix"]
-    bufsize = 3 * 1024 * 1024  # 3MB
+    bufsize = DEFAULT_WINDOW_SIZE
 
     @classmethod
     def from_env(cls):

@@ -1,4 +1,3 @@
-import io
 import stat
 from datetime import datetime
 from unittest import mock
@@ -219,8 +218,10 @@ def test_get_bdbx_md5s(
     assert mock_generate_bdbx_md5.call_count == 2
 
 
-def test_generate_bdbx_md5(mock_sftp_connection, sftp_config, config, mock_stat):
-    fake_file = io.BytesIO(b"My fake bdbx file")
+def test_generate_bdbx_md5(
+    mock_sftp_connection, sftp_config, config, mock_stat, fake_sftp_file
+):
+    fake_file = fake_sftp_file(b"My fake bdbx file")
     mock_sftp_connection.stat.return_value = mock_stat(st_size=17)
     mock_sftp_connection.open.return_value = fake_file
     instrument = Instrument(

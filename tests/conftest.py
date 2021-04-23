@@ -1,3 +1,4 @@
+import io
 import stat
 from dataclasses import dataclass
 from unittest import mock
@@ -62,5 +63,20 @@ def mock_list_dir_attr():
             st_mode: int
 
         return MockListDirAttr(filename=filename, st_mtime=st_mtime, st_mode=st_mode)
+
+    return inner
+
+
+@pytest.fixture
+def fake_sftp_file():
+    def inner(contents):
+        class FakeSFTPFile(io.BytesIO):
+            def __init__(self, byte_content):
+                super().__init__(byte_content)
+
+            def prefetch(self):
+                pass
+
+        return FakeSFTPFile(contents)
 
     return inner
