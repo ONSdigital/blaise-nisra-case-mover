@@ -97,6 +97,7 @@ class SFTP:
         md5sum = hashlib.md5()
         chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
         sftp_file = self.sftp_connection.open(bdbx_file, bufsize=self.config.bufsize)
+        sftp_file.prefetch()
         for chunk in range(chunks):
             sftp_file.seek(chunk * self.config.bufsize)
             md5sum.update(sftp_file.read(self.config.bufsize))
