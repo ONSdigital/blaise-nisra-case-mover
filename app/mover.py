@@ -27,6 +27,7 @@ def main():
     log.info("Connecting to SFTP server")
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
+    cnopts.compression = True
 
     with pysftp.Connection(
         host=sftp_config.host,

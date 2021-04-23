@@ -168,6 +168,7 @@ def copy_opn2101a_files_to_sftp():
 
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
+    cnopts.compression = True
 
     with pysftp.Connection(
         host=sftp_host,
