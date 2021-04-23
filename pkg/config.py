@@ -9,7 +9,7 @@ class Config:
     blaise_api_url = "env_var_not_set"
     valid_surveys = ["OPN", "LMS"]
     extension_list = [".blix", ".bdbx", ".bdix", ".bmix"]
-    bufsize = 100 * 1024 * 1024  # 100Mb
+    bufsize = 10 * 1024 * 1024  # 100Mb
 
     @classmethod
     def from_env(cls):
