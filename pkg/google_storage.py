@@ -3,6 +3,8 @@ import binascii
 import pybase64
 from google.cloud import storage
 
+from util.service_logging import log
+
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
 storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -47,3 +49,9 @@ class GoogleStorage:
         return binascii.hexlify(pybase64.urlsafe_b64decode(blob.md5_hash)).decode(
             "utf-8"
         )
+
+
+def init_google_storage(config):
+    google_storage = GoogleStorage(config.bucket_name, log)
+    google_storage.initialise_bucket_connection()
+    return google_storage

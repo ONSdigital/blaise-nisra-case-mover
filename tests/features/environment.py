@@ -1,20 +1,40 @@
+import base64
 import logging
 import os
 
 import pysftp
+from google.cloud.pubsub_v1 import PublisherClient
 
+import processor
 from app.app import app, load_config
 from pkg.google_storage import GoogleStorage
+
+
+class FakePublisherClient(PublisherClient):
+    def __init__(self):
+        self.published_messages = []
+
+    def publish(self, topic_path, data):
+        message = {"topic_path": topic_path, "data": data}
+        self.published_messages.append(message)
+
+    def run_all(self):
+        for message in self.published_messages:
+            event = {"data": base64.encodebytes(message["data"])}
+            processor.main(event, {})
 
 
 def before_feature(context, feature):
     app.testing = True
     load_config(app)
     context.app = app
+    context.app.publisher_client = FakePublisherClient()
     context.client = app.test_client()
 
 
 def after_scenario(context, scenario):
+    print(f"Published messages: {context.app.publisher_client.published_messages}")
+    context.app.publisher_client.published_messages = []
     google_storage = GoogleStorage(
         os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
     )

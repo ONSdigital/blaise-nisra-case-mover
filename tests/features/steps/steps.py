@@ -55,6 +55,7 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
         mock_requests_post.return_value.status_code = 200
         context.page = context.client.get("/")
         context.mock_requests_post = mock_requests_post
+        context.app.publisher_client.run_all()
 
 
 @when(
@@ -67,6 +68,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
         mock_requests_post.return_value.status_code = 200
         context.page = context.client.get(f"/?survey_source_path={survey_source_path}")
         context.mock_requests_post = mock_requests_post
+        context.app.publisher_client.run_all()
 
 
 @then(
