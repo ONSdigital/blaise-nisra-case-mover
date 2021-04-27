@@ -5,7 +5,7 @@ import os
 import pysftp
 from google.cloud.pubsub_v1 import PublisherClient
 
-import processor
+import main
 from app.app import app, load_config
 from pkg.google_storage import GoogleStorage
 
@@ -21,7 +21,7 @@ class FakePublisherClient(PublisherClient):
     def run_all(self):
         for message in self.published_messages:
             event = {"data": base64.encodebytes(message["data"])}
-            processor.main(event, {})
+            main.processor(event, {})
 
 
 def before_feature(context, feature):
