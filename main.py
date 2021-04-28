@@ -1,16 +1,9 @@
-import os
-from app.app import app, load_config
-
-load_config(app)
-
-if __name__ == "__main__":
-    port = os.getenv("5000")
-    app.run(host="0.0.0.0", port=port)
-
 import base64
+import os
 
 import pysftp
 
+from app.app import app, load_config
 from models.processor_event import ProcessorEvent
 from pkg.case_mover import CaseMover
 from pkg.config import Config
@@ -18,6 +11,12 @@ from pkg.google_storage import init_google_storage
 from pkg.sftp import SFTP, SFTPConfig
 from processor import process_instrument
 from util.service_logging import log
+
+load_config(app)
+
+if __name__ == "__main__":
+    port = os.getenv("5000")
+    app.run(host="0.0.0.0", port=port)
 
 
 def processor(event, _context):

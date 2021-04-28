@@ -1,4 +1,5 @@
 import io
+import logging
 from datetime import datetime
 from unittest import mock
 
@@ -110,6 +111,36 @@ def test_sync_file(
     case_mover.sync_file("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
     assert fake_file.read() == fake_gcp_file.read()
     assert mock_stream_upload.call_count == len(fake_content)
+
+
+@mock.patch.object(GCSObjectStreamUpload, "write")
+@mock.patch.object(GCSObjectStreamUpload, "stop")
+@mock.patch.object(GCSObjectStreamUpload, "start")
+@mock.patch.object(GCSObjectStreamUpload, "__init__")
+def test_sync_file_exception(
+    mock_stream_upload_init,
+    _mock_stream_upload_start,
+    _mock_stream_upload_stop,
+    mock_stream_upload,
+    google_storage,
+    config,
+    mock_sftp,
+    mock_sftp_connection,
+    mock_stat,
+    fake_sftp_file,
+    caplog,
+):
+    config.bufsize = 1
+    mock_stream_upload_init.return_value = None
+    mock_sftp_connection.stat.side_effect = Exception("I exploded the thing")
+
+    with caplog.at_level(logging.ERROR):
+        case_mover = CaseMover(google_storage, config, mock_sftp)
+        case_mover.sync_file(
+            "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
+        )
+        assert "Fatal error while syncing file" in caplog.text
+        assert "I exploded the thing" in caplog.text
 
 
 @mock.patch.object(requests, "post")
