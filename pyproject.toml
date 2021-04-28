@@ -11,6 +11,8 @@ pysftp = "^0.2.9"
 Flask = "^1.1.2"
 google-cloud-storage = "^1.37.0"
 python-dotenv = "^0.16.0"
+google-cloud-pubsub = "^2.4.1"
+dacite = "^1.6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"

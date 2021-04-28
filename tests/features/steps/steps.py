@@ -50,10 +50,25 @@ def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_bee
 
 @when("the nisra-mover service is run with an OPN configuration")
 def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
+    context.app.sftp_config.survey_source_path = "./ONS/TEST"
     with mock.patch("requests.post") as mock_requests_post:
         mock_requests_post.return_value.status_code = 200
         context.page = context.client.get("/")
         context.mock_requests_post = mock_requests_post
+        context.app.publisher_client.run_all()
+
+
+@when(
+    "the nisra-mover service is run with the survey_source_path of {survey_source_path}"
+)
+def step_the_nisra_mover_service_is_run_with_survey_source_path(
+    context, survey_source_path
+):
+    with mock.patch("requests.post") as mock_requests_post:
+        mock_requests_post.return_value.status_code = 200
+        context.page = context.client.get(f"/?survey_source_path={survey_source_path}")
+        context.mock_requests_post = mock_requests_post
+        context.app.publisher_client.run_all()
 
 
 @then(
@@ -155,6 +170,7 @@ def copy_opn2101a_files_to_sftp():
 
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
+    cnopts.compression = True
 
     with pysftp.Connection(
         host=sftp_host,
