@@ -29,20 +29,23 @@ class CaseMover:
             self.sync_file(blob_filepath, sftp_path)
 
     def sync_file(self, blob_filepath: str, sftp_path: str) -> None:
-        with GCSObjectStreamUpload(
-            google_storage=self.google_storage,
-            blob_name=blob_filepath,
-            chunk_size=self.config.bufsize,
-        ) as blob_stream:
-            bdbx_details = self.sftp.sftp_connection.stat(sftp_path)
-            chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
-            sftp_file = self.sftp.sftp_connection.open(
-                sftp_path, bufsize=self.config.bufsize
-            )
-            sftp_file.prefetch()
-            for chunk in range(chunks):
-                sftp_file.seek(chunk * self.config.bufsize)
-                blob_stream.write(sftp_file.read(self.config.bufsize))
+        try:
+            with GCSObjectStreamUpload(
+                google_storage=self.google_storage,
+                blob_name=blob_filepath,
+                chunk_size=self.config.bufsize,
+            ) as blob_stream:
+                bdbx_details = self.sftp.sftp_connection.stat(sftp_path)
+                chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
+                sftp_file = self.sftp.sftp_connection.open(
+                    sftp_path, bufsize=self.config.bufsize
+                )
+                sftp_file.prefetch()
+                for chunk in range(chunks):
+                    sftp_file.seek(chunk * self.config.bufsize)
+                    blob_stream.write(sftp_file.read(self.config.bufsize))
+        except Exception:
+            log.exception("Fatal error while syncing file")
 
     def send_request_to_api(self, instrument_name):
         # added 10 second timeout exception pass to the api request
