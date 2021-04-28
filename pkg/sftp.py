@@ -3,7 +3,7 @@ import math
 import operator
 import os
 import pathlib
-import re
+import stat
 from datetime import datetime, timezone
 from typing import Dict, List
 
@@ -50,8 +50,13 @@ class SFTP:
 
     def get_instrument_folders(self) -> Dict[str, Instrument]:
         instruments = {}
-        for folder in self.sftp_connection.listdir(self.sftp_config.survey_source_path):
-            if re.compile(self.config.instrument_regex).match(folder):
+        for folder_attr in self.sftp_connection.listdir_attr(
+            self.sftp_config.survey_source_path
+        ):
+            if not stat.S_ISDIR(folder_attr.st_mode):
+                continue
+            folder = folder_attr.filename
+            if self.config.valid_survey_name(folder):
                 log.info(f"Instrument folder found - {folder}")
                 instruments[folder] = Instrument(
                     sftp_path=f"{self.sftp_config.survey_source_path}/{folder}"
@@ -92,6 +97,7 @@ class SFTP:
         md5sum = hashlib.md5()
         chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
         sftp_file = self.sftp_connection.open(bdbx_file, bufsize=self.config.bufsize)
+        sftp_file.prefetch()
         for chunk in range(chunks):
             sftp_file.seek(chunk * self.config.bufsize)
             md5sum.update(sftp_file.read(self.config.bufsize))

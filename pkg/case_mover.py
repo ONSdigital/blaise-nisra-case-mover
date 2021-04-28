@@ -39,6 +39,7 @@ class CaseMover:
             sftp_file = self.sftp.sftp_connection.open(
                 sftp_path, bufsize=self.config.bufsize
             )
+            sftp_file.prefetch()
             for chunk in range(chunks):
                 sftp_file.seek(chunk * self.config.bufsize)
                 blob_stream.write(sftp_file.read(self.config.bufsize))
