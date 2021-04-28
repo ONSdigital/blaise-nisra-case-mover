@@ -1,4 +1,5 @@
 from flask import Flask
+from google.cloud import pubsub_v1
 
 from app.mover import mover
 from pkg.config import Config
@@ -15,6 +16,7 @@ def load_config(app: Flask) -> None:
     sftp_config.log()
     app.nisra_config = config
     app.sftp_config = sftp_config
+    app.publisher_client = pubsub_v1.PublisherClient()
 
 
 app.register_blueprint(mover)
