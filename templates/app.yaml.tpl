@@ -12,6 +12,8 @@ env_variables:
   NISRA_BUCKET_NAME: _NISRA_BUCKET_NAME
   BLAISE_API_URL: _BLAISE_API_URL
   SERVER_PARK: _SERVER_PARK
+  PROJECT_ID : _PROJECT_ID
+  PROCESSOR_TOPIC_NAME: _PROCESSOR_TOPIC_NAME
 
 vpc_access_connector:
   name: projects/_PROJECT_ID/locations/europe-west2/connectors/vpcconnect
@@ -19,6 +21,8 @@ vpc_access_connector:
 basic_scaling:
   idle_timeout: 1800s
   max_instances: 1
+
+instance_class: B2
 
 handlers:
 - url: /.*
