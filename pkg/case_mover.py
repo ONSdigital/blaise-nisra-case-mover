@@ -67,7 +67,7 @@ class CaseMover:
             log.exception("Fatal error while syncing file")
 
     def send_request_to_api(self, instrument_name):
-        # added 10 second timeout exception pass to the api request
+        # added 1 second timeout exception pass to the api request
         # because the connection to the api was timing out before
         # it completed the work. this also allows parallel requests
         # to be made to the api.
@@ -84,7 +84,7 @@ class CaseMover:
                 ),
                 headers={"content-type": "application/json"},
                 json={"instrumentDataPath": instrument_name},
-                timeout=10,
+                timeout=1,
             )
         except requests.exceptions.ReadTimeout:
             pass

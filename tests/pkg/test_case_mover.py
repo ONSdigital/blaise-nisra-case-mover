@@ -155,7 +155,7 @@ def test_send_request_to_api(mock_requests_post, google_storage, config, mock_sf
         ),
         json={"instrumentDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
-        timeout=10,
+        timeout=1,
     )
 
 
