@@ -80,3 +80,15 @@ def fake_sftp_file():
         return FakeSFTPFile(contents)
 
     return inner
+
+
+@pytest.fixture
+def fake_blob():
+    def inner(name):
+        @dataclass
+        class FakeBlob:
+            name: str
+
+        return FakeBlob(name=name)
+
+    return inner

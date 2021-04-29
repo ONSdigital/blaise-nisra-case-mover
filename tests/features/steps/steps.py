@@ -138,7 +138,7 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
         ),
         json={"instrumentDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
-        timeout=10,
+        timeout=1,
     )
 
 

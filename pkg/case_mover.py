@@ -1,4 +1,6 @@
 import math
+import pathlib
+from typing import List
 
 import requests
 
@@ -16,9 +18,26 @@ class CaseMover:
         self.config = config
         self.sftp = sftp
 
+    def instrument_needs_updating(self, instrument: Instrument) -> bool:
+        return self.bdbx_md5_changed(instrument) or self.gcp_missing_files(instrument)
+
     def bdbx_md5_changed(self, instrument: Instrument) -> bool:
         blob_md5 = self.google_storage.get_blob_md5(instrument.get_bdbx_blob_filepath())
-        return instrument.bdbx_md5 == blob_md5
+        return instrument.bdbx_md5 != blob_md5
+
+    def gcp_missing_files(self, instrument: Instrument) -> bool:
+        instrument_blobs = self.get_instrument_blobs(instrument)
+        for file in instrument.files:
+            if file.lower() not in instrument_blobs:
+                return True
+        return False
+
+    def get_instrument_blobs(self, instrument: Instrument) -> List[str]:
+        instrument_blobs = []
+        for blob in self.google_storage.list_blobs():
+            if pathlib.Path(blob.name).parent.name == instrument.gcp_folder():
+                instrument_blobs.append(pathlib.Path(blob.name).name.lower())
+        return instrument_blobs
 
     def sync_instrument(self, instrument: Instrument) -> None:
         blob_filepaths = instrument.get_blob_filepaths()
@@ -48,7 +67,7 @@ class CaseMover:
             log.exception("Fatal error while syncing file")
 
     def send_request_to_api(self, instrument_name):
-        # added 10 second timeout exception pass to the api request
+        # added 1 second timeout exception pass to the api request
         # because the connection to the api was timing out before
         # it completed the work. this also allows parallel requests
         # to be made to the api.
@@ -65,7 +84,7 @@ class CaseMover:
                 ),
                 headers={"content-type": "application/json"},
                 json={"instrumentDataPath": instrument_name},
-                timeout=10,
+                timeout=1,
             )
         except requests.exceptions.ReadTimeout:
             pass
