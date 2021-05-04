@@ -1,24 +1,27 @@
 from copy import deepcopy
-from typing import Dict
+from typing import Dict, Tuple
 
 import pysftp
-from flask import Blueprint, current_app, request
+from flask import Blueprint, Flask, current_app, request
 from paramiko import SSHException
 
 from models import Instrument, ProcessorEvent
 from pkg.config import Config
 from pkg.google_storage import init_google_storage
-from pkg.sftp import SFTP
+from pkg.sftp import SFTP, SFTPConfig
 from util.service_logging import log
 
 mover = Blueprint("batch", __name__, url_prefix="/")
 
 
+def config_loader(app: Flask) -> Tuple[Config, SFTPConfig]:
+    return deepcopy(app.nisra_config), deepcopy(app.sftp_config)
+
+
 @mover.route("/")
 def main():
     survey_source_path = request.args.get("survey_source_path")
-    config = deepcopy(current_app.nisra_config)
-    sftp_config = deepcopy(current_app.sftp_config)
+    config, sftp_config = config_loader(current_app)
     if survey_source_path:
         sftp_config.survey_source_path = survey_source_path
     google_storage = init_google_storage(config)
