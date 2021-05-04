@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict
 
 import pysftp
@@ -16,8 +17,8 @@ mover = Blueprint("batch", __name__, url_prefix="/")
 @mover.route("/")
 def main():
     survey_source_path = request.args.get("survey_source_path")
-    config = current_app.nisra_config
-    sftp_config = current_app.sftp_config
+    config = deepcopy(current_app.nisra_config)
+    sftp_config = deepcopy(current_app.sftp_config)
     if survey_source_path:
         sftp_config.survey_source_path = survey_source_path
     google_storage = init_google_storage(config)
