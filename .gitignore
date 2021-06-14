@@ -122,7 +122,6 @@ processed
 # Icon must end with two \r
 Icon
 
-
 # Thumbnails
 ._*
 
@@ -143,3 +142,4 @@ Temporary Items
 .apdisk
 
 requirements.txt
+.vscode
