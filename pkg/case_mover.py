@@ -1,6 +1,6 @@
 import math
 import pathlib
-from typing import List
+from typing import List, Dict
 
 import requests
 
@@ -66,7 +66,7 @@ class CaseMover:
         except Exception:
             log.exception("Fatal error while syncing file")
 
-    def send_request_to_api(self, instrument_name):
+    def send_request_to_api(self, instrument_name: str) -> None:
         # added 1 second timeout exception pass to the api request
         # because the connection to the api was timing out before
         # it completed the work. this also allows parallel requests
@@ -88,3 +88,24 @@ class CaseMover:
             )
         except requests.exceptions.ReadTimeout:
             pass
+
+    def instrument_exists_in_blaise(self, instrument_name: str) -> bool:
+        response = requests.get(
+            f"http://{self.config.blaise_api_url}/api/v1/serverparks/"
+            + f"{self.config.server_park}/instruments/{instrument_name}/exists"
+        )
+        return response.json()
+
+    def filter_existing_instruments(
+        self, instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
+        filtered_instruments = {}
+        for key, instrument in instruments.items():
+            if self.instrument_exists_in_blaise(instrument.gcp_folder()):
+                log.info(f"Instrument {instrument.gcp_folder()} exists in blaise")
+                filtered_instruments[key] = instrument
+            else:
+                log.info(
+                    f"Instrument {instrument.gcp_folder()} does not exist in blaise, not ingesting..."
+                )
+        return filtered_instruments
