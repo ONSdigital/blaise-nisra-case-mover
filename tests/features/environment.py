@@ -6,7 +6,6 @@ import pysftp
 from google.cloud.pubsub_v1 import PublisherClient
 
 import main
-from app.app import app, load_config
 from pkg.google_storage import GoogleStorage
 
 
@@ -25,16 +24,12 @@ class FakePublisherClient(PublisherClient):
 
 
 def before_feature(context, feature):
-    app.testing = True
-    load_config(app)
-    context.app = app
-    context.app.publisher_client = FakePublisherClient()
-    context.client = app.test_client()
+    context.publisher_client = FakePublisherClient()
 
 
 def after_scenario(context, scenario):
-    print(f"Published messages: {context.app.publisher_client.published_messages}")
-    context.app.publisher_client.published_messages = []
+    print(f"Published messages: {context.publisher_client.published_messages}")
+    context.publisher_client.published_messages = []
     google_storage = GoogleStorage(
         os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
     )
