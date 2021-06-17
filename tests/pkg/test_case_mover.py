@@ -159,6 +159,48 @@ def test_send_request_to_api(mock_requests_post, google_storage, config, mock_sf
     )
 
 
+def test_instrument_exists_in_blaise(google_storage, config, mock_sftp, requests_mock):
+    requests_mock.get(
+        f"http://{config.blaise_api_url}/api/v1/serverparks/"
+        + f"{config.server_park}/instruments/opn2101a/exists",
+        text="false",
+    )
+    case_mover = CaseMover(google_storage, config, mock_sftp)
+    assert case_mover.instrument_exists_in_blaise("opn2101a") is False
+
+
+def test_instrument_exists_in_blaise_exists(
+    google_storage, config, mock_sftp, requests_mock
+):
+    requests_mock.get(
+        f"http://{config.blaise_api_url}/api/v1/serverparks/"
+        + f"{config.server_park}/instruments/opn2101a/exists",
+        text="true",
+    )
+    case_mover = CaseMover(google_storage, config, mock_sftp)
+    assert case_mover.instrument_exists_in_blaise("opn2101a") is True
+
+
+@mock.patch.object(CaseMover, "instrument_exists_in_blaise")
+def test_filter_existing_instruments(
+    mock_instrument_exists_in_blaise, google_storage, config, mock_sftp
+):
+    mock_instrument_exists_in_blaise.side_effect = (
+        lambda instrument_name: True if instrument_name.startswith("opn") else False
+    )
+    instruments = {
+        "OPN2101A": Instrument(sftp_path="./ONS/OPN/OPN2101A"),
+        "LMS2101A": Instrument(sftp_path="./ONS/OPN/LMS2101A"),
+        "lMS2101A": Instrument(sftp_path="./ONS/OPN/lMS2101A"),
+        "lMS2101a": Instrument(sftp_path="./ONS/OPN/lMS2101a"),
+    }
+    case_mover = CaseMover(google_storage, config, mock_sftp)
+    filtered_instruments = case_mover.filter_existing_instruments(instruments)
+    assert filtered_instruments == {
+        "OPN2101A": Instrument(sftp_path="./ONS/OPN/OPN2101A"),
+    }
+
+
 @mock.patch.object(GoogleStorage, "list_blobs")
 def test_get_instrument_blobs(
     mock_list_blobs, google_storage, config, mock_sftp, fake_blob
