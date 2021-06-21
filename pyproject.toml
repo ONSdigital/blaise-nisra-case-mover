@@ -8,7 +8,6 @@ authors = ["Your Name <you@example.com>"]
 python = "^3.7"
 pybase64 = "^1.1.4"
 pysftp = "^0.2.9"
-Flask = "^1.1.2"
 google-cloud-storage = "^1.37.0"
 python-dotenv = "^0.16.0"
 google-cloud-pubsub = "^2.4.1"
@@ -24,7 +23,7 @@ black = "^20.8b1"
 behave = "^1.2.6"
 mypy = "^0.812"
 pytest-cov = "^2.11.1"
-pytest-catchlog = "^1.2.2"
+requests-mock = "^1.9.3"
 
 [tool.isort]
 multi_line_output = "3"
