@@ -22,8 +22,8 @@ def trigger(event, _context):
     config = Config.from_env()
     sftp_config = SFTPConfig.from_env()
     config.log()
-    sftp_config.log()
     sftp_config.survey_source_path = trigger_event.survey
+    sftp_config.log()
     publisher_client = pubsub_v1.PublisherClient()
 
     cnopts = pysftp.CnOpts()
