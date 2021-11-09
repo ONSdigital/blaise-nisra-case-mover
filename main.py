@@ -26,7 +26,7 @@ def trigger(*args, **kwargs):
         attempts=3,
         sleeptime=15,
         retry_exceptions=(SSHException),
-        cleaup=ssh_retry_logger,
+        cleanup=ssh_retry_logger,
         args=args,
         kwargs=kwargs,
     )
@@ -85,7 +85,7 @@ def processor(*args, **kwargs):
         attempts=3,
         sleeptime=15,
         retry_exceptions=(SSHException),
-        cleaup=ssh_retry_logger,
+        cleanup=ssh_retry_logger,
         args=args,
         kwargs=kwargs,
     )
