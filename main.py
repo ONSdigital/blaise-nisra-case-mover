@@ -2,6 +2,8 @@ import base64
 
 import pysftp
 from google.cloud import pubsub_v1
+from redo import retry
+from paramiko.ssh_exception import SSHException
 
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
@@ -14,7 +16,23 @@ from processor import process_instrument
 from util.service_logging import log
 
 
-def trigger(event, _context):
+def ssh_retry_logger():
+    log.info("Retrying for SSH Exception")
+
+
+def trigger(*args, **kwargs):
+    retry(
+        do_trigger,
+        attempts=3,
+        sleeptime=15,
+        retry_exceptions=(SSHException),
+        cleaup=ssh_retry_logger,
+        args=args,
+        kwargs=kwargs,
+    )
+
+
+def do_trigger(event, _context):
     trigger_event = TriggerEvent.from_json(
         base64.b64decode(event["data"]).decode("utf-8")
     )
@@ -35,7 +53,6 @@ def trigger(event, _context):
         return "Connection to bucket failed", 500
 
     log.info("Connecting to SFTP server")
-
     with pysftp.Connection(
         host=sftp_config.host,
         username=sftp_config.username,
@@ -62,7 +79,19 @@ def trigger(event, _context):
             )
 
 
-def processor(event, _context):
+def processor(*args, **kwargs):
+    retry(
+        do_processor,
+        attempts=3,
+        sleeptime=15,
+        retry_exceptions=(SSHException),
+        cleaup=ssh_retry_logger,
+        args=args,
+        kwargs=kwargs,
+    )
+
+
+def do_processor(event, _context):
     config = Config.from_env()
     sftp_config = SFTPConfig.from_env()
     config.log()
