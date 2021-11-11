@@ -13,14 +13,16 @@ from pkg.google_storage import init_google_storage
 from pkg.sftp import SFTP, SFTPConfig
 from pkg.trigger import get_filtered_instruments, trigger_processor
 from processor import process_instrument
-from util.service_logging import log
+from util.service_logging import setupLogging
+import logging
 
 
 def ssh_retry_logger():
-    log.info("Retrying for SSH Exception")
+    logging.info("Retrying for SSH Exception")
 
 
 def trigger(*args, **kwargs):
+    setupLogging()
     retry(
         do_trigger,
         attempts=3,
@@ -52,7 +54,7 @@ def do_trigger(event, _context):
     if google_storage.bucket is None:
         return "Connection to bucket failed", 500
 
-    log.info("Connecting to SFTP server")
+    logging.info("Connecting to SFTP server")
     with pysftp.Connection(
         host=sftp_config.host,
         username=sftp_config.username,
@@ -60,15 +62,15 @@ def do_trigger(event, _context):
         port=int(sftp_config.port),
         cnopts=cnopts,
     ) as sftp_connection:
-        log.info("Connected to SFTP server")
+        logging.info("Connected to SFTP server")
 
         sftp = SFTP(sftp_connection, sftp_config, config)
         case_mover = CaseMover(google_storage, config, sftp)
         instruments = get_filtered_instruments(sftp, case_mover)
-        log.info(f"Processing survey - {sftp_config.survey_source_path}")
+        logging.info(f"Processing survey - {sftp_config.survey_source_path}")
 
         if len(instruments) == 0:
-            log.info("No instrument folders found after filtering")
+            logging.info("No instrument folders found after filtering")
             return "No instrument folders found, exiting", 200
 
         for instrument_name, instrument in instruments.items():
@@ -80,6 +82,7 @@ def do_trigger(event, _context):
 
 
 def processor(*args, **kwargs):
+    setupLogging()
     retry(
         do_processor,
         attempts=3,
@@ -105,7 +108,7 @@ def do_processor(event, _context):
     if google_storage.bucket is None:
         return "Connection to bucket failed", 500
 
-    log.info("Connecting to SFTP server")
+    logging.info("Connecting to SFTP server")
 
     with pysftp.Connection(
         host=sftp_config.host,
@@ -114,7 +117,7 @@ def do_processor(event, _context):
         port=int(sftp_config.port),
         cnopts=cnopts,
     ) as sftp_connection:
-        log.info("Connected to SFTP server")
+        logging.info("Connected to SFTP server")
 
         sftp = SFTP(sftp_connection, sftp_config, config)
         case_mover = CaseMover(google_storage, config, sftp)

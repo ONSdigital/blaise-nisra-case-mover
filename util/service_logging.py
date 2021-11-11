@@ -1,13 +1,29 @@
 import logging
 import logging.config
-from os import path
+import sys
+import json
 
 
-def __init__() -> logging.Logger:
-    logger = logging.getLogger(__name__)
-    log_file_path = path.join(path.dirname(path.abspath(__file__)), "logging.conf")
-    logging.config.fileConfig(fname=log_file_path, disable_existing_loggers=False)
-    return logger
+class CloudLoggingFormatter(logging.Formatter):
+    """Produces messages compatible with google cloud logging"""
+
+    def format(self, record: logging.LogRecord) -> str:
+        s = super().format(record)
+        return json.dumps(
+            {
+                "message": s,
+                "severity": record.levelname,
+                "timestamp": {"seconds": int(record.created), "nanos": 0},
+            }
+        )
 
 
-log = __init__()
+def setupLogging() -> logging.Logger:
+    root = logging.getLogger()
+    if not len(root.handlers):
+        handler = logging.StreamHandler(sys.stdout)
+        formatter = CloudLoggingFormatter(fmt="[%(name)s] %(message)s")
+        handler.setFormatter(formatter)
+        root.addHandler(handler)
+        root.setLevel(logging.INFO)
+    return root
