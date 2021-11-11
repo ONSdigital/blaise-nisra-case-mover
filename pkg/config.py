@@ -1,8 +1,7 @@
 import os
 
 from paramiko.common import DEFAULT_WINDOW_SIZE
-
-from util.service_logging import log
+import logging
 
 
 class Config:
@@ -28,13 +27,13 @@ class Config:
         return config
 
     def log(self):
-        log.info(f"bucket_name - {self.bucket_name}")
-        log.info(f"valid_surveys - {self.valid_surveys}")
-        log.info(f"extension_list - {str(self.extension_list)}")
-        log.info(f"server_park - {self.server_park}")
-        log.info(f"blaise_api_url - {self.blaise_api_url}")
-        log.info(f"project_id - {self.project_id}")
-        log.info(f"processor_topic_name - {self.processor_topic_name}")
+        logging.info(f"bucket_name - {self.bucket_name}")
+        logging.info(f"valid_surveys - {self.valid_surveys}")
+        logging.info(f"extension_list - {str(self.extension_list)}")
+        logging.info(f"server_park - {self.server_park}")
+        logging.info(f"blaise_api_url - {self.blaise_api_url}")
+        logging.info(f"project_id - {self.project_id}")
+        logging.info(f"processor_topic_name - {self.processor_topic_name}")
 
     def valid_survey_name(self, survey_name: str) -> bool:
         survey_prefix = survey_name.upper()[:3]
