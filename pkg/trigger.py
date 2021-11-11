@@ -5,7 +5,7 @@ from google.cloud import pubsub_v1
 
 from models import Instrument, ProcessorEvent
 from pkg.config import Config
-from pkg.sftp import SFTPConfig
+from pkg.sftp import SFTP
 import logging
 
 
