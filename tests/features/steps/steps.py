@@ -1,5 +1,4 @@
 import base64
-import logging
 import os
 from pkg.case_mover import CaseMover
 from unittest import mock
@@ -24,7 +23,7 @@ file_list = [
 def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     copy_opn2101a_files_to_sftp()
     nisra_google_storage = GoogleStorage(
-        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
+        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
     )
     nisra_google_storage.initialise_bucket_connection()
 
@@ -107,9 +106,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
     context,
 ):
-    google_storage = GoogleStorage(
-        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
-    )
+    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -141,9 +138,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
 
 @then("no data is copied to the GCP storage bucket")
 def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
-    google_storage = GoogleStorage(
-        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
-    )
+    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -181,9 +176,7 @@ def copy_opn2101a_files_to_sftp():
     os.environ[
         "google_application_credentials"
     ] = "S:\\work\\code\\blaise-nisra-case-mover\\key.json"
-    google_storage = GoogleStorage(
-        os.getenv("TEST_DATA_BUCKET", "env_var_not_set"), logging
-    )
+    google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
