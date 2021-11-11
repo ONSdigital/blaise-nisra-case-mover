@@ -6,6 +6,7 @@ from google.cloud.pubsub_v1 import PublisherClient
 
 import main
 from pkg.google_storage import GoogleStorage
+from util.service_logging import setupLogging
 
 
 class FakePublisherClient(PublisherClient):
@@ -23,6 +24,7 @@ class FakePublisherClient(PublisherClient):
 
 
 def before_feature(context, feature):
+    setupLogging()
     context.publisher_client = FakePublisherClient()
 
 
