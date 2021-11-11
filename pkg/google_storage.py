@@ -2,8 +2,7 @@ import binascii
 
 import pybase64
 from google.cloud import storage
-
-from util.service_logging import log
+import logging
 
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
@@ -11,27 +10,26 @@ storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
 
 
 class GoogleStorage:
-    def __init__(self, bucket_name, log):
+    def __init__(self, bucket_name):
         self.bucket_name = bucket_name
-        self.log = log
         self.bucket = None
         self.storage_client = None
 
     def initialise_bucket_connection(self):
         try:
-            self.log.info(f"Connecting to bucket - {self.bucket_name}")
+            logging.info(f"Connecting to bucket - {self.bucket_name}")
             storage_client = storage.Client()
             self.storage_client = storage_client
             self.bucket = storage_client.get_bucket(self.bucket_name)
-            self.log.info(f"Connected to bucket - {self.bucket_name}")
+            logging.info(f"Connected to bucket - {self.bucket_name}")
         except Exception as ex:
-            self.log.error("Connection to bucket failed - %s", ex)
+            logging.error("Connection to bucket failed - %s", ex)
 
     def upload_file(self, source, dest):
         blob_destination = self.bucket.blob(dest)
-        self.log.info(f"Uploading file - {source}")
+        logging.info(f"Uploading file - {source}")
         blob_destination.upload_from_filename(source)
-        self.log.info(f"Uploaded file - {source}")
+        logging.info(f"Uploaded file - {source}")
 
     def get_blob(self, blob_location):
         return self.bucket.get_blob(blob_location)
@@ -52,6 +50,6 @@ class GoogleStorage:
 
 
 def init_google_storage(config):
-    google_storage = GoogleStorage(config.bucket_name, log)
+    google_storage = GoogleStorage(config.bucket_name)
     google_storage.initialise_bucket_connection()
     return google_storage

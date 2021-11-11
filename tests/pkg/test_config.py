@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 
 from pkg.config import Config
+from util.service_logging import setupLogging
 
 
 @mock.patch.dict(
@@ -27,25 +28,27 @@ def test_config_from_env():
 
 
 def test_config_log(caplog):
+    caplog.set_level(logging.INFO)
+    setupLogging()
     config = Config()
     config.log()
     assert caplog.record_tuples == [
-        ("util.service_logging", logging.INFO, "bucket_name - env_var_not_set"),
+        ("root", logging.INFO, "bucket_name - env_var_not_set"),
         (
-            "util.service_logging",
+            "root",
             logging.INFO,
             "valid_surveys - ['OPN', 'LMS']",
         ),
         (
-            "util.service_logging",
+            "root",
             logging.INFO,
             "extension_list - ['.blix', '.bdbx', '.bdix', '.bmix']",
         ),
-        ("util.service_logging", logging.INFO, "server_park - env_var_not_set"),
-        ("util.service_logging", logging.INFO, "blaise_api_url - env_var_not_set"),
-        ("util.service_logging", logging.INFO, "project_id - env_var_not_set"),
+        ("root", logging.INFO, "server_park - env_var_not_set"),
+        ("root", logging.INFO, "blaise_api_url - env_var_not_set"),
+        ("root", logging.INFO, "project_id - env_var_not_set"),
         (
-            "util.service_logging",
+            "root",
             logging.INFO,
             "processor_topic_name - env_var_not_set",
         ),
