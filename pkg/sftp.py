@@ -89,7 +89,7 @@ class SFTP:
     def generate_bdbx_md5(self, instrument: Instrument) -> str:
         bdbx_file = instrument.bdbx_file()
         if not bdbx_file:
-            log.info(
+            logging.info(
                 f"No bdbx file for '{instrument.sftp_path}' cannot generate an md5"
             )
             return ""
