@@ -11,7 +11,7 @@ import pysftp
 
 from models import Instrument
 from pkg.config import Config
-from util.service_logging import log
+import logging
 
 
 class SFTPConfig:
@@ -31,10 +31,10 @@ class SFTPConfig:
         return cls()
 
     def log(self):
-        log.info(f"survey_source_path - {self.survey_source_path}")
-        log.info(f"sftp_host - {self.host}")
-        log.info(f"sftp_port - {self.port}")
-        log.info(f"sftp_username - {self.username}")
+        logging.info(f"survey_source_path - {self.survey_source_path}")
+        logging.info(f"sftp_host - {self.host}")
+        logging.info(f"sftp_port - {self.port}")
+        logging.info(f"sftp_username - {self.username}")
 
 
 class SFTP:
@@ -57,7 +57,7 @@ class SFTP:
                 continue
             folder = folder_attr.filename
             if self.config.valid_survey_name(folder):
-                log.info(f"Instrument folder found - {folder}")
+                logging.info(f"Instrument folder found - {folder}")
                 instruments[folder] = Instrument(
                     sftp_path=f"{self.sftp_config.survey_source_path}/{folder}"
                 )
@@ -112,7 +112,7 @@ class SFTP:
                     instrument_file.st_mtime, tz=timezone.utc
                 )
             if file_extension in self.config.extension_list:
-                log.info(f"Instrument file found - {instrument_file.filename}")
+                logging.info(f"Instrument file found - {instrument_file.filename}")
                 instrument_file_list.append(instrument_file.filename)
         return instrument_file_list
 
@@ -148,7 +148,7 @@ class SFTP:
             if ".bdbx" in file_types:
                 filtered_instruments[instrument_name] = instrument
             else:
-                log.info(
+                logging.info(
                     "Instrument database file not found - "
                     + f"{instrument_name} - not importing"
                 )
@@ -187,7 +187,7 @@ class SFTP:
         )
         latest_instrument = sorted_conflicts[0]
         for conflict in sorted_conflicts[1:]:
-            log.info(
+            logging.info(
                 f"Found newer instrument '{latest_instrument.sftp_path}' "
                 + f"folder - Skipping this folder '{conflict.sftp_path}'"
             )

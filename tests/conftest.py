@@ -8,7 +8,6 @@ import pytest
 from pkg.config import Config
 from pkg.google_storage import GoogleStorage
 from pkg.sftp import SFTP, SFTPConfig
-from util.service_logging import log
 
 
 @pytest.fixture
@@ -38,7 +37,7 @@ def mock_sftp(mock_sftp_connection, sftp_config, config):
 
 @pytest.fixture
 def google_storage(config):
-    return GoogleStorage(config.bucket_name, log)
+    return GoogleStorage(config.bucket_name)
 
 
 @pytest.fixture
