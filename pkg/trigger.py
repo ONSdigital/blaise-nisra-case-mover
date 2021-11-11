@@ -6,7 +6,7 @@ from google.cloud import pubsub_v1
 from models import Instrument, ProcessorEvent
 from pkg.config import Config
 from pkg.sftp import SFTP
-from util.service_logging import log
+import logging
 
 
 def trigger_processor(
@@ -14,13 +14,13 @@ def trigger_processor(
     config: Config,
     processor_event: ProcessorEvent,
 ) -> None:
-    log.info(f"Triggering processor for: {processor_event.instrument_name}")
+    logging.info(f"Triggering processor for: {processor_event.instrument_name}")
     topic_path = publisher_client.topic_path(
         config.project_id, config.processor_topic_name
     )
     msg_bytes = bytes(processor_event.json(), encoding="utf-8")
     publisher_client.publish(topic_path, data=msg_bytes)
-    log.info(f"Queued on pubsub for: {processor_event.instrument_name}")
+    logging.info(f"Queued on pubsub for: {processor_event.instrument_name}")
 
 
 def get_filtered_instruments(

@@ -1,5 +1,4 @@
 import base64
-import logging
 import os
 
 import pysftp
@@ -7,6 +6,7 @@ from google.cloud.pubsub_v1 import PublisherClient
 
 import main
 from pkg.google_storage import GoogleStorage
+from util.service_logging import setupLogging
 
 
 class FakePublisherClient(PublisherClient):
@@ -24,15 +24,14 @@ class FakePublisherClient(PublisherClient):
 
 
 def before_feature(context, feature):
+    setupLogging()
     context.publisher_client = FakePublisherClient()
 
 
 def after_scenario(context, scenario):
     print(f"Published messages: {context.publisher_client.published_messages}")
     context.publisher_client.published_messages = []
-    google_storage = GoogleStorage(
-        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"), logging
-    )
+    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
     if google_storage.bucket is None:
         print("Failed")
