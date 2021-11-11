@@ -8,8 +8,8 @@ from models import Instrument
 from pkg.config import Config
 from pkg.gcs_stream_upload import GCSObjectStreamUpload
 from pkg.google_storage import GoogleStorage
-from pkg.sftp import SFTP
-from util.service_logging import log
+from pkg.sftp import SFTPConfig, SFTP
+import logging
 
 
 class CaseMover:
@@ -44,7 +44,7 @@ class CaseMover:
         for file in instrument.files:
             blob_filepath = blob_filepaths[file]
             sftp_path = f"{instrument.sftp_path}/{file}"
-            log.info(f"Syncing file from SFTP: {sftp_path} to GCP: {blob_filepath}")
+            logging.info(f"Syncing file from SFTP: {sftp_path} to GCP: {blob_filepath}")
             self.sync_file(blob_filepath, sftp_path)
 
     def sync_file(self, blob_filepath: str, sftp_path: str) -> None:
@@ -64,7 +64,7 @@ class CaseMover:
                     sftp_file.seek(chunk * self.config.bufsize)
                     blob_stream.write(sftp_file.read(self.config.bufsize))
         except Exception:
-            log.exception("Fatal error while syncing file")
+            logging.exception("Fatal error while syncing file")
 
     def send_request_to_api(self, instrument_name: str) -> None:
         # added 1 second timeout exception pass to the api request
@@ -72,7 +72,7 @@ class CaseMover:
         # it completed the work. this also allows parallel requests
         # to be made to the api.
 
-        log.info(
+        logging.info(
             f"Sending request to {self.config.blaise_api_url} "
             + f"for instrument {instrument_name}"
         )
@@ -102,10 +102,10 @@ class CaseMover:
         filtered_instruments = {}
         for key, instrument in instruments.items():
             if self.instrument_exists_in_blaise(instrument.gcp_folder()):
-                log.info(f"Instrument {instrument.gcp_folder()} exists in blaise")
+                logging.info(f"Instrument {instrument.gcp_folder()} exists in blaise")
                 filtered_instruments[key] = instrument
             else:
-                log.info(
+                logging.info(
                     f"Instrument {instrument.gcp_folder()} does not exist in blaise, not ingesting..."
                 )
         return filtered_instruments
