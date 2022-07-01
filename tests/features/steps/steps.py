@@ -158,8 +158,8 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
     blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
     context.mock_requests_post.assert_called_once_with(
         (
-            f"http://{blaise_api_url}/api/v1/serverparks/"
-            f"{server_park}/instruments/opn2101a/data"
+            f"http://{blaise_api_url}/api/v2/serverparks/"
+            f"{server_park}/questionnaires/opn2101a/data"
         ),
         json={"instrumentDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
