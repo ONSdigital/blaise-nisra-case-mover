@@ -150,8 +150,8 @@ def test_send_request_to_api(mock_requests_post, google_storage, config, mock_sf
     case_mover.send_request_to_api("opn2101a")
     mock_requests_post.assert_called_once_with(
         (
-            f"http://{config.blaise_api_url}/api/v1/serverparks/"
-            + f"{config.server_park}/instruments/opn2101a/data"
+            f"http://{config.blaise_api_url}/api/v2/serverparks/"
+            + f"{config.server_park}/questionnaires/opn2101a/data"
         ),
         json={"instrumentDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
@@ -161,8 +161,8 @@ def test_send_request_to_api(mock_requests_post, google_storage, config, mock_sf
 
 def test_instrument_exists_in_blaise(google_storage, config, mock_sftp, requests_mock):
     requests_mock.get(
-        f"http://{config.blaise_api_url}/api/v1/serverparks/"
-        + f"{config.server_park}/instruments/opn2101a/exists",
+        f"http://{config.blaise_api_url}/api/v2/serverparks/"
+        + f"{config.server_park}/questionnaires/opn2101a/exists",
         text="false",
     )
     case_mover = CaseMover(google_storage, config, mock_sftp)
@@ -173,8 +173,8 @@ def test_instrument_exists_in_blaise_exists(
     google_storage, config, mock_sftp, requests_mock
 ):
     requests_mock.get(
-        f"http://{config.blaise_api_url}/api/v1/serverparks/"
-        + f"{config.server_park}/instruments/opn2101a/exists",
+        f"http://{config.blaise_api_url}/api/v2/serverparks/"
+        + f"{config.server_park}/questionnaires/opn2101a/exists",
         text="true",
     )
     case_mover = CaseMover(google_storage, config, mock_sftp)

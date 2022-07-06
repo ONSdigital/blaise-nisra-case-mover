@@ -79,8 +79,8 @@ class CaseMover:
         try:
             requests.post(
                 (
-                    f"http://{self.config.blaise_api_url}/api/v1/serverparks/"
-                    + f"{self.config.server_park}/instruments/{instrument_name}/data"
+                    f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
+                    + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
                 ),
                 headers={"content-type": "application/json"},
                 json={"instrumentDataPath": instrument_name},
@@ -91,8 +91,8 @@ class CaseMover:
 
     def instrument_exists_in_blaise(self, instrument_name: str) -> bool:
         response = requests.get(
-            f"http://{self.config.blaise_api_url}/api/v1/serverparks/"
-            + f"{self.config.server_park}/instruments/{instrument_name}/exists"
+            f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
+            + f"{self.config.server_park}/questionnaires/{instrument_name}/exists"
         )
         return response.json()
 
