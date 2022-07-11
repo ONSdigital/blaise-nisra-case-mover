@@ -83,7 +83,7 @@ class CaseMover:
                     + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
                 ),
                 headers={"content-type": "application/json"},
-                json={"instrumentDataPath": instrument_name},
+                json={"questionnaireDataPath": instrument_name},
                 timeout=1,
             )
         except requests.exceptions.ReadTimeout:
