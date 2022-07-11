@@ -153,7 +153,7 @@ def test_send_request_to_api(mock_requests_post, google_storage, config, mock_sf
             f"http://{config.blaise_api_url}/api/v2/serverparks/"
             + f"{config.server_park}/questionnaires/opn2101a/data"
         ),
-        json={"instrumentDataPath": "opn2101a"},
+        json={"questionnaireDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
         timeout=1,
     )
