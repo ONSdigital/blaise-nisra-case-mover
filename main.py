@@ -1,9 +1,10 @@
 import base64
+import logging
 
 import pysftp
 from google.cloud import pubsub_v1
-from redo import retry
 from paramiko.ssh_exception import SSHException
+from redo import retry
 
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
@@ -14,7 +15,6 @@ from pkg.sftp import SFTP, SFTPConfig
 from pkg.trigger import get_filtered_instruments, trigger_processor
 from processor import process_instrument
 from util.service_logging import setupLogging
-import logging
 
 
 def ssh_retry_logger():

@@ -1,12 +1,12 @@
-from pkg.case_mover import CaseMover
+import logging
 from typing import Dict
 
 from google.cloud import pubsub_v1
 
 from models import Instrument, ProcessorEvent
+from pkg.case_mover import CaseMover
 from pkg.config import Config
 from pkg.sftp import SFTP
-import logging
 
 
 def trigger_processor(

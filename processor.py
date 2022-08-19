@@ -1,6 +1,7 @@
+import logging
+
 from models import Instrument
 from pkg.case_mover import CaseMover
-import logging
 
 
 def process_instrument(
