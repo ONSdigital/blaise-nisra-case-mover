@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import math
 import operator
 import os
@@ -11,7 +12,6 @@ import pysftp
 
 from models import Instrument
 from pkg.config import Config
-import logging
 
 
 class SFTPConfig:
