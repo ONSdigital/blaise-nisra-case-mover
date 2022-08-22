@@ -1,7 +1,7 @@
+import json
 import logging
 import logging.config
 import sys
-import json
 
 
 class CloudLoggingFormatter(logging.Formatter):

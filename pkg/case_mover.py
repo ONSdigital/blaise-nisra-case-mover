@@ -1,6 +1,7 @@
+import logging
 import math
 import pathlib
-from typing import List, Dict
+from typing import Dict, List
 
 import requests
 
@@ -8,8 +9,7 @@ from models import Instrument
 from pkg.config import Config
 from pkg.gcs_stream_upload import GCSObjectStreamUpload
 from pkg.google_storage import GoogleStorage
-from pkg.sftp import SFTPConfig, SFTP
-import logging
+from pkg.sftp import SFTP
 
 
 class CaseMover:
@@ -106,6 +106,7 @@ class CaseMover:
                 filtered_instruments[key] = instrument
             else:
                 logging.info(
-                    f"Instrument {instrument.gcp_folder()} does not exist in blaise, not ingesting..."
+                    f"Instrument {instrument.gcp_folder()} does not exist in blaise, "
+                    "not ingesting..."
                 )
         return filtered_instruments
