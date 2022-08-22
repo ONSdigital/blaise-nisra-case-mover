@@ -43,6 +43,7 @@ class GoogleStorage:
     def get_blob_md5(self, blob_location):
         blob = self.bucket.get_blob(blob_location)
         if not blob:
+            logging.info(f"{blob_location} does not exist in bucket {self.bucket_name}")
             return None
         return binascii.hexlify(pybase64.urlsafe_b64decode(blob.md5_hash)).decode(
             "utf-8"
