@@ -140,8 +140,13 @@ def test_sync_file_exception(
         case_mover.sync_file(
             "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
         )
-        assert "Fatal error while syncing file" in caplog.text
-        assert "I exploded the thing" in caplog.text
+
+    log_records = [(record.levelname, record.message) for record in caplog.records]
+    assert (
+               "ERROR",
+               "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx to opn2103a/opn2103a.bdbx"
+           ) in log_records
+    assert "I exploded the thing" in caplog.text
 
 
 @mock.patch.object(requests, "post")
