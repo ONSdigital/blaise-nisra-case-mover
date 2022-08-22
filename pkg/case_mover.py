@@ -64,7 +64,9 @@ class CaseMover:
                     sftp_file.seek(chunk * self.config.bufsize)
                     blob_stream.write(sftp_file.read(self.config.bufsize))
         except Exception:
-            logging.exception(f"Fatal error while syncing file {sftp_path} to {blob_filepath}")
+            logging.exception(
+                f"Fatal error while syncing file {sftp_path} to {blob_filepath}"
+            )
 
     def send_request_to_api(self, instrument_name: str) -> None:
         # added 1 second timeout exception pass to the api request
