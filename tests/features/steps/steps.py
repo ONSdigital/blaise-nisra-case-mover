@@ -1,12 +1,12 @@
 import base64
 import os
-from pkg.case_mover import CaseMover
 from unittest import mock
 
 import pysftp
 from behave import given, then, when
-import main
 
+import main
+from pkg.case_mover import CaseMover
 from pkg.google_storage import GoogleStorage
 
 file_list = [
