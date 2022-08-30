@@ -1,7 +1,7 @@
+import logging
 import os
 
 from paramiko.common import DEFAULT_WINDOW_SIZE
-import logging
 
 
 class Config:
