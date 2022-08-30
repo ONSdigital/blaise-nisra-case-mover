@@ -1,8 +1,8 @@
 import binascii
+import logging
 
 import pybase64
 from google.cloud import storage
-import logging
 
 # workaround to prevent file transfer timeouts
 storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024  # 5 MB
