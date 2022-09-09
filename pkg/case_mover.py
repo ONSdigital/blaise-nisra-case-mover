@@ -1,6 +1,7 @@
+import logging
 import math
 import pathlib
-from typing import List, Dict
+from typing import Dict, List
 
 import requests
 
@@ -8,8 +9,7 @@ from models import Instrument
 from pkg.config import Config
 from pkg.gcs_stream_upload import GCSObjectStreamUpload
 from pkg.google_storage import GoogleStorage
-from pkg.sftp import SFTPConfig, SFTP
-import logging
+from pkg.sftp import SFTP
 
 
 class CaseMover:
@@ -64,7 +64,9 @@ class CaseMover:
                     sftp_file.seek(chunk * self.config.bufsize)
                     blob_stream.write(sftp_file.read(self.config.bufsize))
         except Exception:
-            logging.exception(f"Fatal error while syncing file {sftp_path} to {blob_filepath}")
+            logging.exception(
+                f"Fatal error while syncing file {sftp_path} to {blob_filepath}"
+            )
 
     def send_request_to_api(self, instrument_name: str) -> None:
         # added 1 second timeout exception pass to the api request
@@ -106,6 +108,7 @@ class CaseMover:
                 filtered_instruments[key] = instrument
             else:
                 logging.info(
-                    f"Instrument {instrument.gcp_folder()} does not exist in blaise, not ingesting..."
+                    f"Instrument {instrument.gcp_folder()} does not exist in blaise, "
+                    "not ingesting..."
                 )
         return filtered_instruments
