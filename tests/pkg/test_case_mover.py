@@ -112,7 +112,7 @@ def test_sync_file(
     case_mover,
 ):
     fake_content = b"foobar this is a fake file"
-    fake_file = mock_sftp_file(fake_content)
+    mock_sftp_file(fake_content)
 
     config.bufsize = 1
 
@@ -122,7 +122,7 @@ def test_sync_file(
 
     case_mover.sync_file("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
 
-    assert get_contents(fake_file) == get_contents(fake_gcp_file)
+    assert fake_content == get_contents(fake_gcp_file)
     assert mock_stream_upload.call_count == len(fake_content)
 
 
@@ -147,12 +147,93 @@ def test_sync_file_exception(
             "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
         )
 
-    log_records = [(record.levelname, record.message) for record in caplog.records]
     assert (
-        "ERROR",
+        "root",
+        logging.ERROR,
         "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx to opn2103a/opn2103a.bdbx",
-    ) in log_records
+    ) in caplog.record_tuples
     assert "I exploded the thing" in caplog.text
+
+
+@mock.patch.object(GCSObjectStreamUpload, "write")
+@mock.patch.object(GCSObjectStreamUpload, "stop")
+@mock.patch.object(GCSObjectStreamUpload, "start")
+@mock.patch.object(GCSObjectStreamUpload, "__init__")
+def test_sync_with_retries_on_read_timeout(
+    mock_stream_upload_init,
+    _mock_stream_upload_start,
+    _mock_stream_upload_stop,
+    mock_stream_upload,
+    config,
+    mock_sftp_connection,
+    mock_stat,
+    fake_sftp_file,
+    mock_sftp_file,
+    case_mover,
+):
+    fake_content = b"foobar this is a fake file"
+    mock_sftp_file(fake_content)
+
+    config.bufsize = len(fake_content)
+
+    write_attempts = 0
+
+    def write_to_gcp_file(bytes):
+        nonlocal write_attempts
+        write_attempts += 1
+        if write_attempts > 2:
+            fake_gcp_file.write(bytes)
+        else:
+            raise requests.exceptions.ReadTimeout()
+
+    fake_gcp_file = io.BytesIO(b"")
+    mock_stream_upload_init.return_value = None
+    mock_stream_upload.side_effect = write_to_gcp_file
+
+    case_mover.sync_file("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
+
+    assert fake_content == get_contents(fake_gcp_file)
+    assert write_attempts == 3
+
+
+@mock.patch.object(GCSObjectStreamUpload, "write")
+@mock.patch.object(GCSObjectStreamUpload, "stop")
+@mock.patch.object(GCSObjectStreamUpload, "start")
+@mock.patch.object(GCSObjectStreamUpload, "__init__")
+def test_sync_with_too_many_retries_on_read_timeout(
+    mock_stream_upload_init,
+    _mock_stream_upload_start,
+    _mock_stream_upload_stop,
+    mock_stream_upload,
+    config,
+    mock_sftp_connection,
+    mock_stat,
+    fake_sftp_file,
+    mock_sftp_file,
+    case_mover,
+    caplog,
+):
+    fake_content = b"foobar this is a fake file"
+    mock_sftp_file(fake_content)
+
+    config.bufsize = len(fake_content)
+
+    def write_to_gcp_file(_bytes):
+        raise requests.exceptions.ReadTimeout()
+
+    mock_stream_upload_init.return_value = None
+    mock_stream_upload.side_effect = write_to_gcp_file
+
+    with caplog.at_level(logging.ERROR):
+        case_mover.sync_file(
+            "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
+        )
+
+    assert (
+        "root",
+        logging.ERROR,
+        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx to opn2103a/opn2103a.bdbx",
+    ) in caplog.record_tuples
 
 
 @mock.patch.object(requests, "post")
