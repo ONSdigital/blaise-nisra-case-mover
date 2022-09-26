@@ -96,7 +96,14 @@ class SFTP:
         bdbx_details = self.sftp_connection.stat(bdbx_file)
         md5sum = hashlib.md5()
         chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
-        sftp_file = self.sftp_connection.open(bdbx_file, bufsize=self.config.bufsize)
+        try:
+            sftp_file = self.sftp_connection.open(
+                bdbx_file, bufsize=self.config.bufsize
+            )
+        except FileNotFoundError as error:
+            logging.error(f"Failed to open {bdbx_file} over SFTP")
+            raise error
+
         sftp_file.prefetch()
         for chunk in range(chunks):
             sftp_file.seek(chunk * self.config.bufsize)

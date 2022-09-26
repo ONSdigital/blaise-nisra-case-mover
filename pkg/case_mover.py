@@ -3,6 +3,7 @@ import math
 import pathlib
 from typing import Dict, List
 
+import redo
 import requests
 
 from models import Instrument
@@ -48,7 +49,7 @@ class CaseMover:
             self.sync_file(blob_filepath, sftp_path)
 
     def sync_file(self, blob_filepath: str, sftp_path: str) -> None:
-        try:
+        def perform_sync():
             with GCSObjectStreamUpload(
                 google_storage=self.google_storage,
                 blob_name=blob_filepath,
@@ -63,6 +64,14 @@ class CaseMover:
                 for chunk in range(chunks):
                     sftp_file.seek(chunk * self.config.bufsize)
                     blob_stream.write(sftp_file.read(self.config.bufsize))
+
+        try:
+            redo.retry(
+                perform_sync,
+                retry_exceptions=(requests.exceptions.ReadTimeout,),
+                attempts=4,
+                max_sleeptime=0,
+            )
         except Exception:
             logging.exception(
                 f"Fatal error while syncing file {sftp_path} to {blob_filepath}"

@@ -1,6 +1,9 @@
+import logging
 import stat
 from datetime import datetime
 from unittest import mock
+
+import pytest
 
 from models.instruments import Instrument
 from pkg.sftp import SFTP
@@ -236,3 +239,28 @@ def test_generate_bdbx_md5(
     # The md5 value for the fake file
     assert sftp.generate_bdbx_md5(instrument) == "50cc5a0bbd05754f98022a25566220fe"
     mock_sftp_connection.stat.assert_called_with("ONS/OPN/OPN2103A/opn2103a.bdbx")
+
+
+def test_generate_bdbx_md5_when_file_does_not_exist(
+    mock_sftp_connection, sftp_config, config, mock_stat, fake_sftp_file, caplog
+):
+    mock_sftp_connection.stat.return_value = mock_stat(st_size=17)
+    mock_sftp_connection.open.side_effect = FileNotFoundError
+    instrument = Instrument(
+        sftp_path="ONS/OPN/OPN2103A",
+        bdbx_updated_at=datetime.fromisoformat("2021-05-20T10:21:53+00:00"),
+        bdbx_md5="my_lovely_md5",
+        files=[
+            "opn2103a.bdbx",
+        ],
+    )
+    sftp = SFTP(mock_sftp_connection, sftp_config, config)
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(FileNotFoundError):
+            sftp.generate_bdbx_md5(instrument)
+
+    assert (
+        "root",
+        logging.ERROR,
+        "Failed to open ONS/OPN/OPN2103A/opn2103a.bdbx over SFTP",
+    ) in caplog.record_tuples
