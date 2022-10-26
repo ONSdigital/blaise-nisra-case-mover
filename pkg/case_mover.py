@@ -72,6 +72,13 @@ class CaseMover:
                 attempts=4,
                 max_sleeptime=0,
             )
+
+        except FileNotFoundError:
+            logging.warning(
+                f"File {sftp_path} not found on SFTP server; "
+                "it seems to have been removed since getting the list of files "
+                "from the server."
+            )
         except Exception:
             logging.exception(
                 f"Fatal error while syncing file {sftp_path} to {blob_filepath}"

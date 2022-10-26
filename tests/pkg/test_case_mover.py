@@ -150,7 +150,8 @@ def test_sync_file_exception(
     assert (
         "root",
         logging.ERROR,
-        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx to opn2103a/opn2103a.bdbx",
+        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx "
+        "to opn2103a/opn2103a.bdbx",
     ) in caplog.record_tuples
     assert "I exploded the thing" in caplog.text
 
@@ -200,6 +201,56 @@ def test_sync_with_retries_on_read_timeout(
 @mock.patch.object(GCSObjectStreamUpload, "stop")
 @mock.patch.object(GCSObjectStreamUpload, "start")
 @mock.patch.object(GCSObjectStreamUpload, "__init__")
+def test_sync_with_retries_on_file_not_found(
+    mock_stream_upload_init,
+    _mock_stream_upload_start,
+    _mock_stream_upload_stop,
+    config,
+    mock_sftp_connection,
+    mock_stat,
+    fake_sftp_file,
+    mock_sftp_file,
+    case_mover,
+    caplog,
+):
+    mock_sftp_connection.stat.return_value = mock_stat(st_size=1234)
+    mock_sftp_connection.open.side_effect = FileNotFoundError()
+
+    # fake_gcp_file = io.BytesIO(b"")
+    mock_stream_upload_init.return_value = None
+    # mock_stream_upload.side_effect = write_to_gcp_file
+
+    with caplog.at_level(logging.WARNING):
+        case_mover.sync_file(
+            "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
+        )
+
+    error_messages = [
+        message
+        for _logger, level, message in caplog.record_tuples
+        if level == logging.ERROR
+    ]
+    warning_messages = [
+        message
+        for _logger, level, message in caplog.record_tuples
+        if level == logging.WARNING
+    ]
+
+    assert (
+        not error_messages
+    ), f"No errors should should have been logged, got {repr(error_messages)}"
+
+    assert (
+        "File ./ONS/OPN/OPN2103A/oPn2103A.BdBx not found on SFTP server; "
+        "it seems to have been removed since getting the list of files from the server."
+        in warning_messages
+    )
+
+
+@mock.patch.object(GCSObjectStreamUpload, "write")
+@mock.patch.object(GCSObjectStreamUpload, "stop")
+@mock.patch.object(GCSObjectStreamUpload, "start")
+@mock.patch.object(GCSObjectStreamUpload, "__init__")
 def test_sync_with_too_many_retries_on_read_timeout(
     mock_stream_upload_init,
     _mock_stream_upload_start,
@@ -232,7 +283,8 @@ def test_sync_with_too_many_retries_on_read_timeout(
     assert (
         "root",
         logging.ERROR,
-        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx to opn2103a/opn2103a.bdbx",
+        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx "
+        "to opn2103a/opn2103a.bdbx",
     ) in caplog.record_tuples
 
 
