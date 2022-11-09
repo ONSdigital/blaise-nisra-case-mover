@@ -2,6 +2,7 @@ import base64
 import logging
 
 import pysftp
+import cloud_functions.nisra_changes_checker
 from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
@@ -129,3 +130,6 @@ def do_processor(event, _context):
         process_instrument(
             case_mover, processor_event.instrument_name, processor_event.instrument
         )
+
+def nisra_changes_checker(_event, _context) -> str:
+    return nisra_changes_checker()
