@@ -1,6 +1,4 @@
-from models.config_model import Config
 
-
-def nisra_changes_checker(config: Config) -> str:
+def nisra_changes_checker() -> str:
 
     return "Done"
