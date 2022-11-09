@@ -131,6 +131,7 @@ def do_processor(event, _context):
             case_mover, processor_event.instrument_name, processor_event.instrument
         )
 
+
 def nisra_changes_checker(_event, _context) -> str:
-    nisra_changes_checker("James")
+    nisra_changes_checker()
     return

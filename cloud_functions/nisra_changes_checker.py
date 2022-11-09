@@ -1,3 +1,3 @@
-def nisra_changes_checker(name: str) -> str:
-    print(f"Hello, {name}!")
+def nisra_changes_checker() -> str:
+    print(f"Hello, James!")
     return
