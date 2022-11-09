@@ -7,6 +7,7 @@ from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
 
+from models.config_model import Config
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
 from pkg.case_mover import CaseMover
@@ -133,4 +134,6 @@ def do_processor(event, _context):
 
 
 def nisra_changes_checker(_event, _context) -> str:
-    return cloud_functions.nisra_changes_checker.nisra_changes_checker()
+    print("Running Cloud Function - nisra_changes_checker")
+    config = Config.from_env()
+    return cloud_functions.nisra_changes_checker.nisra_changes_checker(config)
