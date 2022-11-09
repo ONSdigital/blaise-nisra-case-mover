@@ -133,4 +133,4 @@ def do_processor(event, _context):
 
 
 def nisra_changes_checker(_event, _context) -> str:
-    return "Done!"
+    return cloud_functions.nisra_changes_checker.nisra_changes_checker()
