@@ -138,17 +138,22 @@ def do_processor(event, _context):
 
 
 def nisra_changes_checker(_event, _context) -> str:
-    print("Running Cloud Function - nisra_changes_checker")
+    logging.info("Running Cloud Function - nisra_changes_checker")
 
     bucket_config = BucketConfig.from_env()
+    bucket_config.log()
     bucket_service = GoogleStorageService(config=bucket_config)
+    logging.info("Created bucket_service")
 
     ftp_config = FtpConfig.from_env()
+    ftp_config.log()
     ftp_service = FtpService(config=ftp_config)
+    logging.info("Created ftp_service")
 
     nisra_update_check_service = NisraUpdateCheckService(
         bucket_service=bucket_service,
         ftp_service=ftp_service)
+    logging.info("Created nisra_update_check_service")
 
     return cloud_functions.nisra_changes_checker.nisra_changes_checker(
         nisra_update_check_service=nisra_update_check_service)
