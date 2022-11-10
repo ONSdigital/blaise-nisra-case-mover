@@ -1,34 +1,35 @@
 import logging
 
-from services.ftp_service import FtpService
+from services.blaise_service import BlaiseService
 from services.google_storage_service import GoogleStorageService
 
 
 class NisraUpdateCheckService:
     def __init__(
             self,
-            bucket_service: GoogleStorageService,
-            ftp_service: FtpService):
+            blaise_service: BlaiseService,
+            bucket_service: GoogleStorageService):
         self._survey_types_supported = ["LMS"]
         self._max_hours_since_last_update = 23
+        self._blaise_service = blaise_service
         self._bucket_service = bucket_service
-        self._ftp_service = ftp_service
 
     def check_nisra_files_have_updated(self) -> str:
         logging.info("Starting Nisra check service")
+
+        try:
+            instruments = self._blaise_service.get_instruments()
+            for instrument in instruments:
+                logging.info(f"instrument - {instrument['name']}")
+        except Exception as error:
+            logging.info("Error in getting instruments from blaise ", error)
+
         try:
             bucket_files = self._bucket_service.get_files("bdbx")
             for file in bucket_files:
                 logging.info(f"Bucket file - {file.file_name} {file.last_updated}")
         except Exception as error:
             logging.info("Error in getting files from bucket", error)
-
-        try:
-            ftp_files = self._ftp_service.get_files("", "bdbx")
-            for file in ftp_files:
-                logging.info(f"Ftp file - {file.file_name} {file.last_updated}")
-        except Exception as error:
-            logging.info("Error in getting files from ftp ", error)
 
         return "Done"
 
