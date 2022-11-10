@@ -7,8 +7,7 @@ from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
 
-from models.bucket_config_model import BucketConfig
-
+from models.configuration.bucket_config_model import BucketConfig
 from models.configuration.ftp_config_model import FtpConfig
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
