@@ -7,8 +7,8 @@ from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
 
+from models.configuration.blaise_config_model import BlaiseConfig
 from models.configuration.bucket_config_model import BucketConfig
-from models.configuration.ftp_config_model import FtpConfig
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
 from pkg.case_mover import CaseMover
@@ -17,7 +17,7 @@ from pkg.google_storage import init_google_storage
 from pkg.sftp import SFTP, SFTPConfig
 from pkg.trigger import get_filtered_instruments, trigger_processor
 from processor import process_instrument
-from services.ftp_service import FtpService
+from services.blaise_service import BlaiseService
 from services.google_storage_service import GoogleStorageService
 from services.nisra_update_check_service import NisraUpdateCheckService
 from util.service_logging import setupLogging
@@ -140,19 +140,19 @@ def do_processor(event, _context):
 def nisra_changes_checker(_event, _context) -> str:
     logging.info("Running Cloud Function - nisra_changes_checker")
 
+    blaise_config = BlaiseConfig.from_env()
+    blaise_config.log()
+    blaise_service = BlaiseService(config=blaise_config)
+    logging.info("Created blaise_service")
+
     bucket_config = BucketConfig.from_env()
     bucket_config.log()
     bucket_service = GoogleStorageService(config=bucket_config)
     logging.info("Created bucket_service")
 
-    ftp_config = FtpConfig.from_env()
-    ftp_config.log()
-    ftp_service = FtpService(config=ftp_config)
-    logging.info("Created ftp_service")
-
     nisra_update_check_service = NisraUpdateCheckService(
-        bucket_service=bucket_service,
-        ftp_service=ftp_service)
+        blaise_service=blaise_service,
+        bucket_service=bucket_service)
     logging.info("Created nisra_update_check_service")
 
     return cloud_functions.nisra_changes_checker.nisra_changes_checker(
