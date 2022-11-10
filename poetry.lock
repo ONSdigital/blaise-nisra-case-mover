@@ -76,6 +76,24 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
+name = "blaise-restapi"
+version = "1.0.4"
+description = "Client for calling Blaise RestAPI"
+category = "main"
+optional = false
+python-versions = "^3.9"
+develop = false
+
+[package.dependencies]
+requests = "^2.26.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/ONSdigital/blaise-api-python-client.git"
+reference = "fb5cdbbfc976a95809273d7b9c68c7be47fe2660"
+resolved_reference = "fb5cdbbfc976a95809273d7b9c68c7be47fe2660"
+
+[[package]]
 name = "boto3"
 version = "1.17.45"
 description = "The AWS SDK for Python"
@@ -924,7 +942,7 @@ brotli = ["brotlipy (>=0.6.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7ad771468b7b82c360883ddef84935710b6152155ca6dea615533bef88dae24f"
+content-hash = "1fedc4bc01ed7fd14b6b936a09f5e2d28c54e84e978cefedebf3a5c3b914000a"
 
 [metadata.files]
 atomicwrites = [
@@ -938,6 +956,7 @@ behave = [
     {file = "behave-1.2.6.tar.gz", hash = "sha256:b9662327aa53294c1351b0a9c369093ccec1d21026f050c3bd9b3e5cccf81a86"},
 ]
 black = []
+blaise-restapi = []
 boto3 = []
 botocore = []
 cachetools = []
