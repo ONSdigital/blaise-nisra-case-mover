@@ -7,7 +7,9 @@ from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
 
-from models.config_model import Config
+from models.bucket_config_model import BucketConfig
+
+from models.configuration.ftp_config_model import FtpConfig
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
 from pkg.case_mover import CaseMover
@@ -16,6 +18,9 @@ from pkg.google_storage import init_google_storage
 from pkg.sftp import SFTP, SFTPConfig
 from pkg.trigger import get_filtered_instruments, trigger_processor
 from processor import process_instrument
+from services.ftp_service import FtpService
+from services.google_storage_service import GoogleStorageService
+from services.nisra_update_check_service import NisraUpdateCheckService
 from util.service_logging import setupLogging
 
 
@@ -135,5 +140,16 @@ def do_processor(event, _context):
 
 def nisra_changes_checker(_event, _context) -> str:
     print("Running Cloud Function - nisra_changes_checker")
-    config = Config.from_env()
-    return cloud_functions.nisra_changes_checker.nisra_changes_checker(config)
+
+    bucket_config = BucketConfig.from_env()
+    bucket_service = GoogleStorageService(config=bucket_config)
+
+    ftp_config = FtpConfig.from_env()
+    ftp_service = FtpService(config=ftp_config)
+
+    nisra_update_check_service = NisraUpdateCheckService(
+        bucket_service=bucket_service,
+        ftp_service=ftp_service)
+
+    return cloud_functions.nisra_changes_checker.nisra_changes_checker(
+        nisra_update_check_service=nisra_update_check_service)
