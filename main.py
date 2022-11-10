@@ -138,6 +138,7 @@ def do_processor(event, _context):
 
 
 def nisra_changes_checker(_event, _context) -> str:
+    setupLogging()
     logging.info("Running Cloud Function - nisra_changes_checker")
 
     blaise_config = BlaiseConfig.from_env()
