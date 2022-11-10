@@ -15,6 +15,7 @@ class NisraUpdateCheckService:
         self._ftp_service = ftp_service
 
     def check_nisra_files_have_updated(self) -> str:
+        logging.info("Starting Nisra check service")
         try:
             bucket_files = self._bucket_service.get_files("bdbx")
             for file in bucket_files:
