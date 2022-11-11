@@ -1,10 +1,10 @@
 from notifications_python_client import NotificationsAPIClient
 
-from models.configuration.email_config_model import EmailConfig
+from models.configuration.notification_config_model import NotificationConfig
 
 
-class EmailService:
-    def __init__(self, config: EmailConfig):
+class NotificationService:
+    def __init__(self, config: NotificationConfig):
         self._email_client = NotificationsAPIClient(config.notify_api_key)
         self._email_address = config.to_notify_email
         self._email_template_id = "94264180-7ebd-4ff9-8a27-52abb5949c78"
