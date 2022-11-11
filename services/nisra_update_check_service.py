@@ -3,15 +3,15 @@ from datetime import datetime
 from typing import List
 
 from services.blaise_service import BlaiseService
-from services.google_storage_service import GoogleStorageService
+from services.google_bucket_service import GoogleBucketService
 
 
 class NisraUpdateCheckService:
     def __init__(
             self,
             blaise_service: BlaiseService,
-            bucket_service: GoogleStorageService):
-        self._survey_types_supported = ["LMS"]
+            bucket_service: GoogleBucketService):
+        self._survey_types_supported = "LMS" # can be a tuple if we want to support more
         self._bucket_file_type = "bdbx"
         self._max_hours_since_last_update = 23
         self._blaise_service = blaise_service
