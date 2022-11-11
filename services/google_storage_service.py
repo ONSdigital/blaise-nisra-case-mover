@@ -1,10 +1,10 @@
 import logging
-from typing import List
+from datetime import datetime
+from typing import Dict
 
 from google.cloud import storage
 
 from models.configuration.bucket_config_model import BucketConfig
-from models.instrument_file_model import InstrumentFile
 
 
 class GoogleStorageService:
@@ -12,24 +12,21 @@ class GoogleStorageService:
         self._bucket_name = config.bucket_name
         self.storage_client = storage.Client()
 
-    def get_files(self, file_extension: str) -> List[InstrumentFile]:
-        logging.info(f"GoogleStorageService - connect to bucket {self._bucket_name}")
-        bucket = self.storage_client.get_bucket(self._bucket_name)
+    def get_instrument_modified_dates_from_bucket(self, file_extension: str) -> Dict[str, datetime]:
+        try:
+            bucket = self.storage_client.get_bucket(self._bucket_name)
 
-        instrument_files = []
+            instrument_files = {}
 
-        logging.info(f"GoogleStorageService - get blobs in bucket {self._bucket_name}")
-        blobs = list(bucket.list_blobs())
+            blobs = list(bucket.list_blobs())
 
-        logging.info("Iterate over blobs in bucket")
-        for blob in blobs:
-            logging.info(f"Blob file name - {blob.name}")
-            if blob.name.endswith(file_extension):
-                logging.info(f"Add file name to list - {blob.name}")
-                instrument_files.append(
-                    InstrumentFile(
-                        file_name=blob.name,
-                        last_updated=blob.updated))
+            for blob in blobs:
+                if blob.name.upper().endswith(file_extension.upper()):
+                    continue
 
-        logging.info(f"return instrument files {instrument_files}")
-        return instrument_files
+                instrument_name = blob.name.upper().split("/")[0]
+                instrument_files[instrument_name] = blob.updated
+
+            return instrument_files
+        except Exception as error:
+            logging.error("GoogleStorageService: error in calling 'get_files_from_bucket'", error)
