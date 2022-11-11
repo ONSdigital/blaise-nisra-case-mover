@@ -144,19 +144,13 @@ def nisra_changes_checker(_event, _context) -> str:
     logging.info("Running Cloud Function - nisra_changes_checker")
 
     blaise_config = BlaiseConfig.from_env()
-    blaise_config.log()
     blaise_service = BlaiseService(config=blaise_config)
-    logging.info("Created blaise_service")
 
     bucket_config = BucketConfig.from_env()
-    bucket_config.log()
     bucket_service = GoogleBucketService(config=bucket_config)
-    logging.info("Created bucket_service")
 
     notification_config = NotificationConfig.from_env()
-    notification_config.log()
     notification_service = NotificationService(notification_config)
-    logging.info("Created notification_service")
 
     nisra_update_check_service = NisraUpdateCheckService(
         blaise_service=blaise_service,
