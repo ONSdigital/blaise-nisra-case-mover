@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from services.blaise_service import BlaiseService
@@ -37,7 +37,7 @@ class NisraUpdateCheckService:
 
     @staticmethod
     def instrument_has_not_updated_within_max_hours(date_modified: datetime, max_hours: int) -> bool:
-        date_now = datetime.now()
+        date_now = datetime.now(timezone.utc)
         hours_since_last_update = (date_modified - date_now).total_seconds() / 3600
 
         return hours_since_last_update > max_hours
