@@ -18,7 +18,7 @@ from pkg.sftp import SFTP, SFTPConfig
 from pkg.trigger import get_filtered_instruments, trigger_processor
 from processor import process_instrument
 from services.blaise_service import BlaiseService
-from services.google_storage_service import GoogleStorageService
+from services.google_bucket_service import GoogleBucketService
 from services.nisra_update_check_service import NisraUpdateCheckService
 from util.service_logging import setupLogging
 
@@ -148,7 +148,7 @@ def nisra_changes_checker(_event, _context) -> str:
 
     bucket_config = BucketConfig.from_env()
     bucket_config.log()
-    bucket_service = GoogleStorageService(config=bucket_config)
+    bucket_service = GoogleBucketService(config=bucket_config)
     logging.info("Created bucket_service")
 
     nisra_update_check_service = NisraUpdateCheckService(
