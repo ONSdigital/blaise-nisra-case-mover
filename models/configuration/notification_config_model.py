@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class EmailConfig:
+class NotificationConfig:
     notify_api_key: str
     to_notify_email: str
 
