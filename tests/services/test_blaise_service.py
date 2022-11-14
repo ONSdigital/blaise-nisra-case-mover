@@ -57,21 +57,24 @@ def test_get_questionnaires_calls_the_rest_api_client_with_the_correct_parameter
     _mock_rest_api_client.return_value = questionnaire_list
 
     # act
-    result = blaise_service.get_questionnaires()
+    blaise_service.get_questionnaires()
 
     # assert
-    result = questionnaire_list
+    _mock_rest_api_client.assert_called_with("gusty")
 
 
 @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
 def test_get_questionnaires_returns_a_list_of_questionnaires(
     _mock_rest_api_client, blaise_service,
 ):
+    # arrange
+    _mock_rest_api_client.return_value = questionnaire_list
+
     # act
-    blaise_service.get_questionnaires()
+    result = blaise_service.get_questionnaires()
 
     # assert
-    _mock_rest_api_client.assert_called_with("gusty")
+    assert result == questionnaire_list
 
 
 @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
