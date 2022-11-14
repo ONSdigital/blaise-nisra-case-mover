@@ -44,9 +44,6 @@ class NisraUpdateCheckService:
 
     def questionnaire_has_not_updated_within_max_hours(self, date_modified: datetime) -> bool:
         date_now = datetime.now(timezone.utc)
-        logging.info(f"date modified -{date_modified} / date now {date_now}")
-        logging.info(f"total seconds -{(date_modified - date_now).total_seconds()}")
-        hours_since_last_update = (date_modified - date_now).total_seconds() / 3600
-        logging.info(f"hours_since_last_update -{hours_since_last_update}")
+        hours_since_last_update = (date_now - date_modified).total_seconds() / 3600
 
         return hours_since_last_update > self._max_hours_since_last_update
