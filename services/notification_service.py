@@ -8,7 +8,7 @@ from models.configuration.notification_config_model import NotificationConfig
 class NotificationService:
     def __init__(self, config: NotificationConfig):
         self._email_client = NotificationsAPIClient(config.notify_api_key)
-        self._email_address = config.to_notify_email
+        self._email_address = config.nisra_notify_email
         self._email_template_id = config.email_template_id
 
     def send_email_notification(self, questionnaire_name: str) -> None:
