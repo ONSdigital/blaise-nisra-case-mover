@@ -1,5 +1,7 @@
+import logging
 from typing import List, Dict, Any
 from unittest import mock
+from urllib3.exceptions import HTTPError
 
 import blaise_restapi
 import pytest
@@ -70,6 +72,24 @@ def test_get_questionnaires_returns_a_list_of_questionnaires(
 
     # assert
     _mock_rest_api_client.assert_called_with("gusty")
+
+
+@mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
+def test_get_questionnaires_logs_an_error_if_exception_occurs(
+    _mock_rest_api_client, blaise_service, caplog
+):
+    # arrange
+    _mock_rest_api_client.side_effect = HTTPError()
+
+    # act
+    with caplog.at_level(logging.ERROR):
+        blaise_service.get_questionnaires()
+
+    assert (
+        "root",
+        logging.ERROR,
+        "BlaiseService: error in calling 'get_all_questionnaires_for_server_park': ",
+    ) in caplog.record_tuples
 
 
 @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
