@@ -22,4 +22,4 @@ class NotificationService:
         except Exception as error:
             logging.error(
                 f"NotificationService: Error when sending email for questionnaire {questionnaire_name} "
-                f"via GOV.UK Notify API - ", error)
+                f"via GOV.UK Notify API - {error}")
