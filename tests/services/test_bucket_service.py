@@ -59,7 +59,7 @@ def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_na
 ):
     # arrange
     file_extension = "bdbx"
-    mock_get_blobs.list_blobs.return_value = [
+    mock_get_blobs.return_value = [
         Blob(name="LMS2202_AA1/LMS2202_AA1.BMIX", bucket=bucket_name),
         Blob(name="LMS2202_AA1/LMS2202_AA1.BDBX", bucket=bucket_name),
         Blob(name="LMS2302_AA1/LMS2202_AA1.BDIX", bucket=bucket_name),
