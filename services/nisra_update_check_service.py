@@ -21,21 +21,20 @@ class NisraUpdateCheckService:
 
     def check_nisra_files_have_updated(self) -> str:
         questionnaire_names_in_blaise = self._blaise_service.get_names_of_questionnaire_in_blaise(self._survey_type)
-        questionnaire_modified_dates = self._bucket_service.get_questionnaire_modified_dates(self._bucket_file_type)
+        questionnaire_dates_in_bucket = self._bucket_service.get_questionnaire_modified_dates(self._bucket_file_type)
 
         for questionnaire_name in questionnaire_names_in_blaise:
-            if questionnaire_name not in questionnaire_modified_dates:
+            if questionnaire_name not in questionnaire_dates_in_bucket:
                 logging.warning(f"{questionnaire_name} not in bucket")
                 continue
 
             self.notify_if_questionnaire_has_not_been_updated(
                 questionnaire_name,
-                questionnaire_modified_dates[questionnaire_name])
+                questionnaire_dates_in_bucket[questionnaire_name])
 
         return "Done"
 
-    def notify_if_questionnaire_has_not_been_updated(self, questionnaire_name: str, date_modified: datetime):
-
+    def notify_if_questionnaire_has_not_been_updated(self, questionnaire_name: str, date_modified: datetime) -> None:
         if self.questionnaire_has_not_updated_within_max_hours(date_modified):
             logging.info(
                 f"{questionnaire_name} has a modified date {date_modified} past {self._max_hours_since_last_update} "
@@ -45,6 +44,9 @@ class NisraUpdateCheckService:
 
     def questionnaire_has_not_updated_within_max_hours(self, date_modified: datetime) -> bool:
         date_now = datetime.now(timezone.utc)
+        logging.info(f"date modified -{date_modified} / date now {date_now}")
+        logging.info(f"total seconds -{(date_modified - date_now).total_seconds()}")
         hours_since_last_update = (date_modified - date_now).total_seconds() / 3600
+        logging.info(f"hours_since_last_update -{hours_since_last_update}")
 
         return hours_since_last_update > self._max_hours_since_last_update
