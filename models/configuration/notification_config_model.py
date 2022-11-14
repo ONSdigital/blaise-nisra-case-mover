@@ -19,5 +19,6 @@ class NotificationConfig:
         )
 
     def log(self):
-        logging.info(f"notify_api_key - {self.notify_api_key}")
-        logging.info(f"to_nisra_notify_emailnotify_email - {self.nisra_notify_email}")
+        logging.info(f"notify_api_key: {self.notify_api_key}")
+        logging.info(f"nisra_notify_email: {self.nisra_notify_email}")
+        logging.info(f"email_template_id: 94264180-7ebd-4ff9-8a27-52abb5949c78")

@@ -11,8 +11,8 @@ class BucketConfig:
     @classmethod
     def from_env(cls):
         return cls(
-            bucket_name=os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
+            bucket_name=os.getenv("NISRA_BUCKET_NAME", "")
         )
 
     def log(self):
-        logging.info(f"bucket_name - {self.bucket_name}")
+        logging.info(f"bucket_name: {self.bucket_name}")

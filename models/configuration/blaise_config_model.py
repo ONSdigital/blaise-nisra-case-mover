@@ -16,5 +16,5 @@ class BlaiseConfig:
         )
 
     def log(self) -> None:
-        logging.info(f"Configuration - blaise_api_url: {self.blaise_api_url}")
-        logging.info(f"Configuration - server_park: {self.server_park}")
+        logging.info(f"blaise_api_url: {self.blaise_api_url}")
+        logging.info(f"server_park: {self.server_park}")
