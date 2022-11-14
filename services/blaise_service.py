@@ -15,7 +15,7 @@ class BlaiseService:
         try:
             return self.restapi_client.get_all_questionnaires_for_server_park(self._config.server_park)
         except Exception as error:
-            logging.error("BlaiseService: error in calling 'get_all_questionnaires_for_server_park'", error)
+            logging.error(f"BlaiseService: error in calling 'get_all_questionnaires_for_server_park': {error}")
 
     def get_names_of_questionnaire_in_blaise(self, survey_type: str) -> List[str]:
         questionnaire_names = []
