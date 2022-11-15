@@ -16,8 +16,8 @@ def test_from_env_sets_properties_as_empty_strings_if_vars_are_not_available_fro
 
 def test_from_env_pulls_correct_vars_from_env(monkeypatch):
     # arrange & act
-    monkeypatch.setenv('BLAISE_API_URL', 'http://localhost:90')
-    monkeypatch.setenv('SERVER_PARK', 'gusty')
+    monkeypatch.setenv("BLAISE_API_URL", "http://localhost:90")
+    monkeypatch.setenv("SERVER_PARK", "gusty")
     config = BlaiseConfig.from_env()
 
     # assert
@@ -29,8 +29,8 @@ def test_from_env_pulls_correct_vars_from_env(monkeypatch):
 
 def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
     # arrange & act
-    monkeypatch.setenv('BLAISE_API_URL', 'http://localhost:90')
-    monkeypatch.setenv('SERVER_PARK', 'gusty')
+    monkeypatch.setenv("BLAISE_API_URL", "http://localhost:90")
+    monkeypatch.setenv("SERVER_PARK", "gusty")
     config = BlaiseConfig.from_env()
 
     # act
@@ -49,4 +49,3 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
         logging.INFO,
         f"server_park: gusty",
     ) in caplog.record_tuples
-

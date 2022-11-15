@@ -5,7 +5,6 @@ import pytest
 from google.cloud.storage import Blob
 
 from models.configuration.bucket_config_model import BucketConfig
-
 from services.google_bucket_service import GoogleBucketService
 
 
@@ -15,14 +14,12 @@ def bucket_name() -> str:
 
 
 @pytest.fixture()
-def config(bucket_name) -> BucketConfig:
-    return BucketConfig(
-        bucket_name=bucket_name
-    )
+def config(bucket_name: str) -> BucketConfig:
+    return BucketConfig(bucket_name=bucket_name)
 
 
 @pytest.fixture()
-def bucket_service(config) -> GoogleBucketService:
+def bucket_service(config: BucketConfig) -> GoogleBucketService:
     return GoogleBucketService(config=config)
 
 
@@ -117,12 +114,12 @@ def test_get_questionnaire_modified_dates_logs_an_error_if_exception_occurs(
     mock_get_blobs.side_effect = Exception()
 
     # act
-    with caplog.at_level(logging.ERROR):
-        bucket_service.get_questionnaire_modified_dates(file_extension)
+    with pytest.raises(Exception):
+        with caplog.at_level(logging.ERROR):
+            bucket_service.get_questionnaire_modified_dates(file_extension)
 
     assert (
         "root",
         logging.ERROR,
-       f"GoogleStorageService: error in calling 'get_files_from_bucket' - "
+        f"GoogleStorageService: error in calling 'get_files_from_bucket' - ",
     ) in caplog.record_tuples
-

@@ -1,12 +1,12 @@
 import logging
 from unittest import mock
-from urllib3.exceptions import HTTPError
 
 import blaise_restapi
 import pytest
+from notifications_python_client import NotificationsAPIClient
+from urllib3.exceptions import HTTPError
 
 from models.configuration.notification_config_model import NotificationConfig
-from notifications_python_client import NotificationsAPIClient
 from services.notification_service import NotificationService
 
 
@@ -15,12 +15,12 @@ def config() -> NotificationConfig:
     return NotificationConfig(
         notify_api_key="94264180-7ebd-4ff9-8a27-52abb5949c78-94264180-7ebd-4ff9-8a27-52abb5949c78",
         nisra_notify_email="notify@ons.gov.uk",
-        email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78"
+        email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
     )
 
 
 @pytest.fixture()
-def notification_service(config) -> NotificationService:
+def notification_service(config: NotificationConfig) -> NotificationService:
     return NotificationService(config=config)
 
 
@@ -38,7 +38,8 @@ def test_send_email_notification_calls_the_notification_client_with_the_correct_
     _mock_notification_client.assert_called_with(
         email_address="notify@ons.gov.uk",
         template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
-        personalisation={"questionnaire_name": questionnaire_name})
+        personalisation={"questionnaire_name": questionnaire_name},
+    )
 
 
 @mock.patch.object(NotificationsAPIClient, "send_email_notification")
@@ -57,5 +58,5 @@ def test_send_email_notification_logs_an_error_if_exception_occurs(
         "root",
         logging.ERROR,
         f"NotificationService: Error when sending email for questionnaire {questionnaire_name} "
-                f"via GOV.UK Notify API - ",
+        f"via GOV.UK Notify API - ",
     ) in caplog.record_tuples

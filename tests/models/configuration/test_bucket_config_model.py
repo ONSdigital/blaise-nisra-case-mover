@@ -15,7 +15,7 @@ def test_from_env_sets_properties_as_empty_strings_if_vars_are_not_available_fro
 
 def test_from_env_pulls_correct_vars_from_env(monkeypatch):
     # arrange & act
-    monkeypatch.setenv('NISRA_BUCKET_NAME', 'NISRA')
+    monkeypatch.setenv("NISRA_BUCKET_NAME", "NISRA")
     config = BucketConfig.from_env()
 
     # assert
@@ -26,7 +26,7 @@ def test_from_env_pulls_correct_vars_from_env(monkeypatch):
 
 def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
     # arrange & act
-    monkeypatch.setenv('NISRA_BUCKET_NAME', 'NISRA')
+    monkeypatch.setenv("NISRA_BUCKET_NAME", "NISRA")
     config = BucketConfig.from_env()
 
     # act
@@ -39,4 +39,3 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
         logging.INFO,
         f"bucket_name: NISRA",
     ) in caplog.record_tuples
-
