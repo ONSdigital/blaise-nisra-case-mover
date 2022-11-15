@@ -122,3 +122,29 @@ def test_check_nisra_files_logs_a_warning_if_an_active_instrument_is_missing_in_
         logging.WARNING,
         f"LMS2201_AA1 not in bucket",
     ) in caplog.record_tuples
+
+
+def test_check_nisra_files_ignores_files_in_the_bucket_that_are_not_active_in_blaise(
+    mock_blaise_service,
+    mock_bucket_service,
+    mock_notification_service,
+    nisra_update_check_service,
+):
+
+    # arrange
+    mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = [
+        "LMS2201_AA1",
+    ]
+
+    datetime_now = datetime.now(timezone.utc)
+    mock_bucket_service.get_questionnaire_modified_dates.return_value = {
+        "LMS2201_AA1": datetime_now - timedelta(hours=23, minutes=30),
+        "LMS2301_AB1": datetime_now - timedelta(hours=23, minutes=30),
+    }
+
+    # act
+    nisra_update_check_service.check_nisra_files_have_updated()
+
+    # assert
+    mock_notification_service.send_email_notification.assert_called_once()
+    mock_notification_service.send_email_notification.assert_called_with("LMS2201_AA1")
