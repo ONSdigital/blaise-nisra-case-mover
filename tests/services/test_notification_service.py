@@ -15,7 +15,6 @@ def config() -> NotificationConfig:
     return NotificationConfig(
         notify_api_key="94264180-7ebd-4ff9-8a27-52abb5949c78-94264180-7ebd-4ff9-8a27-52abb5949c78",
         nisra_notify_email="notify@ons.gov.uk",
-        email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
     )
 
 
@@ -26,25 +25,26 @@ def notification_service(config: NotificationConfig) -> NotificationService:
 
 @mock.patch.object(NotificationsAPIClient, "send_email_notification")
 def test_send_email_notification_calls_the_notification_client_with_the_correct_parameters(
-    _mock_notification_client, notification_service
+        _mock_notification_client, notification_service
 ):
     # arrange
-    questionnaire_name = "LMS2202_AA1"
+    message = {"questionnaire_name": "LMS2202_AA1"}
+    template_id = "94264180-7ebd-4ff9-8a27-52abb5949c78"
 
     # act
-    notification_service.send_email_notification(questionnaire_name)
+    notification_service.send_email_notification(message, template_id)
 
     # assert
     _mock_notification_client.assert_called_with(
         email_address="notify@ons.gov.uk",
         template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
-        personalisation={"questionnaire_name": questionnaire_name},
+        personalisation={"questionnaire_name": "LMS2202_AA1"},
     )
 
 
 @mock.patch.object(NotificationsAPIClient, "send_email_notification")
 def test_send_email_notification_logs_an_error_if_exception_occurs(
-    _mock_notification_client, notification_service, caplog
+        _mock_notification_client, notification_service, caplog
 ):
     # arrange
     questionnaire_name = "LMS2202_AA1"
@@ -55,8 +55,8 @@ def test_send_email_notification_logs_an_error_if_exception_occurs(
         notification_service.send_email_notification(questionnaire_name)
 
     assert (
-        "root",
-        logging.ERROR,
-        f"NotificationService: Error when sending email for questionnaire {questionnaire_name} "
-        f"via GOV.UK Notify API - ",
-    ) in caplog.record_tuples
+               "root",
+               logging.ERROR,
+               f"NotificationService: Error when sending email for questionnaire {questionnaire_name} "
+               f"via GOV.UK Notify API - ",
+           ) in caplog.record_tuples
