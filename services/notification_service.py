@@ -1,4 +1,5 @@
 import logging
+from typing import Dict
 
 from notifications_python_client import NotificationsAPIClient
 
@@ -10,7 +11,9 @@ class NotificationService:
         self._email_client = NotificationsAPIClient(config.notify_api_key)  # type: ignore
         self._email_address = config.nisra_notify_email
 
-    def send_email_notification(self, message: dict[str, str], template_id: str) -> None:
+    def send_email_notification(
+        self, message: Dict[str, str], template_id: str
+    ) -> None:
         try:
             logging.info(
                 f"Sending email notification {message} to {self._email_address}"

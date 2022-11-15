@@ -49,4 +49,3 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
         logging.INFO,
         f"nisra_notify_email: notify@ons.gov.uk",
     ) in caplog.record_tuples
-
