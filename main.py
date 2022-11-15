@@ -2,11 +2,11 @@ import base64
 import logging
 
 import pysftp
-import cloud_functions.nisra_changes_checker
 from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
 
+import cloud_functions.nisra_changes_checker
 from models.configuration.blaise_config_model import BlaiseConfig
 from models.configuration.bucket_config_model import BucketConfig
 from models.configuration.notification_config_model import NotificationConfig
@@ -139,7 +139,7 @@ def do_processor(event, _context):
         )
 
 
-def nisra_changes_checker(_event, _context) -> str:
+def nisra_changes_checker(_event, _context):
     setupLogging()
     logging.info("Running Cloud Function - nisra_changes_checker")
 
@@ -155,9 +155,11 @@ def nisra_changes_checker(_event, _context) -> str:
     nisra_update_check_service = NisraUpdateCheckService(
         blaise_service=blaise_service,
         bucket_service=bucket_service,
-        notification_service=notification_service)
+        notification_service=notification_service,
+    )
 
     logging.info("Created nisra_update_check_service")
 
     return cloud_functions.nisra_changes_checker.nisra_changes_checker(
-        nisra_update_check_service=nisra_update_check_service)
+        nisra_update_check_service=nisra_update_check_service
+    )

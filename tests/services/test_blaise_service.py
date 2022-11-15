@@ -1,10 +1,10 @@
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 from unittest import mock
-from urllib3.exceptions import HTTPError
 
 import blaise_restapi
 import pytest
+from urllib3.exceptions import HTTPError
 
 from models.configuration.blaise_config_model import BlaiseConfig
 from services.blaise_service import BlaiseService
@@ -45,7 +45,7 @@ def config() -> BlaiseConfig:
 
 
 @pytest.fixture()
-def blaise_service(config) -> BlaiseService:
+def blaise_service(config: BlaiseConfig) -> BlaiseService:
     return BlaiseService(config=config)
 
 
@@ -65,7 +65,8 @@ def test_get_questionnaires_calls_the_rest_api_client_with_the_correct_parameter
 
 @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
 def test_get_questionnaires_returns_a_list_of_questionnaires(
-    _mock_rest_api_client, blaise_service,
+    _mock_rest_api_client,
+    blaise_service,
 ):
     # arrange
     _mock_rest_api_client.return_value = questionnaire_list
@@ -85,8 +86,9 @@ def test_get_questionnaires_logs_an_error_if_exception_occurs(
     _mock_rest_api_client.side_effect = HTTPError()
 
     # act
-    with caplog.at_level(logging.ERROR):
-        blaise_service.get_questionnaires()
+    with pytest.raises(Exception):
+        with caplog.at_level(logging.ERROR):
+            blaise_service.get_questionnaires()
 
     assert (
         "root",

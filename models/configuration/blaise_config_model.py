@@ -12,7 +12,7 @@ class BlaiseConfig:
     def from_env(cls):
         return cls(
             blaise_api_url=os.getenv("BLAISE_API_URL", ""),
-            server_park=os.getenv("SERVER_PARK", "")
+            server_park=os.getenv("SERVER_PARK", ""),
         )
 
     def log(self):

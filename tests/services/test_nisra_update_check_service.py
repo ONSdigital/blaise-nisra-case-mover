@@ -4,7 +4,10 @@ from unittest.mock import Mock
 
 import pytest
 
+from services.blaise_service import BlaiseService
+from services.google_bucket_service import GoogleBucketService
 from services.nisra_update_check_service import NisraUpdateCheckService
+from services.notification_service import NotificationService
 
 
 @pytest.fixture()
@@ -24,19 +27,20 @@ def mock_notification_service():
 
 @pytest.fixture()
 def nisra_update_check_service(
-        mock_blaise_service,
-        mock_bucket_service,
-        mock_notification_service) -> NisraUpdateCheckService:
+    mock_blaise_service: BlaiseService,
+    mock_bucket_service: GoogleBucketService,
+    mock_notification_service: NotificationService,
+) -> NisraUpdateCheckService:
     return NisraUpdateCheckService(
         blaise_service=mock_blaise_service,
         bucket_service=mock_bucket_service,
-        notification_service=mock_notification_service
+        notification_service=mock_notification_service,
     )
 
 
 def test_check_nisra_files_returns_done(
-        mock_blaise_service,
-        nisra_update_check_service):
+    mock_blaise_service, nisra_update_check_service
+):
 
     # arrange
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = []
@@ -49,8 +53,8 @@ def test_check_nisra_files_returns_done(
 
 
 def test_check_nisra_files_have_updated_calls_the_blaise_service_with_correct_survey_type(
-        mock_blaise_service,
-        nisra_update_check_service):
+    mock_blaise_service, nisra_update_check_service
+):
 
     # arrange
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = []
@@ -63,10 +67,11 @@ def test_check_nisra_files_have_updated_calls_the_blaise_service_with_correct_su
 
 
 def test_check_nisra_files_sends_a_notification_if_a_file_has_not_been_updated_for_23_hours(
-        mock_blaise_service,
-        mock_bucket_service,
-        mock_notification_service,
-        nisra_update_check_service):
+    mock_blaise_service,
+    mock_bucket_service,
+    mock_notification_service,
+    nisra_update_check_service,
+):
 
     # arrange
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = [
@@ -89,11 +94,12 @@ def test_check_nisra_files_sends_a_notification_if_a_file_has_not_been_updated_f
 
 
 def test_check_nisra_files_logs_a_warning_if_an_active_instrument_is_missing_in_the_bucket(
-        mock_blaise_service,
-        mock_bucket_service,
-        mock_notification_service,
-        nisra_update_check_service,
-        caplog):
+    mock_blaise_service,
+    mock_bucket_service,
+    mock_notification_service,
+    nisra_update_check_service,
+    caplog,
+):
 
     # arrange
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = [

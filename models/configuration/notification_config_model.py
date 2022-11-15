@@ -1,6 +1,5 @@
 import logging
 import os
-
 from dataclasses import dataclass
 
 
@@ -15,7 +14,7 @@ class NotificationConfig:
         return cls(
             notify_api_key=os.getenv("NOTIFY_API_KEY", ""),
             nisra_notify_email=os.getenv("NISRA_NOTIFY_EMAIL", ""),
-            email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78"
+            email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
         )
 
     def log(self):
