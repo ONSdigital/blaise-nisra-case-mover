@@ -6,6 +6,10 @@ from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
 from redo import retry
 
+import cloud_functions.nisra_changes_checker
+from models.configuration.blaise_config_model import BlaiseConfig
+from models.configuration.bucket_config_model import BucketConfig
+from models.configuration.notification_config_model import NotificationConfig
 from models.processor_event import ProcessorEvent
 from models.trigger_event import TriggerEvent
 from pkg.case_mover import CaseMover
@@ -14,6 +18,10 @@ from pkg.google_storage import init_google_storage
 from pkg.sftp import SFTP, SFTPConfig
 from pkg.trigger import get_filtered_instruments, trigger_processor
 from processor import process_instrument
+from services.blaise_service import BlaiseService
+from services.google_bucket_service import GoogleBucketService
+from services.nisra_update_check_service import NisraUpdateCheckService
+from services.notification_service import NotificationService
 from util.service_logging import setupLogging
 
 
@@ -129,3 +137,29 @@ def do_processor(event, _context):
         process_instrument(
             case_mover, processor_event.instrument_name, processor_event.instrument
         )
+
+
+def nisra_changes_checker(_event, _context):
+    setupLogging()
+    logging.info("Running Cloud Function - nisra_changes_checker")
+
+    blaise_config = BlaiseConfig.from_env()
+    blaise_service = BlaiseService(config=blaise_config)
+
+    bucket_config = BucketConfig.from_env()
+    bucket_service = GoogleBucketService(config=bucket_config)
+
+    notification_config = NotificationConfig.from_env()
+    notification_service = NotificationService(notification_config)
+
+    nisra_update_check_service = NisraUpdateCheckService(
+        blaise_service=blaise_service,
+        bucket_service=bucket_service,
+        notification_service=notification_service,
+    )
+
+    logging.info("Created nisra_update_check_service")
+
+    return cloud_functions.nisra_changes_checker.nisra_changes_checker(
+        nisra_update_check_service=nisra_update_check_service
+    )

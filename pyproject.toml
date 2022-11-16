@@ -5,7 +5,7 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 pybase64 = "^1.1.4"
 pysftp = "^0.2.9"
 google-cloud-storage = "^1.37.0"
@@ -13,9 +13,12 @@ python-dotenv = "^0.16.0"
 google-cloud-pubsub = "^2.4.1"
 dacite = "^1.6.0"
 redo = "^2.0.4"
+notifications-python-client = "^6.4.1"
+requests = "^2.28.1"
+blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", rev = "fb5cdbbfc976a95809273d7b9c68c7be47fe2660"}
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.2"
+pytest = "^7.0.1"
 boto3 = "^1.17.40"
 isort = "^5.8.0"
 flake8 = "^3.9.0"
@@ -23,7 +26,7 @@ flake8-cognitive-complexity = "^0.1.0"
 black = "^22.6.0"
 behave = "^1.2.6"
 mypy = "^0.812"
-pytest-cov = "^2.11.1"
+pytest-cov = "^3.0.0"
 requests-mock = "^1.9.3"
 
 [tool.isort]
