@@ -45,6 +45,7 @@ def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_na
     result = bucket_service.get_questionnaire_modified_dates(file_extension)
 
     # assert
+    assert len(result) == 3
     assert "LMS2202_AA1" in result
     assert "OPN2101A" in result
     assert "LMS2301_AB1" in result
@@ -72,7 +73,7 @@ def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_na
     result = bucket_service.get_questionnaire_modified_dates(file_extension)
 
     # assert
-    # assert
+    assert len(result) == 3
     assert "LMS2202_AA1" in result
     assert "OPN2101A" in result
     assert "LMS2301_AB1" in result
@@ -100,6 +101,7 @@ def test_get_questionnaire_modified_dates_returns_only_the_instrument_file_names
     result = bucket_service.get_questionnaire_modified_dates(file_extension)
 
     # assert
+    assert len(result) == 3
     assert "OPN2101A" in result
     assert "LMS2301_AB1" in result
     assert "DST3399" in result

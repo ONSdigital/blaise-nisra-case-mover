@@ -11,7 +11,6 @@ def test_from_env_sets_properties_as_empty_strings_if_vars_are_not_available_fro
     assert config == NotificationConfig(
         notify_api_key="",
         nisra_notify_email="",
-        email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
     )
 
 
@@ -25,7 +24,6 @@ def test_from_env_pulls_correct_vars_from_env(monkeypatch):
     assert config == NotificationConfig(
         notify_api_key="AE88HF98",
         nisra_notify_email="notify@ons.gov.uk",
-        email_template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
     )
 
 
@@ -50,10 +48,4 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
         "root",
         logging.INFO,
         f"nisra_notify_email: notify@ons.gov.uk",
-    ) in caplog.record_tuples
-
-    assert (
-        "root",
-        logging.INFO,
-        f"email_template_id: 94264180-7ebd-4ff9-8a27-52abb5949c78",
     ) in caplog.record_tuples

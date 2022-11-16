@@ -90,10 +90,13 @@ def test_check_nisra_files_sends_a_notification_if_a_file_has_not_been_updated_f
 
     # assert
     mock_notification_service.send_email_notification.assert_called_once()
-    mock_notification_service.send_email_notification.assert_called_with("LMS2201_AA1")
+    mock_notification_service.send_email_notification.assert_called_with(
+        message={"questionnaire_name": "LMS2201_AA1"},
+        template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
+    )
 
 
-def test_check_nisra_files_logs_a_warning_if_an_active_instrument_is_missing_in_the_bucket(
+def test_check_nisra_files_sends_a_notification_if_an_active_instrument_is_missing_in_the_bucket(
     mock_blaise_service,
     mock_bucket_service,
     mock_notification_service,
@@ -117,11 +120,11 @@ def test_check_nisra_files_logs_a_warning_if_an_active_instrument_is_missing_in_
         nisra_update_check_service.check_nisra_files_have_updated()
 
     # assert
-    assert (
-        "root",
-        logging.WARNING,
-        f"LMS2201_AA1 not in bucket",
-    ) in caplog.record_tuples
+    mock_notification_service.send_email_notification.assert_called_once()
+    mock_notification_service.send_email_notification.assert_called_with(
+        message={"questionnaire_name": "LMS2201_AA1"},
+        template_id="f9292929-8763-4147-ad1a-681398e8d9fc",
+    )
 
 
 def test_check_nisra_files_ignores_files_in_the_bucket_that_are_not_active_in_blaise(
@@ -132,6 +135,7 @@ def test_check_nisra_files_ignores_files_in_the_bucket_that_are_not_active_in_bl
 ):
 
     # arrange
+    questionnaire_name = "LMS2202_AA1"
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = [
         "LMS2201_AA1",
     ]
@@ -147,4 +151,7 @@ def test_check_nisra_files_ignores_files_in_the_bucket_that_are_not_active_in_bl
 
     # assert
     mock_notification_service.send_email_notification.assert_called_once()
-    mock_notification_service.send_email_notification.assert_called_with("LMS2201_AA1")
+    mock_notification_service.send_email_notification.assert_called_with(
+        message={"questionnaire_name": "LMS2201_AA1"},
+        template_id="94264180-7ebd-4ff9-8a27-52abb5949c78",
+    )
