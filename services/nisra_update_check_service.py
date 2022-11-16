@@ -33,9 +33,7 @@ class NisraUpdateCheckService:
 
         for questionnaire_name in questionnaire_names_in_blaise:
             if questionnaire_name not in questionnaire_dates_in_bucket:
-                self.notify_questionnaire_is_missing_in_the_bucket(
-                    questionnaire_name
-                )
+                self.notify_questionnaire_is_missing_in_the_bucket(questionnaire_name)
                 continue
 
             self.notify_if_questionnaire_has_not_been_updated(
@@ -44,7 +42,9 @@ class NisraUpdateCheckService:
 
         return "Done"
 
-    def notify_questionnaire_is_missing_in_the_bucket(self, questionnaire_name: str) -> None:
+    def notify_questionnaire_is_missing_in_the_bucket(
+        self, questionnaire_name: str
+    ) -> None:
         logging.info(
             f"{questionnaire_name} is missing in the NISRA bucket, sending notification"
         )
