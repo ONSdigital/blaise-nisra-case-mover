@@ -7,6 +7,7 @@ from paramiko.ssh_exception import SSHException
 from redo import retry
 
 import cloud_functions.nisra_changes_checker
+from exceptions import ProcessorError, TriggerError
 from models.configuration.blaise_config_model import BlaiseConfig
 from models.configuration.bucket_config_model import BucketConfig
 from models.configuration.notification_config_model import NotificationConfig
@@ -23,7 +24,7 @@ from services.google_bucket_service import GoogleBucketService
 from services.nisra_update_check_service import NisraUpdateCheckService
 from services.notification_service import NotificationService
 from util.service_logging import setupLogging
-from exceptions import TriggerError, ProcessorError
+
 
 def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
@@ -86,7 +87,9 @@ def do_trigger(event, _context):
                 trigger_processor(
                     publisher_client,
                     config,
-                    ProcessorEvent(instrument_name=instrument_name, instrument=instrument),
+                    ProcessorEvent(
+                        instrument_name=instrument_name, instrument=instrument
+                    ),
                 )
     except TriggerError:
         exit(1)
