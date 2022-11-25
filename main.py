@@ -7,7 +7,6 @@ from paramiko.ssh_exception import SSHException
 from redo import retry
 
 import cloud_functions.nisra_changes_checker
-from exceptions import ProcessorError, TriggerError
 from models.configuration.blaise_config_model import BlaiseConfig
 from models.configuration.bucket_config_model import BucketConfig
 from models.configuration.notification_config_model import NotificationConfig
@@ -91,7 +90,8 @@ def do_trigger(event, _context):
                         instrument_name=instrument_name, instrument=instrument
                     ),
                 )
-    except TriggerError:
+    except Exception as error:
+        logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
         exit(1)
 
 
@@ -144,7 +144,8 @@ def do_processor(event, _context):
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
-    except ProcessorError:
+    except Exception as error:
+        logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
         exit(1)
 
 
