@@ -92,7 +92,6 @@ def do_trigger(event, _context):
                 )
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
-        exit(1)
 
 
 def processor(*args, **kwargs):
@@ -146,7 +145,6 @@ def do_processor(event, _context):
             )
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
-        exit(1)
 
 
 def nisra_changes_checker(_event, _context):
