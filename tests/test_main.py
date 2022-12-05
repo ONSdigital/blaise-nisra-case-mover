@@ -17,7 +17,6 @@ def test_do_trigger_logs_error_when_exception_is_raised(from_json, caplog):
     assert len(errors) == 1
     error = errors[0]
     assert error.message == "Exception: Kaboom"
-    assert error.exc_info[1] == original_exception
 
 
 @mock.patch("main.Config.from_env")
@@ -33,4 +32,3 @@ def test_do_processor_logs_error_when_exception_is_raised(from_env, caplog):
     assert len(errors) == 1
     error = errors[0]
     assert error.message == "Exception: Kaboom"
-    assert error.exc_info[1] == original_exception
