@@ -5,30 +5,52 @@ import operator
 import os
 import pathlib
 import stat
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Dict, List, Type, TypeVar
 
 import pysftp
 
 from models import Instrument
 from pkg.config import Config
 
+T = TypeVar("T", bound="SFTPConfig")
 
+
+@dataclass
 class SFTPConfig:
-    host = None
-    username = None
-    password = None
-    port = None
-    survey_source_path = None
+    host: str
+    username: str
+    password: str
+    port: str
+    survey_source_path: str
 
     @classmethod
-    def from_env(cls):
-        cls.host = os.getenv("SFTP_HOST", "env_var_not_set")
-        cls.username = os.getenv("SFTP_USERNAME", "env_var_not_set")
-        cls.password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
-        cls.port = os.getenv("SFTP_PORT", "env_var_not_set")
-        cls.survey_source_path = os.getenv("SURVEY_SOURCE_PATH", "env_var_not_set")
-        return cls()
+    def from_env(cls: Type[T]) -> T:
+        missing = []
+
+        def get_from_env(name: str) -> str:
+            try:
+                return os.environ[name]
+            except KeyError:
+                missing.append(name)
+                return ""
+
+        instance = cls(
+            host=get_from_env("SFTP_HOST"),
+            username=get_from_env("SFTP_USERNAME"),
+            password=get_from_env("SFTP_PASSWORD"),
+            port=get_from_env("SFTP_PORT"),
+            survey_source_path=get_from_env("SURVEY_SOURCE_PATH"),
+        )
+
+        if missing:
+            raise Exception(
+                "The following required environment variables have not been set: "
+                + ", ".join(missing)
+            )
+
+        return instance
 
     def log(self):
         logging.info(f"survey_source_path - {self.survey_source_path}")

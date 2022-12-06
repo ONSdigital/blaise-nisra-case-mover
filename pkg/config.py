@@ -1,30 +1,52 @@
 import logging
 import os
+from dataclasses import dataclass, field
+from typing import List, Type, TypeVar
 
 from paramiko.common import DEFAULT_WINDOW_SIZE
 
+T = TypeVar("T", bound="Config")
 
+
+@dataclass
 class Config:
-    bucket_name = "env_var_not_set"
-    server_park = "env_var_not_set"
-    blaise_api_url = "env_var_not_set"
-    valid_surveys = ["OPN", "LMS"]
-    extension_list = [".blix", ".bdbx", ".bdix", ".bmix"]
-    bufsize = DEFAULT_WINDOW_SIZE
-    project_id = "env_var_not_set"
-    processor_topic_name = "env_var_not_set"
+    bucket_name: str
+    server_park: str
+    blaise_api_url: str
+    project_id: str
+    processor_topic_name: str
+    valid_surveys: List[str] = field(default_factory=lambda: ["OPN", "LMS"])
+    extension_list: List[str] = field(
+        default_factory=lambda: [".blix", ".bdbx", ".bdix", ".bmix"]
+    )
+    bufsize: int = field(default_factory=lambda: DEFAULT_WINDOW_SIZE)
 
     @classmethod
-    def from_env(cls):
-        config = cls()
-        config.server_park = os.getenv("SERVER_PARK", "env_var_not_set")
-        config.blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
-        config.bucket_name = os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
-        config.project_id = os.getenv("PROJECT_ID", "env_var_not_set")
-        config.processor_topic_name = os.getenv(
-            "PROCESSOR_TOPIC_NAME", "env_var_not_set"
+    def from_env(cls: Type[T]) -> T:
+        missing = []
+
+        def get_from_env(name: str) -> str:
+            try:
+                return os.environ[name]
+            except KeyError:
+                missing.append(name)
+                return ""
+
+        instance = cls(
+            server_park=get_from_env("SERVER_PARK"),
+            blaise_api_url=get_from_env("BLAISE_API_URL"),
+            bucket_name=get_from_env("NISRA_BUCKET_NAME"),
+            project_id=get_from_env("PROJECT_ID"),
+            processor_topic_name=get_from_env("PROCESSOR_TOPIC_NAME"),
         )
-        return config
+
+        if missing:
+            raise Exception(
+                "The following required environment variables have not been set: "
+                + ", ".join(missing)
+            )
+
+        return instance
 
     def log(self):
         logging.info(f"bucket_name - {self.bucket_name}")
