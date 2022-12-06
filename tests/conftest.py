@@ -22,7 +22,6 @@ def sftp_config():
         username="test_username",
         password="test_password",
         port="1234",
-        survey_source_path="./ONS/OPN",
     )
 
 

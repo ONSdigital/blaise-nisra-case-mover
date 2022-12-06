@@ -24,9 +24,9 @@ def trigger_processor(
 
 
 def get_filtered_instruments(
-    sftp: SFTP, case_mover: CaseMover
+    sftp: SFTP, case_mover: CaseMover, survey_source_path: str
 ) -> Dict[str, Instrument]:
-    instruments = sftp.get_instrument_folders()
+    instruments = sftp.get_instrument_folders(survey_source_path)
     instruments = case_mover.filter_existing_instruments(instruments)
     instruments = sftp.get_instrument_files(instruments)
     instruments = sftp.filter_instrument_files(instruments)

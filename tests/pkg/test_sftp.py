@@ -17,7 +17,6 @@ from pkg.sftp import SFTP, SFTPConfig
         "SFTP_USERNAME": "test_username",
         "SFTP_PASSWORD": "test_password",
         "SFTP_PORT": "1234",
-        "SURVEY_SOURCE_PATH": "test_path",
     },
 )
 def test_sftpconfig_from_env_gets_values_from_the_env():
@@ -26,7 +25,6 @@ def test_sftpconfig_from_env_gets_values_from_the_env():
     assert config.username == "test_username"
     assert config.password == "test_password"
     assert config.port == "1234"
-    assert config.survey_source_path == "test_path"
 
 
 @mock.patch.dict(os.environ, {})
@@ -35,7 +33,7 @@ def test_sftpconfig_from_env_raises_when_env_vars_are_missing():
         Exception,
         match=(
             "The following required environment variables have not been set: "
-            "SFTP_HOST, SFTP_USERNAME, SFTP_PASSWORD, SFTP_PORT, SURVEY_SOURCE_PATH"
+            "SFTP_HOST, SFTP_USERNAME, SFTP_PASSWORD, SFTP_PORT"
         ),
     ):
         SFTPConfig.from_env()
@@ -53,7 +51,7 @@ def test_get_instrument_folders(
         mock_list_dir_attr(filename="foobar", st_mtime=1, st_mode=stat.S_IFDIR),
     ]
     sftp = SFTP(mock_sftp_connection, sftp_config, config)
-    assert sftp.get_instrument_folders() == {
+    assert sftp.get_instrument_folders("./ONS/OPN") == {
         "OPN2101A": Instrument(sftp_path="./ONS/OPN/OPN2101A"),
         "LMS2101A": Instrument(sftp_path="./ONS/OPN/LMS2101A"),
         "lMS2101A": Instrument(sftp_path="./ONS/OPN/lMS2101A"),
