@@ -8,6 +8,7 @@ from behave import given, then, when
 import main
 from pkg.case_mover import CaseMover
 from pkg.google_storage import GoogleStorage
+from pkg.sftp import SFTPConfig
 
 file_list = [
     "FrameEthnicity.blix",
@@ -21,10 +22,8 @@ file_list = [
 
 @given("there is no new OPN NISRA data on the NISRA SFTP")
 def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
-    copy_opn2101a_files_to_sftp()
-    nisra_google_storage = GoogleStorage(
-        os.getenv("NISRA_BUCKET_NAME", "env_var_not_set")
-    )
+    copy_opn2101a_files_to_sftp(context.sftp_config)
+    nisra_google_storage = GoogleStorage(context.config.bucket_name)
     nisra_google_storage.initialise_bucket_connection()
 
     if nisra_google_storage.bucket is None:
@@ -47,7 +46,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
 def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(  # noqa: E501
     context,
 ):
-    copy_opn2101a_files_to_sftp()
+    copy_opn2101a_files_to_sftp(context.sftp_config)
 
 
 @when("the nisra-mover service is run with an OPN configuration")
@@ -106,7 +105,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
     context,
 ):
-    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
+    google_storage = GoogleStorage(context.config.bucket_name)
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -138,7 +137,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
 
 @then("no data is copied to the GCP storage bucket")
 def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
-    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
+    google_storage = GoogleStorage(context.config.bucket_name)
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -154,8 +153,8 @@ def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
 
 @then("a call is made to the RESTful API to process the new data")
 def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
-    server_park = os.getenv("SERVER_PARK", "env_var_not_set")
-    blaise_api_url = os.getenv("BLAISE_API_URL", "env_var_not_set")
+    server_park = context.config.server_park
+    blaise_api_url = context.config.blaise_api_url
     context.mock_requests_post.assert_called_once_with(
         (
             f"http://{blaise_api_url}/api/v2/serverparks/"
@@ -172,10 +171,7 @@ def step_a_call_is_not_made_to_the_restful_api(context):
     context.mock_requests_post.assert_not_called()
 
 
-def copy_opn2101a_files_to_sftp():
-    os.environ[
-        "google_application_credentials"
-    ] = "S:\\work\\code\\blaise-nisra-case-mover\\key.json"
+def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig):
     google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
 
@@ -186,20 +182,15 @@ def copy_opn2101a_files_to_sftp():
         blob = google_storage.get_blob(f"opn2101a-nisra/{file}")
         blob.download_to_filename(file)
 
-    sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
-    sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
-    sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
-    sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
-
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
     cnopts.compression = True
 
     with pysftp.Connection(
-        host=sftp_host,
-        username=sftp_username,
-        password=sftp_password,
-        port=int(sftp_port),
+        host=sftp_config.host,
+        username=sftp_config.username,
+        password=sftp_config.password,
+        port=int(sftp_config.port),
         cnopts=cnopts,
     ) as sftp:
 

@@ -1,4 +1,5 @@
 import logging
+import os
 import stat
 from datetime import datetime
 from unittest import mock
@@ -6,7 +7,38 @@ from unittest import mock
 import pytest
 
 from models.instruments import Instrument
-from pkg.sftp import SFTP
+from pkg.sftp import SFTP, SFTPConfig
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        "SFTP_HOST": "test_host",
+        "SFTP_USERNAME": "test_username",
+        "SFTP_PASSWORD": "test_password",
+        "SFTP_PORT": "1234",
+        "SURVEY_SOURCE_PATH": "test_path",
+    },
+)
+def test_sftpconfig_from_env_gets_values_from_the_env():
+    config = SFTPConfig.from_env()
+    assert config.host == "test_host"
+    assert config.username == "test_username"
+    assert config.password == "test_password"
+    assert config.port == "1234"
+    assert config.survey_source_path == "test_path"
+
+
+@mock.patch.dict(os.environ, {})
+def test_sftpconfig_from_env_raises_when_env_vars_are_missing():
+    with pytest.raises(
+        Exception,
+        match=(
+            "The following required environment variables have not been set: "
+            "SFTP_HOST, SFTP_USERNAME, SFTP_PASSWORD, SFTP_PORT, SURVEY_SOURCE_PATH"
+        ),
+    ):
+        SFTPConfig.from_env()
 
 
 def test_get_instrument_folders(
