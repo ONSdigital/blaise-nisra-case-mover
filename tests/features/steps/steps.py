@@ -171,7 +171,7 @@ def step_a_call_is_not_made_to_the_restful_api(context):
     context.mock_requests_post.assert_not_called()
 
 
-def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig):
+def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
     google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
 

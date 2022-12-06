@@ -23,7 +23,6 @@ class SFTPConfig:
     username: str
     password: str
     port: str
-    survey_source_path: str
 
     @classmethod
     def from_env(cls: Type[T]) -> T:
@@ -41,7 +40,6 @@ class SFTPConfig:
             username=get_from_env("SFTP_USERNAME"),
             password=get_from_env("SFTP_PASSWORD"),
             port=get_from_env("SFTP_PORT"),
-            survey_source_path=get_from_env("SURVEY_SOURCE_PATH"),
         )
 
         if missing:
@@ -53,7 +51,6 @@ class SFTPConfig:
         return instance
 
     def log(self):
-        logging.info(f"survey_source_path - {self.survey_source_path}")
         logging.info(f"sftp_host - {self.host}")
         logging.info(f"sftp_port - {self.port}")
         logging.info(f"sftp_username - {self.username}")
@@ -70,18 +67,16 @@ class SFTP:
         self.sftp_config = sftp_config
         self.config = config
 
-    def get_instrument_folders(self) -> Dict[str, Instrument]:
+    def get_instrument_folders(self, survey_source_path: str) -> Dict[str, Instrument]:
         instruments = {}
-        for folder_attr in self.sftp_connection.listdir_attr(
-            self.sftp_config.survey_source_path
-        ):
+        for folder_attr in self.sftp_connection.listdir_attr(survey_source_path):
             if not stat.S_ISDIR(folder_attr.st_mode):
                 continue
             folder = folder_attr.filename
             if self.config.valid_survey_name(folder):
                 logging.info(f"Instrument folder found - {folder}")
                 instruments[folder] = Instrument(
-                    sftp_path=f"{self.sftp_config.survey_source_path}/{folder}"
+                    sftp_path=f"{survey_source_path}/{folder}"
                 )
         return instruments
 
