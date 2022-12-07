@@ -5,33 +5,52 @@ import operator
 import os
 import pathlib
 import stat
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Dict, List, Type, TypeVar
 
 import pysftp
 
 from models import Instrument
 from pkg.config import Config
 
+T = TypeVar("T", bound="SFTPConfig")
 
+
+@dataclass
 class SFTPConfig:
-    host = None
-    username = None
-    password = None
-    port = None
-    survey_source_path = None
+    host: str
+    username: str
+    password: str
+    port: str
 
     @classmethod
-    def from_env(cls):
-        cls.host = os.getenv("SFTP_HOST", "env_var_not_set")
-        cls.username = os.getenv("SFTP_USERNAME", "env_var_not_set")
-        cls.password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
-        cls.port = os.getenv("SFTP_PORT", "env_var_not_set")
-        cls.survey_source_path = os.getenv("SURVEY_SOURCE_PATH", "env_var_not_set")
-        return cls()
+    def from_env(cls: Type[T]) -> T:
+        missing = []
+
+        def get_from_env(name: str) -> str:
+            try:
+                return os.environ[name]
+            except KeyError:
+                missing.append(name)
+                return ""
+
+        instance = cls(
+            host=get_from_env("SFTP_HOST"),
+            username=get_from_env("SFTP_USERNAME"),
+            password=get_from_env("SFTP_PASSWORD"),
+            port=get_from_env("SFTP_PORT"),
+        )
+
+        if missing:
+            raise Exception(
+                "The following required environment variables have not been set: "
+                + ", ".join(missing)
+            )
+
+        return instance
 
     def log(self):
-        logging.info(f"survey_source_path - {self.survey_source_path}")
         logging.info(f"sftp_host - {self.host}")
         logging.info(f"sftp_port - {self.port}")
         logging.info(f"sftp_username - {self.username}")
@@ -48,18 +67,16 @@ class SFTP:
         self.sftp_config = sftp_config
         self.config = config
 
-    def get_instrument_folders(self) -> Dict[str, Instrument]:
+    def get_instrument_folders(self, survey_source_path: str) -> Dict[str, Instrument]:
         instruments = {}
-        for folder_attr in self.sftp_connection.listdir_attr(
-            self.sftp_config.survey_source_path
-        ):
+        for folder_attr in self.sftp_connection.listdir_attr(survey_source_path):
             if not stat.S_ISDIR(folder_attr.st_mode):
                 continue
             folder = folder_attr.filename
             if self.config.valid_survey_name(folder):
                 logging.info(f"Instrument folder found - {folder}")
                 instruments[folder] = Instrument(
-                    sftp_path=f"{self.sftp_config.survey_source_path}/{folder}"
+                    sftp_path=f"{survey_source_path}/{folder}"
                 )
         return instruments
 
