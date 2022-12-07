@@ -630,6 +630,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "pebble"
+version = "5.0.3"
+description = "Threading and multiprocessing eye-candy."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "platformdirs"
 version = "2.5.4"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -965,7 +973,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5cb7a4cb69600c5cd92c4d7c68aa1a67be82003100e0410214a6395a72cae2f8"
+content-hash = "53beff20d0696ef27e9925612c7da21ea2b73b707d8f74e9f575d19fcb3d1ab0"
 
 [metadata.files]
 attrs = [
@@ -1452,6 +1460,10 @@ parse-type = [
 pathspec = [
     {file = "pathspec-0.10.2-py3-none-any.whl", hash = "sha256:88c2606f2c1e818b978540f73ecc908e13999c6c3a383daf3705652ae79807a5"},
     {file = "pathspec-0.10.2.tar.gz", hash = "sha256:8f6bf73e5758fd365ef5d58ce09ac7c27d2833a8d7da51712eac6e27e35141b0"},
+]
+pebble = [
+    {file = "Pebble-5.0.3-py3-none-any.whl", hash = "sha256:8274aa0959f387b368ede47666129cbe5d123f276a1bd9cafe77e020194b2141"},
+    {file = "Pebble-5.0.3.tar.gz", hash = "sha256:bdcfd9ea7e0aedb895b204177c19e6d6543d9962f4e3402ebab2175004863da8"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.4-py3-none-any.whl", hash = "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10"},

@@ -4,6 +4,7 @@ import logging
 import pysftp
 from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
+from pebble import concurrent
 from redo import retry
 
 import cloud_functions.nisra_changes_checker
@@ -29,13 +30,24 @@ def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
 
 
+@concurrent.process(timeout=60)
+def create_sftp_connection(cnopts, sftp_config):
+    return pysftp.Connection(
+        host=sftp_config.host,
+        username=sftp_config.username,
+        password=sftp_config.password,
+        port=int(sftp_config.port),
+        cnopts=cnopts,
+    )
+
+
 def trigger(*args, **kwargs):
     setupLogging()
     retry(
         do_trigger,
         attempts=3,
         sleeptime=15,
-        retry_exceptions=(SSHException),
+        retry_exceptions=(SSHException, TimeoutError),
         cleanup=ssh_retry_logger,
         args=args,
         kwargs=kwargs,
@@ -64,13 +76,7 @@ def do_trigger(event, _context):
             return "Connection to bucket failed", 500
 
         logging.info("Connecting to SFTP server")
-        with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp_connection:
+        with create_sftp_connection(cnopts, sftp_config).result() as sftp_connection:
             logging.info("Connected to SFTP server")
 
             sftp = SFTP(sftp_connection, sftp_config, config)
@@ -100,7 +106,7 @@ def processor(*args, **kwargs):
         do_processor,
         attempts=3,
         sleeptime=15,
-        retry_exceptions=(SSHException),
+        retry_exceptions=(SSHException, TimeoutError),
         cleanup=ssh_retry_logger,
         args=args,
         kwargs=kwargs,
@@ -124,13 +130,7 @@ def do_processor(event, _context):
 
         logging.info("Connecting to SFTP server")
 
-        with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp_connection:
+        with create_sftp_connection(cnopts, sftp_config).result() as sftp_connection:
             logging.info("Connected to SFTP server")
 
             sftp = SFTP(sftp_connection, sftp_config, config)
