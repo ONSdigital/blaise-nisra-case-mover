@@ -65,7 +65,10 @@ def do_trigger(event, _context):
             return "Connection to bucket failed", 500
 
         try:
-            logging.info("Public IP address - " + requests.get("https://checkip.amazonaws.com").text.strip())
+            logging.info(
+                "Public IP address - "
+                + requests.get("https://checkip.amazonaws.com").text.strip()
+            )
         except:
             logging.info("Unable to get public IP address")
         logging.info("Connecting to SFTP server")
@@ -128,7 +131,10 @@ def do_processor(event, _context):
             return "Connection to bucket failed", 500
 
         try:
-            logging.info("Public IP address - " + requests.get("https://checkip.amazonaws.com").text.strip())
+            logging.info(
+                "Public IP address - "
+                + requests.get("https://checkip.amazonaws.com").text.strip()
+            )
         except:
             logging.info("Unable to get public IP address")
         logging.info("Connecting to SFTP server")
