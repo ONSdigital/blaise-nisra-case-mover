@@ -51,7 +51,7 @@ def do_trigger(event, _context):
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
         config.log()
-        sftp_config.survey_source_path = trigger_event.survey
+        survey_source_path = trigger_event.survey
         sftp_config.log()
         publisher_client = pubsub_v1.PublisherClient()
 
@@ -75,8 +75,8 @@ def do_trigger(event, _context):
 
             sftp = SFTP(sftp_connection, sftp_config, config)
             case_mover = CaseMover(google_storage, config, sftp)
-            instruments = get_filtered_instruments(sftp, case_mover)
-            logging.info(f"Processing survey - {sftp_config.survey_source_path}")
+            instruments = get_filtered_instruments(sftp, case_mover, survey_source_path)
+            logging.info(f"Processing survey - {survey_source_path}")
 
             if len(instruments) == 0:
                 logging.info("No instrument folders found after filtering")

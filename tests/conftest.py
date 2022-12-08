@@ -17,17 +17,23 @@ def mock_sftp_connection():
 
 @pytest.fixture
 def sftp_config():
-    sftp_config = SFTPConfig()
-    sftp_config.survey_source_path = "./ONS/OPN"
-    return sftp_config
+    return SFTPConfig(
+        host="test_host",
+        username="test_username",
+        password="test_password",
+        port="1234",
+    )
 
 
 @pytest.fixture
 def config():
-    config = Config()
-    config.blaise_api_url = "mock_blaise_api_url.com"
-    config.server_park = "MOCK_SERVER_PARK"
-    return config
+    return Config(
+        bucket_name="test_bucket_name",
+        server_park="MOCK_SERVER_PARK",
+        blaise_api_url="mock_blaise_api_url.com",
+        project_id="test_project_id",
+        processor_topic_name="test_processor_topic_name",
+    )
 
 
 @pytest.fixture()
