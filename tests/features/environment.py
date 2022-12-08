@@ -5,7 +5,9 @@ import pysftp
 from google.cloud.pubsub_v1 import PublisherClient
 
 import main
+from pkg.config import Config
 from pkg.google_storage import GoogleStorage
+from pkg.sftp import SFTPConfig
 from util.service_logging import setupLogging
 
 
@@ -21,6 +23,11 @@ class FakePublisherClient(PublisherClient):
         for message in self.published_messages:
             event = {"data": base64.encodebytes(message["data"])}
             main.processor(event, {})
+
+
+def before_all(context):
+    context.config = Config.from_env()
+    context.sftp_config = SFTPConfig.from_env()
 
 
 def before_feature(context, feature):
@@ -40,18 +47,14 @@ def after_scenario(context, scenario):
 
     google_storage.delete_blobs(blobs)
 
-    sftp_host = os.getenv("SFTP_HOST", "env_var_not_set")
-    sftp_username = os.getenv("SFTP_USERNAME", "env_var_not_set")
-    sftp_password = os.getenv("SFTP_PASSWORD", "env_var_not_set")
-    sftp_port = os.getenv("SFTP_PORT", "env_var_not_set")
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
 
     with pysftp.Connection(
-        host=sftp_host,
-        username=sftp_username,
-        password=sftp_password,
-        port=int(sftp_port),
+        host=context.sftp_config.host,
+        username=context.sftp_config.username,
+        password=context.sftp_config.password,
+        port=int(context.sftp_config.port),
         cnopts=cnopts,
     ) as sftp:
         sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
