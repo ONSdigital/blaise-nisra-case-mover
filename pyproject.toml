@@ -15,7 +15,7 @@ dacite = "^1.6.0"
 redo = "^2.0.4"
 notifications-python-client = "^6.4.1"
 requests = "^2.28.1"
-blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", rev = "fb5cdbbfc976a95809273d7b9c68c7be47fe2660"}
+blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", branch = "main"}
 google-cloud-logging = "^3.3.0"
 
 [tool.poetry.dev-dependencies]
