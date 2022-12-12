@@ -26,6 +26,14 @@ from services.notification_service import NotificationService
 from util.service_logging import setupLogging
 
 
+def public_ip_logger():
+    try:
+        public_ip = requests.get("https://checkip.amazonaws.com").text.strip()
+        logging.info("Public IP address - " + public_ip)
+    except:
+        logging.warning("Unable to lookup public IP address")
+
+
 def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
 
@@ -64,13 +72,7 @@ def do_trigger(event, _context):
         if google_storage.bucket is None:
             return "Connection to bucket failed", 500
 
-        try:
-            logging.info(
-                "Public IP address - "
-                + requests.get("https://checkip.amazonaws.com").text.strip()
-            )
-        except:
-            logging.info("Unable to get public IP address")
+        public_ip_logger()
         logging.info("Connecting to SFTP server")
         with pysftp.Connection(
             host=sftp_config.host,
@@ -130,13 +132,7 @@ def do_processor(event, _context):
         if google_storage.bucket is None:
             return "Connection to bucket failed", 500
 
-        try:
-            logging.info(
-                "Public IP address - "
-                + requests.get("https://checkip.amazonaws.com").text.strip()
-            )
-        except:
-            logging.info("Unable to get public IP address")
+        public_ip_logger()
         logging.info("Connecting to SFTP server")
         with pysftp.Connection(
             host=sftp_config.host,
