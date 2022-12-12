@@ -16,7 +16,7 @@ def test_public_ip_logger(requests_mock, caplog):
     assert ("root", logging.INFO, "Public IP address - 1.3.3.7") in caplog.record_tuples
 
 
-def test_public_ip_logger_raises_exception(requests_mock, caplog):
+def test_public_ip_logger_logs_warning(requests_mock, caplog):
     with caplog.at_level(logging.WARN):
         requests_mock.get("https://checkip.amazonaws.com/", exc=Exception)
         public_ip_logger()
