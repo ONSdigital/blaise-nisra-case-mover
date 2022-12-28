@@ -1,5 +1,6 @@
 import base64
 import logging
+import time
 
 import pysftp
 import requests
@@ -119,6 +120,9 @@ def processor(*args, **kwargs):
 
 def do_processor(event, _context):
     try:
+        logging.info("Pausing for 120 seconds")
+        time.sleep(120)
+        logging.info("Unpaused")
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
         config.log()
@@ -150,9 +154,12 @@ def do_processor(event, _context):
                 base64.b64decode(event["data"]).decode("utf-8")
             )
 
+            logging.info(f"Processing instrument: {processor_event.instrument_name}")
+
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
+        logging.info("Should close FTP connection")
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
