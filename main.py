@@ -120,8 +120,8 @@ def processor(*args, **kwargs):
 
 def do_processor(event, _context):
     try:
-        logging.info("Pausing for 120 seconds")
-        time.sleep(120)
+        logging.info("Pausing for 15 seconds")
+        time.sleep(15)
         logging.info("Unpaused")
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
@@ -159,7 +159,7 @@ def do_processor(event, _context):
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
-        logging.info("Should close FTP connection")
+        logging.info("Closing SFTP connection")
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
