@@ -17,6 +17,10 @@ from pkg.config import Config
 T = TypeVar("T", bound="SFTPConfig")
 
 
+class InvalidFilenameError(Exception):
+    pass
+
+
 @dataclass
 class SFTPConfig:
     host: str
@@ -86,6 +90,19 @@ class SFTP:
         for _, instrument in instruments.items():
             instrument.files = self._get_instrument_files_for_instrument(instrument)
         return instruments
+
+    def filter_invalid_instrument_filenames(self, instruments: Dict[str, Instrument]):
+        for questionnaire_name, questionnaire in instruments.items():
+            for file in questionnaire.files:
+                filename = file.split(".")[0].lower()
+                extension = file.split(".")[1].lower()
+                if extension != "blix":
+                    try:
+                        if filename != questionnaire_name.lower():
+                            raise InvalidFilenameError
+                    except InvalidFilenameError:
+                        logging.error(f"Invalid filename {file} found in NISRA sftp for {questionnaire_name}. Filename should be {questionnaire_name}.{extension}. Please notify NISRA")
+                        continue
 
     def filter_instrument_files(
         self, instruments: Dict[str, Instrument]
