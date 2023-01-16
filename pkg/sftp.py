@@ -91,10 +91,10 @@ class SFTP:
         self, instruments: Dict[str, Instrument]
     ) -> Dict[str, Instrument]:
         filtered_instruments = self._filter_non_bdbx(instruments)
-        confilcting_instruments = self._get_conflicting_instruments(
+        conflicting_instruments = self._get_conflicting_instruments(
             filtered_instruments
         )
-        return self._resolve_conflicts(filtered_instruments, confilcting_instruments)
+        return self._resolve_conflicts(filtered_instruments, conflicting_instruments)
 
     def generate_bdbx_md5s(
         self, instruments: Dict[str, Instrument]
@@ -141,22 +141,22 @@ class SFTP:
         return instrument_file_list
 
     def _resolve_conflicts(
-        self,
-        instruments: Dict[str, Instrument],
-        confilcting_instruments: Dict[str, List[str]],
+            self,
+            instruments: Dict[str, Instrument],
+            conflicting_instruments: Dict[str, List[str]],
     ) -> Dict[str, Instrument]:
         filtered_instruments = {}
         processed_conflicts = []
         for instrument_name, instrument in instruments.items():
-            if instrument_name.lower() in confilcting_instruments:
+            if instrument_name.lower() in conflicting_instruments:
                 if instrument_name in processed_conflicts:
                     continue
                 filtered_instruments[
                     instrument_name.lower()
                 ] = self._get_latest_conflicting_instrument(
-                    instruments, confilcting_instruments, instrument_name
+                    instruments, conflicting_instruments, instrument_name
                 )
-                processed_conflicts += confilcting_instruments[instrument_name.lower()]
+                processed_conflicts += conflicting_instruments[instrument_name.lower()]
             else:
                 filtered_instruments[instrument_name] = instrument
         return filtered_instruments
@@ -194,12 +194,12 @@ class SFTP:
         }
 
     def _get_latest_conflicting_instrument(
-        _self,
-        instruments: Dict[str, Instrument],
-        confilcting_instruments: Dict[str, List[str]],
-        instrument_name: str,
+            _self,
+            instruments: Dict[str, Instrument],
+            conflicting_instruments: Dict[str, List[str]],
+            instrument_name: str,
     ) -> Instrument:
-        conflict_instruments = confilcting_instruments[instrument_name.lower()]
+        conflict_instruments = conflicting_instruments[instrument_name.lower()]
         instrument_conflicts = {
             instrument_name: instruments[instrument_name]
             for instrument_name in conflict_instruments
