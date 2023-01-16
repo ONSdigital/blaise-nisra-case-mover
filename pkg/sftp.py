@@ -101,7 +101,9 @@ class SFTP:
                         if filename != questionnaire_name.lower():
                             raise InvalidFilenameError
                     except InvalidFilenameError:
-                        logging.error(f"Invalid filename {file} found in NISRA sftp for {questionnaire_name}. Filename should be {questionnaire_name}.{extension}. Please notify NISRA")
+                        logging.error(
+                            f"Invalid filename {file} found in NISRA sftp for {questionnaire_name}. Filename should be {questionnaire_name}.{extension}. Please notify NISRA"
+                        )
                         continue
 
     def filter_instrument_files(
@@ -158,9 +160,9 @@ class SFTP:
         return instrument_file_list
 
     def _resolve_conflicts(
-            self,
-            instruments: Dict[str, Instrument],
-            conflicting_instruments: Dict[str, List[str]],
+        self,
+        instruments: Dict[str, Instrument],
+        conflicting_instruments: Dict[str, List[str]],
     ) -> Dict[str, Instrument]:
         filtered_instruments = {}
         processed_conflicts = []
@@ -211,10 +213,10 @@ class SFTP:
         }
 
     def _get_latest_conflicting_instrument(
-            _self,
-            instruments: Dict[str, Instrument],
-            conflicting_instruments: Dict[str, List[str]],
-            instrument_name: str,
+        _self,
+        instruments: Dict[str, Instrument],
+        conflicting_instruments: Dict[str, List[str]],
+        instrument_name: str,
     ) -> Instrument:
         conflict_instruments = conflicting_instruments[instrument_name.lower()]
         instrument_conflicts = {
