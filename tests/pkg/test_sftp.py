@@ -86,7 +86,7 @@ def test_get_instrument_files(
     }
 
 
-def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files_are_misnamed(
+def test_filter_invalid_questionnaire_filenames_logs_an_error_when_questionnaire_files_are_misnamed(
     mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
 ):
     # arrange
@@ -149,7 +149,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
     )
 
 
-def test_filter_invalid_instrument_filenames_removes_instruments_with_invalid_files(
+def test_filter_invalid_questionnaire_filenames_removes_questionnaire_with_invalid_files(
     mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
 ):
     # arrange
