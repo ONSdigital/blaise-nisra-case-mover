@@ -87,7 +87,7 @@ class SFTP:
             instrument.files = self._get_instrument_files_for_instrument(instrument)
         return instruments
 
-    def filter_invalid_instrument_filenames(
+    def filter_invalid_questionnaire_filenames(
         self, questionnaires: Dict[str, Instrument]
     ) -> Dict[str, Instrument]:
         filtered_questionnaires = {}
