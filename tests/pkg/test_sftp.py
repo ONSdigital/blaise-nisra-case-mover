@@ -159,10 +159,10 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
         in caplog.record_tuples
     )
     assert (
-               "root",
-               logging.ERROR,
-               "Invalid filenames found in NISRA sftp for OPN2104A - not importing",
-           ) in caplog.record_tuples
+        "root",
+        logging.ERROR,
+        "Invalid filenames found in NISRA sftp for OPN2104A - not importing",
+    ) in caplog.record_tuples
 
 
 def test_filter_invalid_instrument_filenames_removes_instrument_with_invalid_files(
