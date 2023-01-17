@@ -123,6 +123,17 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
                 "sOc2023_xlib.BmIx",
             ],  # completely valid
         ),
+        "OPN2104A": Instrument(
+            sftp_path="ONS/OPN/OPN2104A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2104a.BdBx",
+                "oPn2104A.BdIx",
+                "oPn2104a.BlAx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # invalid number of required files
+        ),
     }
 
     # act and assert
@@ -147,6 +158,11 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
         )
         in caplog.record_tuples
     )
+    assert (
+               "root",
+               logging.ERROR,
+               "Invalid filenames found in NISRA sftp for OPN2104A - not importing",
+           ) in caplog.record_tuples
 
 
 def test_filter_invalid_instrument_filenames_removes_instrument_with_invalid_files(
