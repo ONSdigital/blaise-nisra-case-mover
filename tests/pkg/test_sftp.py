@@ -97,26 +97,31 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
             bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
             files=[
                 "oPn2101A.BdBx",
-                "2101A.BdIx",  # invalid filename
-                "oPn2101B.BmIx",  # invalid filename
+                "2101A.BdIx",
+                "oPn2101a.BmIx",
                 "FrameSOC.blix",
-            ],
+                "sOc2023_xlib.BmIx",
+            ],  # contains invalid filename
         ),
         "OPN2102A": Instrument(
             sftp_path="ONS/OPN/OPN2102A",
             bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
             files=[
+                "oPn2102A.BdBx",
                 "oPn2102A.BdIx",
-                "2102A.BmIx",  # invalid filename
                 "FrameSOC.blix",
-            ],
+            ],  # invalid number of required files
         ),
         "OPN2103A": Instrument(
             sftp_path="ONS/OPN/OPN2103A",
             bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
             files=[
-                "oPn2103A.BdBx",
-            ],
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # completely valid
         ),
     }
 
@@ -127,18 +132,21 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
     assert (
         "root",
         logging.ERROR,
-        "Invalid filename 2101A.BdIx found in NISRA sftp for OPN2101A. Filename should be OPN2101A.bdix. Please notify NISRA",
+        "Invalid filenames found in NISRA sftp for OPN2101A - not importing",
     ) in caplog.record_tuples
     assert (
         "root",
         logging.ERROR,
-        "Invalid filename oPn2101B.BmIx found in NISRA sftp for OPN2101A. Filename should be OPN2101A.bmix. Please notify NISRA",
+        "Invalid filenames found in NISRA sftp for OPN2102A - not importing",
     ) in caplog.record_tuples
     assert (
-        "root",
-        logging.ERROR,
-        "Invalid filename 2102A.BmIx found in NISRA sftp for OPN2102A. Filename should be OPN2102A.bmix. Please notify NISRA",
-    ) in caplog.record_tuples
+        not (
+            "root",
+            logging.ERROR,
+            "Invalid filenames found in NISRA sftp for OPN2103A - not importing",
+        )
+        in caplog.record_tuples
+    )
 
 
 def test_filter_instrument_files_removes_instruments_without_bdbx_files(
