@@ -29,6 +29,7 @@ def get_filtered_instruments(
     instruments = sftp.get_instrument_folders(survey_source_path)
     instruments = case_mover.filter_existing_instruments(instruments)
     instruments = sftp.get_instrument_files(instruments)
+    instruments = sftp.filter_invalid_instrument_filenames(instruments)
     instruments = sftp.filter_instrument_files(instruments)
     instruments = sftp.generate_bdbx_md5s(instruments)
     return instruments

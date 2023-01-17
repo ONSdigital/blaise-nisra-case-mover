@@ -1,9 +1,6 @@
 import logging
 from unittest import mock
 
-import pytest
-import requests
-
 from main import do_processor, do_trigger, public_ip_logger
 
 
