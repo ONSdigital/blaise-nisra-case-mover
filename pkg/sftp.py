@@ -91,14 +91,16 @@ class SFTP:
         self, instruments: Dict[str, Instrument]
     ) -> None:
         for questionnaire_name, questionnaire in instruments.items():
-            for file in questionnaire.files:
-                filename = file.split(".")[0].lower()
-                extension = file.split(".")[1].lower()
+            filenames_to_validate = [
+                f"{file.split('.')[0].lower()}"
+                for file in questionnaire.files
+                if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
+            ]
 
-                if extension != "blix" and filename != questionnaire_name.lower():
-                    logging.error(
-                        f"Invalid filename {file} found in NISRA sftp for {questionnaire_name}. Filename should be {questionnaire_name}.{extension}. Please notify NISRA"
-                    )
+            if filenames_to_validate.count(questionnaire_name.lower()) != 3:
+                logging.error(
+                    f"Invalid filenames found in NISRA sftp for {questionnaire_name} - not importing"
+                )
 
     def filter_instrument_files(
         self, instruments: Dict[str, Instrument]
