@@ -88,19 +88,18 @@ class SFTP:
         return instruments
 
     def filter_invalid_instrument_filenames(
-        self, instruments: Dict[str, Instrument]
-    ) -> None:
-        for questionnaire_name, questionnaire in instruments.items():
-            filenames_to_validate = [
-                f"{file.split('.')[0].lower()}"
-                for file in questionnaire.files
-                if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
-            ]
-
+        self, questionnaires: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
+        filtered_questionnaires = {}
+        for questionnaire_name, questionnaire in questionnaires.items():
+            filenames_to_validate = self._get_filenames_to_validate(questionnaire)
             if filenames_to_validate.count(questionnaire_name.lower()) != 3:
                 logging.error(
                     f"Invalid filenames found in NISRA sftp for {questionnaire_name} - not importing"
                 )
+            else:
+                filtered_questionnaires[questionnaire_name] = questionnaire
+        return filtered_questionnaires
 
     def filter_instrument_files(
         self, instruments: Dict[str, Instrument]
@@ -154,6 +153,13 @@ class SFTP:
                 logging.info(f"Instrument file found - {instrument_file.filename}")
                 instrument_file_list.append(instrument_file.filename)
         return instrument_file_list
+
+    def _get_filenames_to_validate(self, questionnaire: Instrument) -> List[str]:
+        return [
+            f"{file.split('.')[0].lower()}"
+            for file in questionnaire.files
+            if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
+        ]
 
     def _resolve_conflicts(
         self,
