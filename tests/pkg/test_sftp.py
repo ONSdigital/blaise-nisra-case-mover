@@ -149,6 +149,61 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
     )
 
 
+def test_filter_invalid_instrument_filenames_removes_instruments_with_invalid_files(
+    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
+):
+    # arrange
+    sftp = SFTP(mock_sftp_connection, sftp_config, config)
+    instrument_folders = {
+        "OPN2101A": Instrument(
+            sftp_path="ONS/OPN/OPN2101A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2101A.BdBx",
+                "2101A.BdIx",
+                "oPn2101a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # contains invalid filename
+        ),
+        "OPN2102A": Instrument(
+            sftp_path="ONS/OPN/OPN2102A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2102A.BdBx",
+                "oPn2102A.BdIx",
+                "FrameSOC.blix",
+            ],  # invalid number of required files
+        ),
+        "OPN2103A": Instrument(
+            sftp_path="ONS/OPN/OPN2103A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # completely valid
+        ),
+    }
+
+    # act and assert
+    assert sftp.filter_invalid_instrument_filenames(instrument_folders) == {
+        "OPN2103A": Instrument(
+            sftp_path="ONS/OPN/OPN2103A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],
+        ),
+    }
+
+
 def test_filter_instrument_files_removes_instruments_without_bdbx_files(
     mock_sftp_connection, sftp_config, config
 ):
