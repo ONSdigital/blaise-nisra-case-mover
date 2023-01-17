@@ -17,10 +17,6 @@ from pkg.config import Config
 T = TypeVar("T", bound="SFTPConfig")
 
 
-class InvalidFilenameError(Exception):
-    pass
-
-
 @dataclass
 class SFTPConfig:
     host: str
