@@ -98,15 +98,11 @@ class SFTP:
             for file in questionnaire.files:
                 filename = file.split(".")[0].lower()
                 extension = file.split(".")[1].lower()
-                if extension != "blix":
-                    try:
-                        if filename != questionnaire_name.lower():
-                            raise InvalidFilenameError
-                    except InvalidFilenameError:
-                        logging.error(
-                            f"Invalid filename {file} found in NISRA sftp for {questionnaire_name}. Filename should be {questionnaire_name}.{extension}. Please notify NISRA"
-                        )
-                        continue
+
+                if extension != "blix" and filename != questionnaire_name.lower():
+                    logging.error(
+                        f"Invalid filename {file} found in NISRA sftp for {questionnaire_name}. Filename should be {questionnaire_name}.{extension}. Please notify NISRA"
+                    )
 
     def filter_instrument_files(
         self, instruments: Dict[str, Instrument]
