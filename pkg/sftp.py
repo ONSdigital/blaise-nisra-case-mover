@@ -87,19 +87,19 @@ class SFTP:
             instrument.files = self._get_instrument_files_for_instrument(instrument)
         return instruments
 
-    def filter_invalid_questionnaire_filenames(
-        self, questionnaires: Dict[str, Instrument]
+    def filter_invalid_instrument_filenames(
+        self, instruments: Dict[str, Instrument]
     ) -> Dict[str, Instrument]:
-        filtered_questionnaires = {}
-        for questionnaire_name, questionnaire in questionnaires.items():
-            filenames_to_validate = self._get_filenames_to_validate(questionnaire)
-            if filenames_to_validate.count(questionnaire_name.lower()) != 3:
+        filtered_instruments = {}
+        for instrument_name, instrument in instruments.items():
+            filenames_to_validate = self._get_filenames_to_validate(instrument)
+            if filenames_to_validate.count(instrument_name.lower()) != 3:
                 logging.error(
-                    f"Invalid filenames found in NISRA sftp for {questionnaire_name} - not importing"
+                    f"Invalid filenames found in NISRA sftp for {instrument_name} - not importing"
                 )
             else:
-                filtered_questionnaires[questionnaire_name] = questionnaire
-        return filtered_questionnaires
+                filtered_instruments[instrument_name] = instrument
+        return filtered_instruments
 
     def filter_instrument_files(
         self, instruments: Dict[str, Instrument]
@@ -154,10 +154,10 @@ class SFTP:
                 instrument_file_list.append(instrument_file.filename)
         return instrument_file_list
 
-    def _get_filenames_to_validate(self, questionnaire: Instrument) -> List[str]:
+    def _get_filenames_to_validate(self, instrument: Instrument) -> List[str]:
         return [
             f"{file.split('.')[0].lower()}"
-            for file in questionnaire.files
+            for file in instrument.files
             if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
         ]
 
