@@ -86,6 +86,140 @@ def test_get_instrument_files(
     }
 
 
+def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files_are_misnamed(
+    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
+):
+    # arrange
+    sftp = SFTP(mock_sftp_connection, sftp_config, config)
+    instrument_folders = {
+        "OPN2101A": Instrument(
+            sftp_path="ONS/OPN/OPN2101A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2101A.BdBx",
+                "2101A.BdIx",
+                "oPn2101a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # contains invalid filename
+        ),
+        "OPN2102A": Instrument(
+            sftp_path="ONS/OPN/OPN2102A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2102A.BdBx",
+                "oPn2102A.BdIx",
+                "FrameSOC.blix",
+            ],  # invalid number of required files
+        ),
+        "OPN2103A": Instrument(
+            sftp_path="ONS/OPN/OPN2103A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # completely valid
+        ),
+        "OPN2104A": Instrument(
+            sftp_path="ONS/OPN/OPN2104A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2104a.BdBx",
+                "oPn2104A.BdIx",
+                "oPn2104a.BlAx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # invalid number of required files
+        ),
+    }
+
+    # act and assert
+    with caplog.at_level(logging.ERROR):
+        sftp.filter_invalid_instrument_filenames(instrument_folders)
+
+    assert (
+        "root",
+        logging.ERROR,
+        "Invalid filenames found in NISRA sftp for OPN2101A - not importing",
+    ) in caplog.record_tuples
+    assert (
+        "root",
+        logging.ERROR,
+        "Invalid filenames found in NISRA sftp for OPN2102A - not importing",
+    ) in caplog.record_tuples
+    assert (
+        not (
+            "root",
+            logging.ERROR,
+            "Invalid filenames found in NISRA sftp for OPN2103A - not importing",
+        )
+        in caplog.record_tuples
+    )
+    assert (
+        "root",
+        logging.ERROR,
+        "Invalid filenames found in NISRA sftp for OPN2104A - not importing",
+    ) in caplog.record_tuples
+
+
+def test_filter_invalid_instrument_filenames_removes_instrument_with_invalid_files(
+    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
+):
+    # arrange
+    sftp = SFTP(mock_sftp_connection, sftp_config, config)
+    instrument_folders = {
+        "OPN2101A": Instrument(
+            sftp_path="ONS/OPN/OPN2101A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2101A.BdBx",
+                "2101A.BdIx",
+                "oPn2101a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # contains invalid filename
+        ),
+        "OPN2102A": Instrument(
+            sftp_path="ONS/OPN/OPN2102A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2102A.BdBx",
+                "oPn2102A.BdIx",
+                "FrameSOC.blix",
+            ],  # invalid number of required files
+        ),
+        "OPN2103A": Instrument(
+            sftp_path="ONS/OPN/OPN2103A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # completely valid
+        ),
+    }
+
+    # act and assert
+    assert sftp.filter_invalid_instrument_filenames(instrument_folders) == {
+        "OPN2103A": Instrument(
+            sftp_path="ONS/OPN/OPN2103A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],
+        ),
+    }
+
+
 def test_filter_instrument_files_removes_instruments_without_bdbx_files(
     mock_sftp_connection, sftp_config, config
 ):
