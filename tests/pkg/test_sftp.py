@@ -127,7 +127,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
 
     # act and assert
     with caplog.at_level(logging.ERROR):
-        sftp.filter_invalid_instrument_filenames(instrument_folders)
+        sftp.filter_invalid_questionnaire_filenames(instrument_folders)
 
     assert (
         "root",
@@ -189,7 +189,7 @@ def test_filter_invalid_instrument_filenames_removes_instruments_with_invalid_fi
     }
 
     # act and assert
-    assert sftp.filter_invalid_instrument_filenames(instrument_folders) == {
+    assert sftp.filter_invalid_questionnaire_filenames(instrument_folders) == {
         "OPN2103A": Instrument(
             sftp_path="ONS/OPN/OPN2103A",
             bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
