@@ -154,8 +154,9 @@ class SFTP:
         conflicting_instruments = cls._get_conflicting_instruments(filtered_instruments)
         return cls._resolve_conflicts(filtered_instruments, conflicting_instruments)
 
-    @staticmethod
+    @classmethod
     def _resolve_conflicts(
+        cls,
         instruments: Dict[str, Instrument],
         conflicting_instruments: Dict[str, List[str]],
     ) -> Dict[str, Instrument]:
@@ -167,7 +168,7 @@ class SFTP:
                     continue
                 filtered_instruments[
                     instrument_name.lower()
-                ] = SFTP._get_latest_conflicting_instrument(
+                ] = cls._get_latest_conflicting_instrument(
                     instruments, conflicting_instruments, instrument_name
                 )
                 processed_conflicts += conflicting_instruments[instrument_name.lower()]
