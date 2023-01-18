@@ -143,25 +143,25 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
     assert (
         "root",
         logging.ERROR,
-        "Invalid filenames found in NISRA sftp for OPN2101A - not importing",
+        "OPN2101A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         "root",
         logging.ERROR,
-        "Invalid filenames found in NISRA sftp for OPN2102A - not importing",
+        "OPN2102A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         not (
             "root",
             logging.ERROR,
-            "Invalid filenames found in NISRA sftp for OPN2103A - not importing",
+            "OPN2103A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
         )
         in caplog.record_tuples
     )
     assert (
         "root",
         logging.ERROR,
-        "Invalid filenames found in NISRA sftp for OPN2104A - not importing",
+        "OPN2104A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
     ) in caplog.record_tuples
 
 
