@@ -87,29 +87,6 @@ class SFTP:
             instrument.files = self._get_instrument_files_for_instrument(instrument)
         return instruments
 
-    def filter_invalid_instrument_filenames(
-        self, instruments: Dict[str, Instrument]
-    ) -> Dict[str, Instrument]:
-        filtered_instruments = {}
-        for instrument_name, instrument in instruments.items():
-            filenames_to_validate = self._get_filenames_to_validate(instrument)
-            if filenames_to_validate.count(instrument_name.lower()) != 3:
-                logging.error(
-                    f"{instrument_name} will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA"
-                )
-            else:
-                filtered_instruments[instrument_name] = instrument
-        return filtered_instruments
-
-    def filter_instrument_files(
-        self, instruments: Dict[str, Instrument]
-    ) -> Dict[str, Instrument]:
-        filtered_instruments = self._filter_non_bdbx(instruments)
-        conflicting_instruments = self._get_conflicting_instruments(
-            filtered_instruments
-        )
-        return self._resolve_conflicts(filtered_instruments, conflicting_instruments)
-
     def generate_bdbx_md5s(
         self, instruments: Dict[str, Instrument]
     ) -> Dict[str, Instrument]:
@@ -154,15 +131,33 @@ class SFTP:
                 instrument_file_list.append(instrument_file.filename)
         return instrument_file_list
 
-    def _get_filenames_to_validate(self, instrument: Instrument) -> List[str]:
-        return [
-            f"{file.split('.')[0].lower()}"
-            for file in instrument.files
-            if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
-        ]
+    @staticmethod
+    def filter_invalid_instrument_filenames(
+        instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
+        filtered_instruments = {}
+        for instrument_name, instrument in instruments.items():
+            filenames_to_validate = SFTP._get_filenames_to_validate(instrument)
+            if filenames_to_validate.count(instrument_name.lower()) != 3:
+                logging.error(
+                    f"{instrument_name} will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA"
+                )
+            else:
+                filtered_instruments[instrument_name] = instrument
+        return filtered_instruments
 
+    @staticmethod
+    def filter_instrument_files(
+        instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
+        filtered_instruments = SFTP._filter_non_bdbx(instruments)
+        conflicting_instruments = SFTP._get_conflicting_instruments(
+            filtered_instruments
+        )
+        return SFTP._resolve_conflicts(filtered_instruments, conflicting_instruments)
+
+    @staticmethod
     def _resolve_conflicts(
-        self,
         instruments: Dict[str, Instrument],
         conflicting_instruments: Dict[str, List[str]],
     ) -> Dict[str, Instrument]:
@@ -174,7 +169,7 @@ class SFTP:
                     continue
                 filtered_instruments[
                     instrument_name.lower()
-                ] = self._get_latest_conflicting_instrument(
+                ] = SFTP._get_latest_conflicting_instrument(
                     instruments, conflicting_instruments, instrument_name
                 )
                 processed_conflicts += conflicting_instruments[instrument_name.lower()]
@@ -182,9 +177,16 @@ class SFTP:
                 filtered_instruments[instrument_name] = instrument
         return filtered_instruments
 
-    def _filter_non_bdbx(
-        _self, instruments: Dict[str, Instrument]
-    ) -> Dict[str, Instrument]:
+    @staticmethod
+    def _get_filenames_to_validate(instrument: Instrument) -> List[str]:
+        return [
+            f"{file.split('.')[0].lower()}"
+            for file in instrument.files
+            if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
+        ]
+
+    @staticmethod
+    def _filter_non_bdbx(instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
             file_types = [
@@ -199,8 +201,9 @@ class SFTP:
                 )
         return filtered_instruments
 
+    @staticmethod
     def _get_conflicting_instruments(
-        _self, instruments: Dict[str, Instrument]
+        instruments: Dict[str, Instrument]
     ) -> Dict[str, List[str]]:
         conflicting_instruments: Dict[str, List[str]] = {}
         for folder_name in instruments.keys():
@@ -214,8 +217,8 @@ class SFTP:
             if len(instruments) > 1
         }
 
+    @staticmethod
     def _get_latest_conflicting_instrument(
-        _self,
         instruments: Dict[str, Instrument],
         conflicting_instruments: Dict[str, List[str]],
         instrument_name: str,
