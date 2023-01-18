@@ -131,13 +131,13 @@ class SFTP:
                 instrument_file_list.append(instrument_file.filename)
         return instrument_file_list
 
-    @staticmethod
+    @classmethod
     def filter_invalid_instrument_filenames(
-        instruments: Dict[str, Instrument]
+        cls, instruments: Dict[str, Instrument]
     ) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
-            filenames_to_validate = SFTP._get_filenames_to_validate(instrument)
+            filenames_to_validate = cls._get_filenames_to_validate(instrument)
             if filenames_to_validate.count(instrument_name.lower()) != 3:
                 logging.error(
                     f"{instrument_name} will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA"
@@ -146,15 +146,13 @@ class SFTP:
                 filtered_instruments[instrument_name] = instrument
         return filtered_instruments
 
-    @staticmethod
+    @classmethod
     def filter_instrument_files(
-        instruments: Dict[str, Instrument]
+        cls, instruments: Dict[str, Instrument]
     ) -> Dict[str, Instrument]:
-        filtered_instruments = SFTP._filter_non_bdbx(instruments)
-        conflicting_instruments = SFTP._get_conflicting_instruments(
-            filtered_instruments
-        )
-        return SFTP._resolve_conflicts(filtered_instruments, conflicting_instruments)
+        filtered_instruments = cls._filter_non_bdbx(instruments)
+        conflicting_instruments = cls._get_conflicting_instruments(filtered_instruments)
+        return cls._resolve_conflicts(filtered_instruments, conflicting_instruments)
 
     @staticmethod
     def _resolve_conflicts(
