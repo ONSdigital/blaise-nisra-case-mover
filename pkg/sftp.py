@@ -95,7 +95,7 @@ class SFTP:
             filenames_to_validate = self._get_filenames_to_validate(instrument)
             if filenames_to_validate.count(instrument_name.lower()) != 3:
                 logging.error(
-                    f"Invalid filenames found in NISRA sftp for {instrument_name} - not importing"
+                    f"{instrument_name} will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA"
                 )
             else:
                 filtered_instruments[instrument_name] = instrument
