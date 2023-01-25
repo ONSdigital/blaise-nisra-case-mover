@@ -137,13 +137,26 @@ class SFTP:
     ) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
-            filenames_to_validate = cls._get_filenames_to_validate(instrument)
-            if filenames_to_validate.count(instrument_name.lower()) != 3:
-                logging.error(
-                    f"{instrument_name} will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA"
-                )
+            required_files = [
+                f"{instrument_name.lower()}.bdbx",
+                f"{instrument_name.lower()}.bdix",
+                f"{instrument_name.lower()}.bmix",
+            ]
+            filenames_to_validate = [filename.lower() for filename in instrument.files]
+
+            logging.info(
+                f"Files found in {instrument.sftp_path} in NISRA SFTP: {filenames_to_validate}"
+            )
+
+            difference = set(required_files).difference(filenames_to_validate)
+            if difference:
+                for filename in difference:
+                    logging.error(
+                        f"The required file, {filename}, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
+                    )
             else:
                 filtered_instruments[instrument_name] = instrument
+
         return filtered_instruments
 
     @classmethod
@@ -175,14 +188,6 @@ class SFTP:
             else:
                 filtered_instruments[instrument_name] = instrument
         return filtered_instruments
-
-    @staticmethod
-    def _get_filenames_to_validate(instrument: Instrument) -> List[str]:
-        return [
-            f"{file.split('.')[0].lower()}"
-            for file in instrument.files
-            if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
-        ]
 
     @staticmethod
     def _filter_non_bdbx(instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
