@@ -86,7 +86,7 @@ def test_get_instrument_files(
     }
 
 
-def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files_are_misnamed(
+def test_filter_invalid_instrument_filenames_logs_an_informational_message_listing_the_filenames_found(
     mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
 ):
     # arrange
@@ -101,7 +101,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
                 "oPn2101a.BmIx",
                 "FrameSOC.blix",
                 "sOc2023_xlib.BmIx",
-            ],  # contains invalid filename
+            ],
         ),
         "OPN2102A": Instrument(
             sftp_path="ONS/OPN/OPN2102A",
@@ -110,7 +110,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
                 "oPn2102A.BdBx",
                 "oPn2102A.BdIx",
                 "FrameSOC.blix",
-            ],  # invalid number of required files
+            ],
         ),
         "OPN2103A": Instrument(
             sftp_path="ONS/OPN/OPN2103A",
@@ -121,7 +121,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
                 "oPn2103a.BmIx",
                 "FrameSOC.blix",
                 "sOc2023_xlib.BmIx",
-            ],  # completely valid
+            ],
         ),
         "OPN2104A": Instrument(
             sftp_path="ONS/OPN/OPN2104A",
@@ -132,7 +132,84 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
                 "oPn2104a.BlAx",
                 "FrameSOC.blix",
                 "sOc2023_xlib.BmIx",
-            ],  # invalid number of required files
+            ],
+        ),
+    }
+
+    # act and assert
+    with caplog.at_level(logging.INFO):
+        sftp.filter_invalid_instrument_filenames(instrument_folders)
+
+    assert (
+        "root",
+        logging.INFO,
+        "Files found in ONS/OPN/OPN2101A in NISRA SFTP: ['opn2101a.bdbx', '2101a.bdix', 'opn2101a.bmix', 'framesoc.blix', 'soc2023_xlib.bmix']",
+    ) in caplog.record_tuples
+    assert (
+        "root",
+        logging.INFO,
+        "Files found in ONS/OPN/OPN2102A in NISRA SFTP: ['opn2102a.bdbx', 'opn2102a.bdix', 'framesoc.blix']",
+    ) in caplog.record_tuples
+    assert (
+        "root",
+        logging.INFO,
+        "Files found in ONS/OPN/OPN2103A in NISRA SFTP: ['opn2103a.bdbx', 'opn2103a.bdix', 'opn2103a.bmix', 'framesoc.blix', 'soc2023_xlib.bmix']",
+    ) in caplog.record_tuples
+    assert (
+        "root",
+        logging.INFO,
+        "Files found in ONS/OPN/OPN2104A in NISRA SFTP: ['opn2104a.bdbx', 'opn2104a.bdix', 'opn2104a.blax', 'framesoc.blix', 'soc2023_xlib.bmix']",
+    ) in caplog.record_tuples
+
+
+def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files_are_misnamed(
+    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
+):
+    # arrange
+    sftp = SFTP(mock_sftp_connection, sftp_config, config)
+    instrument_folders = {
+        "OPN2101A": Instrument(
+            sftp_path="ONS/OPN/OPN2101A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2101A.BdBx",
+                "2101A.BdIx",  # invalid filename
+                "oPn2101a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],
+        ),
+        "OPN2102A": Instrument(
+            sftp_path="ONS/OPN/OPN2102A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2102A.BdBx",
+                "oPn2102A.BdIx",
+                "FrameSOC.blix",
+            ],  # missing bmix
+        ),
+        "OPN2103A": Instrument(
+            sftp_path="ONS/OPN/OPN2103A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "oPn2103a.BdBx",
+                "oPn2103A.BdIx",
+                "oPn2103a.BmIx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # completely valid. Should NOT error
+        ),
+        "OPN2104A": Instrument(
+            sftp_path="ONS/OPN/OPN2104A",
+            bdbx_updated_at=datetime.fromisoformat("2021-03-31T10:21:53+00:00"),
+            files=[
+                "sOc2023_xlib.BdBx",
+                "oPn2104A.BmIx",
+                "oPn2104A.BdIx",
+                "oPn2104a.BlAx",
+                "FrameSOC.blix",
+                "sOc2023_xlib.BmIx",
+            ],  # missing bdbx
         ),
     }
 
@@ -143,25 +220,25 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
     assert (
         "root",
         logging.ERROR,
-        "OPN2101A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
+        "The required file, opn2101a.bdix, was not found in ONS/OPN/OPN2101A. OPN2101A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         "root",
         logging.ERROR,
-        "OPN2102A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
+        "The required file, opn2102a.bmix, was not found in ONS/OPN/OPN2102A. OPN2102A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         not (
             "root",
             logging.ERROR,
-            "OPN2103A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
+            "The required file, opn2103a.bdbx, was not found in ONS/OPN/OPN2103A. OPN2103A will not be imported from NISRA SFTP. Please notify NISRA",
         )
         in caplog.record_tuples
     )
     assert (
         "root",
         logging.ERROR,
-        "OPN2104A will not be imported from NISRA SFTP as it contains invalid filenames.  Please notify NISRA",
+        "The required file, opn2104a.bdbx, was not found in ONS/OPN/OPN2104A. OPN2104A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
 
 
