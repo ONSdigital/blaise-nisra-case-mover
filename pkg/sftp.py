@@ -244,9 +244,3 @@ class SFTP:
                 + f"folder - Skipping this folder '{conflict.sftp_path}'"
             )
         return latest_instrument
-
-    @staticmethod
-    def log_error(filename, sftp_path, instrument_name):
-        logging.error(
-            f"The required file, {filename}, was not found in {sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
-        )
