@@ -174,7 +174,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
             files=[
                 "oPn2101A.BdBx",
                 "2101A.BdIx",  # invalid filename
-                "oPn2101a.BmIx",
+                "oPn.BmIx",  # invalid filename
                 "FrameSOC.blix",
                 "sOc2023_xlib.BmIx",
             ],
@@ -221,6 +221,11 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
         "root",
         logging.ERROR,
         "The required file, opn2101a.bdix, was not found in ONS/OPN/OPN2101A. OPN2101A will not be imported from NISRA SFTP. Please notify NISRA",
+    ) in caplog.record_tuples
+    assert (
+        "root",
+        logging.ERROR,
+        "The required file, opn2101a.bmix, was not found in ONS/OPN/OPN2101A. OPN2101A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         "root",

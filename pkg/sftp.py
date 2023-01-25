@@ -137,26 +137,23 @@ class SFTP:
     ) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
+            required_files = [
+                f"{instrument_name.lower()}.bdbx",
+                f"{instrument_name.lower()}.bdix",
+                f"{instrument_name.lower()}.bmix",
+            ]
             filenames_to_validate = [filename.lower() for filename in instrument.files]
+
             logging.info(
                 f"Files found in {instrument.sftp_path} in NISRA SFTP: {filenames_to_validate}"
             )
 
-            if f"{instrument_name.lower()}.bdbx" not in filenames_to_validate:
-                logging.error(
-                    f"The required file, {instrument_name.lower()}.bdbx, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
-                )
-
-            elif f"{instrument_name.lower()}.bdix" not in filenames_to_validate:
-                logging.error(
-                    f"The required file, {instrument_name.lower()}.bdix, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
-                )
-
-            elif f"{instrument_name.lower()}.bmix" not in filenames_to_validate:
-                logging.error(
-                    f"The required file, {instrument_name.lower()}.bmix, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
-                )
-
+            difference = set(required_files).difference(filenames_to_validate)
+            if difference:
+                for filename in difference:
+                    logging.error(
+                        f"The required file, {filename}, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
+                    )
             else:
                 filtered_instruments[instrument_name] = instrument
 
@@ -191,14 +188,6 @@ class SFTP:
             else:
                 filtered_instruments[instrument_name] = instrument
         return filtered_instruments
-
-    @staticmethod
-    def _get_filenames_to_validate(instrument: Instrument) -> List[str]:
-        return [
-            f"{file.split('.')[0].lower()}"
-            for file in instrument.files
-            if file.split(".")[1].lower() in ["bdbx", "bdix", "bmix"]
-        ]
 
     @staticmethod
     def _filter_non_bdbx(instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
@@ -255,3 +244,9 @@ class SFTP:
                 + f"folder - Skipping this folder '{conflict.sftp_path}'"
             )
         return latest_instrument
+
+    @staticmethod
+    def log_error(filename, sftp_path, instrument_name):
+        logging.error(
+            f"The required file, {filename}, was not found in {sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
+        )
