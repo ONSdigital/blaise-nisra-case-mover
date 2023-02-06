@@ -162,7 +162,7 @@ def test_filter_invalid_instrument_filenames_logs_an_informational_message_listi
     ) in caplog.record_tuples
 
 
-def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files_are_misnamed(
+def test_filter_invalid_instrument_filenames_logs_a_warning_when_instrument_files_are_misnamed(
     mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
 ):
     # arrange
@@ -197,7 +197,7 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
                 "oPn2103a.BmIx",
                 "FrameSOC.blix",
                 "sOc2023_xlib.BmIx",
-            ],  # completely valid. Should NOT error
+            ],  # completely valid. Should NOT warn
         ),
         "OPN2104A": Instrument(
             sftp_path="ONS/OPN/OPN2104A",
@@ -214,35 +214,35 @@ def test_filter_invalid_instrument_filenames_logs_an_error_when_instrument_files
     }
 
     # act and assert
-    with caplog.at_level(logging.ERROR):
+    with caplog.at_level(logging.WARNING):
         sftp.filter_invalid_instrument_filenames(instrument_folders)
 
     assert (
         "root",
-        logging.ERROR,
+        logging.WARNING,
         "The required file, opn2101a.bdix, was not found in ONS/OPN/OPN2101A. OPN2101A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         "root",
-        logging.ERROR,
+        logging.WARNING,
         "The required file, opn2101a.bmix, was not found in ONS/OPN/OPN2101A. OPN2101A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         "root",
-        logging.ERROR,
+        logging.WARNING,
         "The required file, opn2102a.bmix, was not found in ONS/OPN/OPN2102A. OPN2102A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
     assert (
         not (
             "root",
-            logging.ERROR,
+            logging.WARNING,
             "The required file, opn2103a.bdbx, was not found in ONS/OPN/OPN2103A. OPN2103A will not be imported from NISRA SFTP. Please notify NISRA",
         )
         in caplog.record_tuples
     )
     assert (
         "root",
-        logging.ERROR,
+        logging.WARNING,
         "The required file, opn2104a.bdbx, was not found in ONS/OPN/OPN2104A. OPN2104A will not be imported from NISRA SFTP. Please notify NISRA",
     ) in caplog.record_tuples
 
