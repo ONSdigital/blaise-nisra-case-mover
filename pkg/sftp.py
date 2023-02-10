@@ -151,7 +151,7 @@ class SFTP:
             difference = set(required_files).difference(filenames_to_validate)
             if difference:
                 for filename in difference:
-                    logging.error(
+                    logging.warning(
                         f"The required file, {filename}, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
                     )
             else:
