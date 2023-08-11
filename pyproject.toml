@@ -14,7 +14,7 @@ google-cloud-pubsub = "^2.4.1"
 dacite = "^1.6.0"
 redo = "^2.0.4"
 notifications-python-client = "^6.4.1"
-requests = "^2.28.1"
+requests = "^2.31.0"
 blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", branch = "main"}
 google-cloud-logging = "^3.3.0"
 
