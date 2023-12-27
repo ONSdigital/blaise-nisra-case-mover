@@ -70,9 +70,9 @@ class SFTP:
     def get_instrument_folders(self, survey_source_path: str) -> Dict[str, Instrument]:
         instruments = {}
         for folder_attr in self.sftp_connection.listdir_attr(survey_source_path):
-            logging.debug(f"folder_attr: {folder_attr}")
+            logging.info(f"DEBUG: folder_attr: {folder_attr}")
             if not stat.S_ISDIR(folder_attr.st_mode):
-                logging.debug(f"{folder_attr.st_mode} was not a directory. Continuing")
+                logging.info(f"DEBUG: {folder_attr.st_mode} was not a directory. Continuing")
                 continue
             folder = folder_attr.filename
             if self.config.valid_survey_name(folder):
