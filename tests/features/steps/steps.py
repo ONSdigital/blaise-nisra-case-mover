@@ -194,9 +194,9 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
         except Exception as err:
             print(f"DEBUG: blob.download_to_filename(file) because: {err}")
 
-    cnopts = pysftp.CnOpts(knownhosts='known_hosts')
+    cnopts = pysftp.CnOpts()
     print(f"DEBUG: cnopts: {cnopts}")
-    # cnopts.hostkeys = None
+    cnopts.hostkeys = None
     cnopts.compression = True
 
     if sftp_config.host is None:
