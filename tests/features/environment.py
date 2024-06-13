@@ -48,7 +48,6 @@ def after_scenario(context, scenario):
     google_storage.delete_blobs(blobs)
 
     cnopts = pysftp.CnOpts()
-    print(f"DEBUG: cnopts: {cnopts}")
     cnopts.hostkeys = None
 
     with pysftp.Connection(
@@ -58,5 +57,4 @@ def after_scenario(context, scenario):
         port=int(context.sftp_config.port),
         cnopts=cnopts,
     ) as sftp:
-        print(f"DEBUG: sftp: {sftp}")
         sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")

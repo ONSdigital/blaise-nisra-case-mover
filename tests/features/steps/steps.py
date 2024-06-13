@@ -183,8 +183,24 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
         blob.download_to_filename(file)
 
     cnopts = pysftp.CnOpts()
+    print(f"DEBUG: cnopts: {cnopts}")
     cnopts.hostkeys = None
     cnopts.compression = True
+
+    if sftp_config.host is None:
+        print("DEBUG: host was none")
+
+    if sftp_config.username is None:
+        print("DEBUG: username was none")
+
+    if sftp_config.password is None:
+        print("DEBUG: password was none")
+
+    if sftp_config.port is None:
+        print("DEBUG: port was none")
+
+    if cnopts is None:
+        print("DEBUG: cnopts was none")
 
     with pysftp.Connection(
         host=sftp_config.host,
@@ -193,8 +209,8 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
         port=int(sftp_config.port),
         cnopts=cnopts,
     ) as sftp:
-
         try:
+            print("DEBUG: Attempting to sftp.execute('rm -rf ~/ONS/TEST/OPN2101A')...")
             sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
         finally:
             sftp.mkdir("ONS/TEST/OPN2101A/")
