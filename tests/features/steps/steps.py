@@ -212,6 +212,8 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
         try:
             print("DEBUG: Attempting to sftp.execute('rm -rf ~/ONS/TEST/OPN2101A')...")
             sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+        except Exception as err:
+            print(f"DEBUG: could not sftp.execute('rm -rf ~/ONS/TEST/OPN2101A'): {err}")
         finally:
             sftp.mkdir("ONS/TEST/OPN2101A/")
 
