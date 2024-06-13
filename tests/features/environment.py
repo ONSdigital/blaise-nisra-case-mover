@@ -47,17 +47,9 @@ def after_scenario(context, scenario):
 
     google_storage.delete_blobs(blobs)
 
-    # cnopts = pysftp.CnOpts()
-    # cnopts.hostkeys = None
-
-    hostkeys = None
-    if cnopts.hostkeys.lookup(host) is None:
-        print("New host - will accept any host key")
-        # Backup loaded .ssh/known_hosts file
-        hostkeys = cnopts.hostkeys
-
-        # And do not verify host key of the new host
-        cnopts.hostkeys = None
+    cnopts = pysftp.CnOpts()
+    print(f"DEBUG: cnopts: {cnopts}")
+    cnopts.hostkeys = None
 
     with pysftp.Connection(
         host=context.sftp_config.host,
@@ -66,9 +58,5 @@ def after_scenario(context, scenario):
         port=int(context.sftp_config.port),
         cnopts=cnopts,
     ) as sftp:
-        if hostkeys is not None:
-            print("Connected to new host, caching its hostkey")
-            hostkeys.add(host, sftp.remote_server_key.get_name(), sftp.remote_server_key)
-            hostkeys.save(pysftp.helpers.known_hosts())
-
+        print(f"DEBUG: sftp: {sftp}")
         sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
