@@ -171,16 +171,31 @@ def step_a_call_is_not_made_to_the_restful_api(context):
     context.mock_requests_post.assert_not_called()
 
 
+print("DEBUG: google_storage was not set")
+
+
 def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
+    print("DEBUG: copy_opn2101a_files_to_sftp()...")
     google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"))
+    if google_storage == "env_var_not_set":
+        print("DEBUG: google_storage was not set")
+
+    print("DEBUG: google_storage.initialise_bucket_connection()...")
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
-        print("Failed")
+        print("DEBUG: google_storage.bucket is None")
 
     for file in file_list:
-        blob = google_storage.get_blob(f"opn2101a-nisra/{file}")
-        blob.download_to_filename(file)
+        try:
+            blob = google_storage.get_blob(f"opn2101a-nisra/{file}")
+        except Exception as err:
+            print(f"DEBUG: could not google_storage.get_blob('opn2101a-nisra/{file}') because: {err}")
+
+        try:
+            blob.download_to_filename(file)
+        except Exception as err:
+            print(f"DEBUG: blob.download_to_filename(file) because: {err}")
 
     cnopts = pysftp.CnOpts()
     print(f"DEBUG: cnopts: {cnopts}")
