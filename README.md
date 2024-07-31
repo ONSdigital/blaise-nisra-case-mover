@@ -52,7 +52,7 @@ The GCP environments have an SFTP server for testing purposes. Run the following
 to the test server:
 
 ```bash
-gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-b" --project "ons-blaise-v2-<env>" --local-host-port=localhost:2222
+gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-a" --project "ons-blaise-v2-<env>" --local-host-port=localhost:2222
 ```
 
 Refer to the `.tfstate` file for the environment to locate the password, you can find this with the name `sftp_password`.
