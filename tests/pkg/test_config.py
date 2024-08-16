@@ -66,7 +66,7 @@ def test_config_log(caplog):
         (
             "root",
             logging.INFO,
-            "valid_surveys - ['OPN', 'LMS', 'WLS']",
+            "valid_surveys - ['OPN', 'LMS', 'WLS', 'LMX']",
         ),
         (
             "root",
