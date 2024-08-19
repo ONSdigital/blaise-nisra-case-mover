@@ -2,6 +2,7 @@ import base64
 import logging
 import time
 
+import flask
 import pysftp
 import requests
 from google.cloud import pubsub_v1
@@ -52,16 +53,19 @@ def trigger(*args, **kwargs):
     )
 
 
-def do_trigger(event, _context):
+def do_trigger(request: flask.Request):
     try:
-        trigger_event = TriggerEvent.from_json(
-            base64.b64decode(event["data"]).decode("utf-8")
-        )
-        print(f"Nisra triggered for survey: '{trigger_event.survey}'")
+        print(f"DEBUG: request: {request}")
+        survey = request.get_json()["survey"]
+        print(f"DEBUG: survey: {survey}")
+        # trigger_event = TriggerEvent.from_json(
+        #     base64.b64decode(request["data"]).decode("utf-8")
+        # )
+        print(f"Nisra triggered for survey: '{survey}'")
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
         config.log()
-        survey_source_path = trigger_event.survey
+        survey_source_path = survey
         sftp_config.log()
         publisher_client = pubsub_v1.PublisherClient()
 

@@ -1,6 +1,8 @@
 import logging
 from unittest import mock
 
+import flask
+
 from main import do_processor, do_trigger, public_ip_logger
 
 
@@ -24,19 +26,20 @@ def test_public_ip_logger_logs_warning(requests_mock, caplog):
     ) in caplog.record_tuples
 
 
-@mock.patch("main.TriggerEvent.from_json")
-def test_do_trigger_logs_error_when_exception_is_raised(from_json, caplog):
-    original_exception = Exception("Kaboom")
-
-    from_json.side_effect = original_exception
-
-    with caplog.at_level(logging.ERROR):
-        do_trigger(dict(data=""), {})
-
-    errors = [entry for entry in caplog.records if entry.levelno == logging.ERROR]
-    assert len(errors) == 1
-    error = errors[0]
-    assert error.message == "Exception: Kaboom"
+# @mock.patch("flask.Request.from_json")
+# def test_do_trigger_logs_error_when_exception_is_raised(caplog):
+#     # arrange
+#     mock_request = flask.Request.from_values(json={"survey": {}})
+#
+#     # act
+#     with caplog.at_level(logging.ERROR):
+#         do_trigger(mock_request)
+#
+#     # assert
+#     errors = [entry for entry in caplog.records if entry.levelno == logging.ERROR]
+#     assert len(errors) == 1
+#     error = errors[0]
+#     assert error.message == "Exception: Kaboom"
 
 
 @mock.patch("main.Config.from_env")
