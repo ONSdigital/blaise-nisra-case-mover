@@ -53,16 +53,22 @@ def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_bee
 @when("the nisra-mover service is run with an OPN configuration")
 def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
     with mock.patch(
-            "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
+        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
     ):
         with mock.patch.object(
-                CaseMover, "instrument_exists_in_blaise"
+            CaseMover, "instrument_exists_in_blaise"
         ) as mock_instrument_exists_in_blaise:
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
-                mock_request = flask.Request.from_values(json={"survey": "OPN"})
                 mock_requests_post.return_value.status_code = 200
-                main.trigger(mock_request)
+                main.trigger(
+                    {
+                        "data": base64.encodebytes(
+                            '{"survey": "./ONS/TEST"}'.encode("utf-8")
+                        )
+                    },
+                    {},
+                )
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
@@ -81,9 +87,15 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
         ) as mock_instrument_exists_in_blaise:
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
-                mock_request = flask.Request.from_values(json={"survey": "OPN"})
                 mock_requests_post.return_value.status_code = 200
-                main.trigger(mock_request)
+                main.trigger(
+                    {
+                        "data": base64.encodebytes(
+                            '{"survey": "./ONS/TEST"}'.encode("utf-8")
+                        )
+                    },
+                    {},
+                )
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
