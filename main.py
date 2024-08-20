@@ -58,9 +58,9 @@ def trigger(*args, **kwargs):
     return retry_and_return()
 
 
-def do_trigger(*args, **_kwargs):
+def do_trigger(request, _content):
     try:
-        survey = args[0].get_json()["survey"]
+        survey = request.get_json()["survey"]
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
         config.log()
