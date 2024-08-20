@@ -42,26 +42,25 @@ def ssh_retry_logger():
 
 def trigger(*args, **kwargs):
     setupLogging()
-    retry(
-        do_trigger,
-        attempts=3,
-        sleeptime=15,
-        retry_exceptions=(SSHException),
-        cleanup=ssh_retry_logger,
-        args=args,
-        kwargs=kwargs,
-    )
+
+    def retry_and_return():
+        retry(
+            do_trigger,
+            attempts=3,
+            sleeptime=15,
+            retry_exceptions=(SSHException),
+            cleanup=ssh_retry_logger,
+            args=args,
+            kwargs=kwargs,
+        )
+        return "Done"
+
+    return retry_and_return()
 
 
 def do_trigger(request: flask.Request):
     try:
-        print(f"DEBUG: request: {request}")
         survey = request.get_json()["survey"]
-        print(f"DEBUG: survey: {survey}")
-        # trigger_event = TriggerEvent.from_json(
-        #     base64.b64decode(request["data"]).decode("utf-8")
-        # )
-        print(f"Nisra triggered for survey: '{survey}'")
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
         config.log()
