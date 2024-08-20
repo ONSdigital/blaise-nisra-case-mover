@@ -2,7 +2,6 @@ import base64
 import os
 from unittest import mock
 
-import flask
 import pysftp
 from behave import given, then, when
 
@@ -45,7 +44,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"  # noqa: E501
 )
 def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(  # noqa: E501
-        context,
+    context,
 ):
     copy_opn2101a_files_to_sftp(context.sftp_config)
 
@@ -77,13 +76,13 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
     "the nisra-mover service is run with the survey_source_path of {survey_source_path}"
 )
 def step_the_nisra_mover_service_is_run_with_survey_source_path(
-        context, survey_source_path
+    context, survey_source_path
 ):
     with mock.patch(
-            "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
+        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
     ):
         with mock.patch.object(
-                CaseMover, "instrument_exists_in_blaise"
+            CaseMover, "instrument_exists_in_blaise"
         ) as mock_instrument_exists_in_blaise:
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
@@ -91,7 +90,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
                 main.trigger(
                     {
                         "data": base64.encodebytes(
-                            '{"survey": "./ONS/TEST"}'.encode("utf-8")
+                            f'{{"survey": "{survey_source_path}"}}'.encode("utf-8")
                         )
                     },
                     {},
@@ -104,7 +103,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
     "the new data is copied to the GCP storage bucket including all necessary support files"  # noqa: E501
 )
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
-        context,
+    context,
 ):
     google_storage = GoogleStorage(context.config.bucket_name)
     google_storage.initialise_bucket_connection()
@@ -132,7 +131,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
     check = all(item in bucket_items for item in bucket_file_list)
 
     assert (
-            check is True
+        check is True
     ), f"Bucket items {bucket_items}, did not match expected: {bucket_file_list}"
 
 
@@ -188,11 +187,11 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
     cnopts.compression = True
 
     with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
+        host=sftp_config.host,
+        username=sftp_config.username,
+        password=sftp_config.password,
+        port=int(sftp_config.port),
+        cnopts=cnopts,
     ) as sftp:
 
         try:
