@@ -40,7 +40,7 @@ def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
 
 
-def trigger(*args, **kwargs):
+def trigger(*args):
     setupLogging()
 
     def retry_and_return():
@@ -51,7 +51,6 @@ def trigger(*args, **kwargs):
             retry_exceptions=(SSHException),
             cleanup=ssh_retry_logger,
             args=args,
-            kwargs=kwargs,
         )
         return "Done"
 
