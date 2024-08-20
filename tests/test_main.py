@@ -26,20 +26,21 @@ def test_public_ip_logger_logs_warning(requests_mock, caplog):
     ) in caplog.record_tuples
 
 
-# @mock.patch("flask.Request.from_json")
-# def test_do_trigger_logs_error_when_exception_is_raised(caplog):
-#     # arrange
-#     mock_request = flask.Request.from_values(json={"survey": {}})
-#
-#     # act
-#     with caplog.at_level(logging.ERROR):
-#         do_trigger(mock_request)
-#
-#     # assert
-#     errors = [entry for entry in caplog.records if entry.levelno == logging.ERROR]
-#     assert len(errors) == 1
-#     error = errors[0]
-#     assert error.message == "Exception: Kaboom"
+@mock.patch("flask.Request.get_json")
+def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, caplog):
+    # arrange
+    mock_get_json.side_effect = Exception("Kaboom")
+    mock_request = flask.Request.from_values(json={"survey": "OPN"})
+
+    # act
+    with caplog.at_level(logging.ERROR):
+        do_trigger(mock_request)
+
+    # assert
+    errors = [entry for entry in caplog.records if entry.levelno == logging.ERROR]
+    assert len(errors) == 1
+    error = errors[0]
+    assert error.message == "Exception: Kaboom"
 
 
 @mock.patch("main.Config.from_env")
