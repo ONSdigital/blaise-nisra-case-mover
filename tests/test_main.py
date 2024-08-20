@@ -30,11 +30,11 @@ def test_public_ip_logger_logs_warning(requests_mock, caplog):
 def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, caplog):
     # arrange
     mock_get_json.side_effect = Exception("Kaboom")
-    mock_request = flask.Request.from_values(json={"survey": "OPN"})
+    args = flask.Request.from_values(json={"survey": "OPN"})
 
     # act
     with caplog.at_level(logging.ERROR):
-        do_trigger(mock_request)
+        do_trigger(args, None)
 
     # assert
     errors = [entry for entry in caplog.records if entry.levelno == logging.ERROR]
