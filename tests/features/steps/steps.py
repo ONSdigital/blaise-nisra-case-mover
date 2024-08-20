@@ -61,7 +61,7 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
-                main.trigger(json={"survey": "OPN"})
+                main.trigger({"survey": "OPN"})
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
