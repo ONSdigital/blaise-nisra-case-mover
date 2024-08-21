@@ -2,7 +2,6 @@ import base64
 import logging
 import time
 
-import flask
 import pysftp
 import requests
 from google.cloud import pubsub_v1
@@ -39,7 +38,7 @@ def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
 
 
-def trigger(request: flask.Request):
+def trigger(request):
     setupLogging()
 
     def retry_and_return():
@@ -57,7 +56,7 @@ def trigger(request: flask.Request):
     return retry_and_return()
 
 
-def do_trigger(request: flask.Request, _content=None):
+def do_trigger(request, _content=None):
     try:
         survey = request.get_json()["survey"]
         config = Config.from_env()
