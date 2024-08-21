@@ -40,7 +40,7 @@ def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
 
 
-def trigger(*args, **kwargs):
+def trigger(request: flask.Request):
     setupLogging()
 
     def retry_and_return():
@@ -50,15 +50,15 @@ def trigger(*args, **kwargs):
             sleeptime=15,
             retry_exceptions=(SSHException),
             cleanup=ssh_retry_logger,
-            args=args,
-            kwargs=kwargs,
+            args=(request, ),
+            kwargs={},
         )
         return "Done"
 
     return retry_and_return()
 
 
-def do_trigger(request, _content):
+def do_trigger(request: flask.Request, _content=None):
     try:
         survey = request.get_json()["survey"]
         config = Config.from_env()
