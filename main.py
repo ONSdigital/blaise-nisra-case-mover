@@ -49,7 +49,7 @@ def trigger(request: flask.Request):
             sleeptime=15,
             retry_exceptions=(SSHException),
             cleanup=ssh_retry_logger,
-            args=(request, ),
+            args=(request,),
             kwargs={},
         )
         return "Done"
