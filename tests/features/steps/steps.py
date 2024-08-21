@@ -62,7 +62,7 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
                 mock_request = flask.Request.from_values(json={"survey": "./ONS/TEST"})
-                main.trigger(mock_request, {})
+                main.trigger(mock_request)
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
@@ -83,7 +83,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
                 mock_request = flask.Request.from_values(json={"survey": "./ONS/TEST"})
-                main.trigger(mock_request, {})
+                main.trigger(mock_request)
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
