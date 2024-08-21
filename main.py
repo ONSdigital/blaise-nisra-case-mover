@@ -14,7 +14,6 @@ from models.configuration.blaise_config_model import BlaiseConfig
 from models.configuration.bucket_config_model import BucketConfig
 from models.configuration.notification_config_model import NotificationConfig
 from models.processor_event import ProcessorEvent
-from models.trigger_event import TriggerEvent
 from pkg.case_mover import CaseMover
 from pkg.config import Config
 from pkg.google_storage import init_google_storage
