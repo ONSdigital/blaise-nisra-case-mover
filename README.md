@@ -49,7 +49,7 @@ This configuration will attempt to process all OPN instruments found on a local 
 ##### Connect to GCP Environment for Bucket and sftp server access:
 
 The GCP environments have an SFTP server for testing purposes. Run the following gcloud command to create a local tunnel
-to the test server:
+to the test server: 
 
 ```bash
 gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-a" --project "ons-blaise-v2-<env>" --local-host-port=localhost:2222
