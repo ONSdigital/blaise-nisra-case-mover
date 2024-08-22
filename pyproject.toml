@@ -17,6 +17,7 @@ notifications-python-client = "^6.4.1"
 requests = "^2.31.0"
 blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", branch = "main"}
 google-cloud-logging = "^3.3.0"
+flask = ">=1.0,<3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"

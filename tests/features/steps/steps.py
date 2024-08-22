@@ -2,6 +2,7 @@ import base64
 import os
 from unittest import mock
 
+import flask
 import pysftp
 from behave import given, then, when
 
@@ -60,14 +61,8 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
-                main.trigger(
-                    {
-                        "data": base64.encodebytes(
-                            '{"survey": "./ONS/TEST"}'.encode("utf-8")
-                        )
-                    },
-                    {},
-                )
+                mock_request = flask.Request.from_values(json={"survey": "./ONS/TEST"})
+                main.trigger(mock_request)
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
@@ -87,14 +82,8 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
-                main.trigger(
-                    {
-                        "data": base64.encodebytes(
-                            f'{{"survey": "{survey_source_path}"}}'.encode("utf-8")
-                        )
-                    },
-                    {},
-                )
+                mock_request = flask.Request.from_values(json={"survey": "./ONS/TEST"})
+                main.trigger(mock_request)
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
 
