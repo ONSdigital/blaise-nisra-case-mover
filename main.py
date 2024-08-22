@@ -13,7 +13,6 @@ from models.configuration.blaise_config_model import BlaiseConfig
 from models.configuration.bucket_config_model import BucketConfig
 from models.configuration.notification_config_model import NotificationConfig
 from models.processor_event import ProcessorEvent
-from models.trigger_event import TriggerEvent
 from pkg.case_mover import CaseMover
 from pkg.config import Config
 from pkg.google_storage import init_google_storage
@@ -39,29 +38,31 @@ def ssh_retry_logger():
     logging.info("Retrying for SSH Exception")
 
 
-def trigger(*args, **kwargs):
+def trigger(request):
     setupLogging()
-    retry(
-        do_trigger,
-        attempts=3,
-        sleeptime=15,
-        retry_exceptions=(SSHException),
-        cleanup=ssh_retry_logger,
-        args=args,
-        kwargs=kwargs,
-    )
 
-
-def do_trigger(event, _context):
-    try:
-        trigger_event = TriggerEvent.from_json(
-            base64.b64decode(event["data"]).decode("utf-8")
+    def retry_and_return():
+        retry(
+            do_trigger,
+            attempts=3,
+            sleeptime=15,
+            retry_exceptions=(SSHException),
+            cleanup=ssh_retry_logger,
+            args=(request,),
+            kwargs={},
         )
-        print(f"Nisra triggered for survey: '{trigger_event.survey}'")
+        return "Done"
+
+    return retry_and_return()
+
+
+def do_trigger(request, _content=None):
+    try:
+        survey = request.get_json()["survey"]
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
         config.log()
-        survey_source_path = trigger_event.survey
+        survey_source_path = survey
         sftp_config.log()
         publisher_client = pubsub_v1.PublisherClient()
 
