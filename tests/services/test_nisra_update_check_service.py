@@ -63,7 +63,7 @@ def test_check_nisra_files_have_updated_calls_the_blaise_service_with_correct_su
     nisra_update_check_service.check_nisra_files_have_updated()
 
     # assert
-    mock_blaise_service.get_names_of_questionnaire_in_blaise.assert_called_with("LMS")
+    mock_blaise_service.get_names_of_questionnaire_in_blaise.assert_called_with("LM")
 
 
 def test_check_nisra_files_sends_a_notification_if_a_file_has_not_been_updated_for_23_hours(
