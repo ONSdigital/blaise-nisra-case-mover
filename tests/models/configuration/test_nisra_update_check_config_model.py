@@ -6,7 +6,7 @@ def test_model_populates_expected_vars():
     config = NisraUpdateCheckConfig()
 
     # assert
-    assert config.survey_type == "LMS"
+    assert config.survey_type == "LM"
     assert config.bucket_file_type == "bdbx"
     assert config.max_hours_since_last_update == 23
     assert config.no_update_template_id == "94264180-7ebd-4ff9-8a27-52abb5949c78"
