@@ -165,7 +165,7 @@ def do_processor(event, _context):
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
 
-def nisra_changes_checker(_event, _context):
+def nisra_changes_checker(_request):
     setupLogging()
     logging.info("Running Cloud Function - nisra_changes_checker")
 
