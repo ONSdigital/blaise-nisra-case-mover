@@ -16,7 +16,7 @@ class Config:
     project_id: str
     processor_topic_name: str
     valid_surveys: List[str] = field(
-        default_factory=lambda: ["OPN", "LMS", "WLS", "LMX"]
+        default_factory=lambda: ["OPN", "LMS", "LMX"]
     )
     extension_list: List[str] = field(
         default_factory=lambda: [".blix", ".bdbx", ".bdix", ".bmix"]
