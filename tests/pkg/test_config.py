@@ -66,7 +66,7 @@ def test_config_log(caplog):
         (
             "root",
             logging.INFO,
-            "valid_surveys - ['OPN', 'LMS', 'WLS', 'LMX']",
+            "valid_surveys - ['OPN', 'LMS', 'LMX']",
         ),
         (
             "root",
@@ -98,7 +98,6 @@ def test_config_log(caplog):
         ("LMC2101_DD3", False),
         ("LMC21", False),
         ("LMS21", False),
-        ("WLS2301", True),
     ],
 )
 def test_valid_survey_name(survey_name, expected):

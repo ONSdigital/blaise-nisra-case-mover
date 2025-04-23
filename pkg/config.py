@@ -15,9 +15,7 @@ class Config:
     blaise_api_url: str
     project_id: str
     processor_topic_name: str
-    valid_surveys: List[str] = field(
-        default_factory=lambda: ["OPN", "LMS", "WLS", "LMX"]
-    )
+    valid_surveys: List[str] = field(default_factory=lambda: ["OPN", "LMS", "LMX"])
     extension_list: List[str] = field(
         default_factory=lambda: [".blix", ".bdbx", ".bdix", ".bmix"]
     )
