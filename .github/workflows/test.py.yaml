@@ -22,7 +22,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Run black
         run: poetry run black --check .
       - name: Run isort
@@ -43,7 +43,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
       - name: Run mypy
         run: poetry run mypy .
 
@@ -62,7 +62,7 @@ jobs:
     - name: Install Poetry
       run: pip install poetry
     - name: Install dependencies
-      run: poetry install
+      run: poetry install --no-root
     - name: Run pytest
       run: poetry run pytest --cov=./ tests/*
     - name: Run codecov
