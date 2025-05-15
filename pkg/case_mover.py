@@ -90,22 +90,34 @@ class CaseMover:
         # it completed the work. this also allows parallel requests
         # to be made to the api.
 
+        max_retries = 1
+        attempt = 0
+
         logging.info(
             f"Sending request to {self.config.blaise_api_url} "
             + f"for instrument {instrument_name}"
         )
-        try:
-            requests.post(
-                (
-                    f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
-                    + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
-                ),
-                headers={"content-type": "application/json"},
-                json={"questionnaireDataPath": instrument_name},
-                timeout=1,
-            )
-        except requests.exceptions.ReadTimeout:
-            pass
+        while attempt <= max_retries:
+            try:
+                requests.post(
+                    (
+                        f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
+                        + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
+                    ),
+                    headers={"content-type": "application/json"},
+                    json={"questionnaireDataPath": instrument_name},
+                    timeout=(2,1)
+                )
+                logging.info(f"Request successful for instrument {instrument_name} on attempt # {attempt+1}")
+                break
+
+            except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout) as e:
+                logging.warning(f"Attempt {attempt + 1} failed due to timeout: {e}")
+                attempt += 1
+                if attempt > max_retries:
+                    logging.error("Max retries exceeded for /api/v2/serverparks/"
+                        + f"{self.config.server_park}/questionnaires/{instrument_name}/data")
+                    break
 
     def instrument_exists_in_blaise(self, instrument_name: str) -> bool:
         response = requests.get(
