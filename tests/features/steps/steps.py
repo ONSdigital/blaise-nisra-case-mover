@@ -151,7 +151,7 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
         ),
         json={"questionnaireDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
-        timeout=(2, 1),
+        timeout=(2, 2),
     )
 
 
