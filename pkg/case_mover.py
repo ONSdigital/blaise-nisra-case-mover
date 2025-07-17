@@ -106,7 +106,7 @@ class CaseMover:
                     ),
                     headers={"content-type": "application/json"},
                     json={"questionnaireDataPath": instrument_name},
-                    timeout=(2, 1),
+                    timeout=(2, 2),
                 )
                 logging.info(
                     f"Request successful for instrument {instrument_name} on attempt # {attempt+1}"
@@ -120,7 +120,7 @@ class CaseMover:
                 logging.warning(f"Attempt {attempt + 1} failed due to timeout: {e}")
                 attempt += 1
                 if attempt > max_retries:
-                    logging.error(
+                    logging.warning(
                         "Max retries exceeded for /api/v2/serverparks/"
                         + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
                     )
