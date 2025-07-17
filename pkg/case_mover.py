@@ -108,10 +108,6 @@ class CaseMover:
                     json={"questionnaireDataPath": instrument_name},
                     timeout=(2, 2),
                 )
-                logging.info(
-                    f"Request successful for instrument {instrument_name} on attempt # {attempt+1}"
-                )
-
             except (
                 requests.exceptions.ConnectTimeout,
                 requests.exceptions.ReadTimeout,
