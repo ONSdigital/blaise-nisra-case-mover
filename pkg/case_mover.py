@@ -111,7 +111,6 @@ class CaseMover:
                 logging.info(
                     f"Request successful for instrument {instrument_name} on attempt # {attempt+1}"
                 )
-                break
 
             except (
                 requests.exceptions.ConnectTimeout,
@@ -119,12 +118,7 @@ class CaseMover:
             ) as e:
                 logging.warning(f"Attempt {attempt + 1} failed due to timeout: {e}")
                 attempt += 1
-                if attempt > max_retries:
-                    logging.warning(
-                        "Max retries exceeded for /api/v2/serverparks/"
-                        + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
-                    )
-                    break
+                pass
 
     def instrument_exists_in_blaise(self, instrument_name: str) -> bool:
         response = requests.get(
