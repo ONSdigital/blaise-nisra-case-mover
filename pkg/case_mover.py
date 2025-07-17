@@ -90,7 +90,7 @@ class CaseMover:
         # it completed the work. this also allows parallel requests
         # to be made to the api.
 
-        max_retries = 1
+        max_retries = 2
         attempt = 0
 
         logging.info(
