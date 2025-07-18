@@ -106,13 +106,15 @@ class CaseMover:
                     ),
                     headers={"content-type": "application/json"},
                     json={"questionnaireDataPath": instrument_name},
-                    timeout=(2, 2),
+                    timeout=(2, 1),
                 )
             except (
                 requests.exceptions.ConnectTimeout,
                 requests.exceptions.ReadTimeout,
             ) as e:
-                logging.warning(f"Attempt {attempt + 1} failed due to timeout: {e}")
+                logging.warning(
+                    f"Attempt {attempt + 1} failed for Instrument {instrument_name} due to timeout: {e}"
+                )
                 attempt += 1
                 pass
 
