@@ -20,8 +20,8 @@ blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.
 google-cloud-logging = "^3.3.0"
 flask = ">=1.0,<3.0"
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.0.1"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
 boto3 = "^1.17.40"
 isort = "^5.8.0"
 flake8 = "^3.9.0"
@@ -29,7 +29,7 @@ flake8-cognitive-complexity = "^0.1.0"
 black = "^22.6.0"
 behave = "^1.2.6"
 mypy = "^0.812"
-pytest-cov = "^3.0.0"
+pytest-cov = "^6.2.1"
 requests-mock = "^1.9.3"
 
 [tool.isort]
