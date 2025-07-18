@@ -20,7 +20,7 @@ blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.
 google-cloud-logging = "^3.3.0"
 flask = ">=1.0,<3.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.0.1"
 boto3 = "^1.17.40"
 isort = "^5.8.0"
