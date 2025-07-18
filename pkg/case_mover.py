@@ -108,6 +108,7 @@ class CaseMover:
                     json={"questionnaireDataPath": instrument_name},
                     timeout=(2, 1),
                 )
+                break
             except (
                 requests.exceptions.ConnectTimeout,
                 requests.exceptions.ReadTimeout,
