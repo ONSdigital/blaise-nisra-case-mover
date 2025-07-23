@@ -106,7 +106,10 @@ class CaseMover:
                     ),
                     headers={"content-type": "application/json"},
                     json={"questionnaireDataPath": instrument_name},
-                    timeout=(2, 1),
+                    timeout=(2, 2),
+                )
+                logging.info(
+                    f"Attempt {attempt + 1} successful for Instrument {instrument_name}"
                 )
                 break
             except (
