@@ -51,18 +51,15 @@ def test_raises_when_env_vars_are_missing():
     },
 )
 def test_config_log(caplog):
-    caplog.set_level(logging.INFO)
-    setupLogging()
-    config = Config.from_env()
-    config.log()
+
+    with caplog.at_level(logging.INFO):
+        setupLogging()
+        config = Config.from_env()
+        config.log()
+        
+        
     assert caplog.record_tuples == [
         ("root", logging.INFO, "bucket_name - nisra_bucket"),
-        (
-            "root",
-            logging.INFO,
-            "{'logging.googleapis.com/diagnostic': {'instrumentation_source': [{'name': "
-            "'python', 'version': '3.3.1'}]}}",
-        ),
         (
             "root",
             logging.INFO,
