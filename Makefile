@@ -27,4 +27,4 @@ integration-test:
 .PHONY: test
 ## Run unit tests
 test:
-	@poetry run python -m pytest
+	@poetry run python -m pytest -vv
