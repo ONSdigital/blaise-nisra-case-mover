@@ -36,25 +36,35 @@ def before_feature(context, feature):
 
 
 def after_scenario(context, scenario):
-    print(f"Published messages: {context.publisher_client.published_messages}")
-    context.publisher_client.published_messages = []
-    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
-    google_storage.initialise_bucket_connection()
-    if google_storage.bucket is None:
-        print("Failed")
 
-    blobs = google_storage.list_blobs()
+    try:
+        print(f"Published messages: {context.publisher_client.published_messages}")
+        context.publisher_client.published_messages = []
+    except Exception as e:
+        print(f"Ignored publisher cleanup error: {e}")    
 
-    google_storage.delete_blobs(blobs)
+    try:
+        google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
+        google_storage.initialise_bucket_connection()
+        if google_storage.bucket is None:
+            print("Failed")
 
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
+        blobs = google_storage.list_blobs()
 
-    with pysftp.Connection(
-        host=context.sftp_config.host,
-        username=context.sftp_config.username,
-        password=context.sftp_config.password,
-        port=int(context.sftp_config.port),
-        cnopts=cnopts,
-    ) as sftp:
-        sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+        google_storage.delete_blobs(blobs)
+    except Exception as e:
+        print(f"Ignored Google Storage cleanup error: {e}")
+
+    try:
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
+        with pysftp.Connection(
+            host=context.sftp_config.host,
+            username=context.sftp_config.username,
+            password=context.sftp_config.password,
+            port=int(context.sftp_config.port),
+            cnopts=cnopts,
+        ) as sftp:
+            sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+    except Exception as e:
+        print(f"Ignored SFTP cleanup error: {e}")
