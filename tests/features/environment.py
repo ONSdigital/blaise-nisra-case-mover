@@ -1,5 +1,6 @@
 import base64
 import os
+import sys
 
 import pysftp
 from google.cloud.pubsub_v1 import PublisherClient
@@ -41,7 +42,7 @@ def after_scenario(context, scenario):
         print(f"Published messages: {context.publisher_client.published_messages}")
         context.publisher_client.published_messages = []
     except Exception as e:
-        print(f"Ignored publisher cleanup error: {e}")    
+        print(f"Ignored publisher cleanup error: {e}", file=sys.__stderr__, flush=True)    
 
     try:
         google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
@@ -53,7 +54,7 @@ def after_scenario(context, scenario):
 
         google_storage.delete_blobs(blobs)
     except Exception as e:
-        print(f"Ignored Google Storage cleanup error: {e}")
+        print(f"Ignored Google Storage cleanup error: {e}", file=sys.__stderr__, flush=True)
 
     try:
         cnopts = pysftp.CnOpts()
@@ -67,4 +68,5 @@ def after_scenario(context, scenario):
         ) as sftp:
             sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
     except Exception as e:
-        print(f"Ignored SFTP cleanup error: {e}")
+        print(f"Ignored SFTP cleanup error: {e}", file=sys.__stderr__, flush=True)
+        
