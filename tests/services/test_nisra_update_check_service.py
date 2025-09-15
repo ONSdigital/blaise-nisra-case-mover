@@ -137,7 +137,7 @@ def test_check_nisra_files_ignores_files_in_the_bucket_that_are_not_active_in_bl
     # arrange
     questionnaire_name = "LMS2202_AA1"
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = [
-        questionnaire_name,
+        "LMS2201_AA1",
     ]
 
     datetime_now = datetime.now(timezone.utc)
