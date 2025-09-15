@@ -12,6 +12,7 @@ from pkg.google_storage import GoogleStorage
 from pkg.sftp import SFTPConfig
 from util.service_logging import setupLogging
 
+
 class FakePublisherClient(PublisherClient):
     def __init__(self):
         self.published_messages = []
@@ -24,7 +25,8 @@ class FakePublisherClient(PublisherClient):
         for message in self.published_messages:
             event = {"data": base64.encodebytes(message["data"])}
             main.processor(event, {})
-    
+
+
 def before_all(context):
     context.config = Config.from_env()
     context.sftp_config = SFTPConfig.from_env()
@@ -34,12 +36,12 @@ def before_feature(context, feature):
     setupLogging()
     context.mock_requests_post = None
     context.publisher_client = FakePublisherClient()
-    
+
 
 def after_scenario(context, scenario):
     logging.info(f"After Scenario cleanup")
     print(f"Published messages: {context.publisher_client.published_messages}")
-    context.publisher_client.published_messages = []  
+    context.publisher_client.published_messages = []
 
     google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
@@ -65,6 +67,7 @@ def after_scenario(context, scenario):
     ) as sftp:
         sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
     logging.info(f"After Scenario SFTP successful")
+
 
 def after_feature(context, feature):
     context = None

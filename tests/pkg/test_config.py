@@ -56,8 +56,7 @@ def test_config_log(caplog):
         setupLogging()
         config = Config.from_env()
         config.log()
-        
-        
+
     assert caplog.record_tuples == [
         ("root", logging.INFO, "bucket_name - nisra_bucket"),
         (

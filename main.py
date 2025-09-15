@@ -41,18 +41,15 @@ def ssh_retry_logger():
 def trigger(request):
     setupLogging()
 
-    def retry_and_return():
-        return retry(
-            do_trigger,
-            attempts=3,
-            sleeptime=15,
-            retry_exceptions=(SSHException),
-            cleanup=ssh_retry_logger,
-            args=(request,),
-            kwargs={},
-        )
-
-    return retry_and_return()
+    return retry(
+        do_trigger,
+        attempts=3,
+        sleeptime=15,
+        retry_exceptions=(SSHException),
+        cleanup=ssh_retry_logger,
+        args=(request,),
+        kwargs={},
+    )
 
 
 def do_trigger(request, _content=None):
