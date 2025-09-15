@@ -37,5 +37,5 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
     assert (
         "root",
         logging.INFO,
-        f"bucket_name: NISRA",
+        "bucket_name: NISRA",
     ) in caplog.record_tuples

@@ -1,6 +1,4 @@
-import base64
 import os
-import sys
 from unittest import mock
 
 import flask

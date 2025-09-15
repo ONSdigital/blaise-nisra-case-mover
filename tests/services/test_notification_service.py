@@ -1,10 +1,8 @@
 import logging
 from unittest import mock
 
-import blaise_restapi
 import pytest
 from notifications_python_client import NotificationsAPIClient
-from urllib3.exceptions import HTTPError
 
 from models.configuration.notification_config_model import NotificationConfig
 from services.notification_service import NotificationService
@@ -59,5 +57,5 @@ def test_send_email_notification_logs_an_error_if_exception_occurs(
     assert (
         "root",
         logging.ERROR,
-        f"NotificationService: Error when sending email via GOV.UK Notify API - ",
+        "NotificationService: Error when sending email via GOV.UK Notify API - ",
     ) in caplog.record_tuples

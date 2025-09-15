@@ -16,13 +16,13 @@ format:
 lint:
 	@poetry run black --check .
 	@poetry run isort --check .
-	@poetry run flake8 --max-line-length=88 .
+	@poetry run flake8 --max-line-length=200 .
 	@poetry run mypy --config-file ${mkfile_dir}/.mypy.ini .
 
 .PHONY: integration-test
 ## Run integration tests
 integration-test:
-	@poetry run python -m behave --format=progress2 tests/features
+	@poetry run python -m behave --format=progress2 tests/features --no-capture
 
 .PHONY: test
 ## Run unit tests

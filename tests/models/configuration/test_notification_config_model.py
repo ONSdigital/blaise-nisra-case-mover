@@ -41,11 +41,11 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
     assert (
         "root",
         logging.INFO,
-        f"notify_api_key: AE88HF98",
+        "notify_api_key: AE88HF98",
     ) in caplog.record_tuples
 
     assert (
         "root",
         logging.INFO,
-        f"nisra_notify_email: notify@ons.gov.uk",
+        "nisra_notify_email: notify@ons.gov.uk",
     ) in caplog.record_tuples

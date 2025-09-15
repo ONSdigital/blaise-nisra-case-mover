@@ -123,5 +123,5 @@ def test_get_questionnaire_modified_dates_logs_an_error_if_exception_occurs(
     assert (
         "root",
         logging.ERROR,
-        f"GoogleStorageService: error in calling 'get_files_from_bucket' - ",
+        "GoogleStorageService: error in calling 'get_files_from_bucket' - ",
     ) in caplog.record_tuples

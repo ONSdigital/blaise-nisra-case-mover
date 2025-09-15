@@ -1,7 +1,6 @@
 import base64
 import logging
 import os
-import sys
 
 import pysftp
 from google.cloud.pubsub_v1 import PublisherClient
@@ -39,22 +38,22 @@ def before_feature(context, feature):
 
 
 def after_scenario(context, scenario):
-    logging.info(f"After Scenario cleanup")
+    logging.info("After Scenario cleanup")
     print(f"Published messages: {context.publisher_client.published_messages}")
     context.publisher_client.published_messages = []
 
     google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
     google_storage.initialise_bucket_connection()
-    logging.info(f"After Scenario Bucket connection successful")
+    logging.info("After Scenario Bucket connection successful")
     if google_storage.bucket is None:
-        logging.info(f"After Scenario Google storage issue")
+        logging.info("After Scenario Google storage issue")
 
     blobs = google_storage.list_blobs()
-    logging.info(f"After Scenario list blobs successful")
+    logging.info("After Scenario list blobs successful")
     logging.info(google_storage.list_blobs())
 
     google_storage.delete_blobs(blobs)
-    logging.info(f"After Scenario delete blobs successful")
+    logging.info("After Scenario delete blobs successful")
 
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
@@ -66,8 +65,4 @@ def after_scenario(context, scenario):
         cnopts=cnopts,
     ) as sftp:
         sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
-    logging.info(f"After Scenario SFTP successful")
-
-
-def after_feature(context, feature):
-    context = None
+    logging.info("After Scenario SFTP successful")

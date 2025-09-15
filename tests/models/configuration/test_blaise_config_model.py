@@ -41,11 +41,11 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
     assert (
         "root",
         logging.INFO,
-        f"blaise_api_url: http://localhost:90",
+        "blaise_api_url: http://localhost:90",
     ) in caplog.record_tuples
 
     assert (
         "root",
         logging.INFO,
-        f"server_park: gusty",
+        "server_park: gusty",
     ) in caplog.record_tuples
