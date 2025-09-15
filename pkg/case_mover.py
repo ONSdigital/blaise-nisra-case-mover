@@ -23,7 +23,11 @@ class CaseMover:
         return self.bdbx_md5_changed(instrument) or self.gcp_missing_files(instrument)
 
     def bdbx_md5_changed(self, instrument: Instrument) -> bool:
-        blob_md5 = self.google_storage.get_blob_md5(instrument.get_bdbx_blob_filepath())
+        bdbx_filepath = instrument.get_bdbx_blob_filepath()
+        if bdbx_filepath is None:
+            # If there's no bdbx file, consider it as needing update
+            return True
+        blob_md5 = self.google_storage.get_blob_md5(bdbx_filepath)
         return instrument.bdbx_md5 != blob_md5
 
     def gcp_missing_files(self, instrument: Instrument) -> bool:

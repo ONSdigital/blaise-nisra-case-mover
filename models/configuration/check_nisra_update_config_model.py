@@ -9,7 +9,7 @@ class NisraUpdateCheckConfig:
     no_update_template_id: str
     missing_questionnaire_template_id: str
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.survey_type = "LM"
         self.bucket_file_type = "bdbx"
         self.max_hours_since_last_update = 23

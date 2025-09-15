@@ -1,4 +1,5 @@
 import os
+from typing import Any
 from unittest import mock
 
 import flask
@@ -88,13 +89,13 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
                 context.publisher_client.run_all()
 
 
-@then(
+@then(  # type: ignore[misc]
     "the new data is copied to the GCP storage bucket including all necessary support files"  # noqa: E501
 )
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
-    context,
-):
-    google_storage = GoogleStorage(context.config.bucket_name)
+    context: Any,
+) -> None:
+    google_storage: GoogleStorage = GoogleStorage(context.config.bucket_name)
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -124,9 +125,9 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
     ), f"Bucket items {bucket_items}, did not match expected: {bucket_file_list}"
 
 
-@then("no data is copied to the GCP storage bucket")
-def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
-    google_storage = GoogleStorage(context.config.bucket_name)
+@then("no data is copied to the GCP storage bucket")  # type: ignore[misc]
+def step_no_data_is_copied_to_the_gcp_storage_bucket(context: Any) -> None:
+    google_storage: GoogleStorage = GoogleStorage(context.config.bucket_name)
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
@@ -166,7 +167,9 @@ def step_a_call_is_not_made_to_the_restful_api(context):
 
 
 def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
-    google_storage = GoogleStorage(os.getenv("TEST_DATA_BUCKET", "env_var_not_set"))
+    google_storage: GoogleStorage = GoogleStorage(
+        os.getenv("TEST_DATA_BUCKET", "env_var_not_set")
+    )
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:

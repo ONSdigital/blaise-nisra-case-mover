@@ -1,6 +1,7 @@
 import io
 import stat
 from dataclasses import dataclass
+from typing import Any, Callable
 from unittest import mock
 
 import pytest
@@ -42,13 +43,13 @@ def mock_sftp(mock_sftp_connection, sftp_config, config):
 
 
 @pytest.fixture
-def google_storage(config):
+def google_storage(config: Any) -> GoogleStorage:
     return GoogleStorage(config.bucket_name)
 
 
 @pytest.fixture
-def mock_stat():
-    def inner(st_size):
+def mock_stat() -> Callable[[int], Any]:
+    def inner(st_size: int) -> Any:
         @dataclass
         class MockStat:
             st_size: int
@@ -59,8 +60,8 @@ def mock_stat():
 
 
 @pytest.fixture
-def mock_list_dir_attr():
-    def inner(filename, st_mtime, st_mode=stat.S_IFREG):
+def mock_list_dir_attr() -> Callable[[str, int, int], Any]:
+    def inner(filename: str, st_mtime: int, st_mode: int = stat.S_IFREG) -> Any:
         @dataclass
         class MockListDirAttr:
             filename: str
@@ -73,13 +74,13 @@ def mock_list_dir_attr():
 
 
 @pytest.fixture
-def fake_sftp_file():
-    def inner(contents):
+def fake_sftp_file() -> Callable[[Any], Any]:
+    def inner(contents: Any) -> Any:
         class FakeSFTPFile(io.BytesIO):
-            def __init__(self, byte_content):
+            def __init__(self, byte_content: Any) -> None:
                 super().__init__(byte_content)
 
-            def prefetch(self):
+            def prefetch(self) -> None:
                 pass
 
         return FakeSFTPFile(contents)
@@ -88,8 +89,8 @@ def fake_sftp_file():
 
 
 @pytest.fixture
-def fake_blob():
-    def inner(name):
+def fake_blob() -> Callable[[str], Any]:
+    def inner(name: str) -> Any:
         @dataclass
         class FakeBlob:
             name: str

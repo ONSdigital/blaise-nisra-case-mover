@@ -1,3 +1,5 @@
+from typing import Optional
+
 from google.auth.transport.requests import AuthorizedSession
 from google.resumable_media import common, requests
 
@@ -23,6 +25,15 @@ class GCSObjectStreamUpload(object):
         blob_name: str,
         chunk_size: int = 256 * 1024,
     ):
+        if google_storage.bucket is None:
+            raise RuntimeError(
+                "GoogleStorage bucket is not initialized. Call initialise_bucket_connection() first."
+            )
+        if google_storage.storage_client is None:
+            raise RuntimeError(
+                "GoogleStorage client is not initialized. Call initialise_bucket_connection() first."
+            )
+
         self._bucket = google_storage.bucket
         self._blob = self._bucket.blob(blob_name)
 
@@ -31,10 +42,10 @@ class GCSObjectStreamUpload(object):
         self._chunk_size = chunk_size
         self._read = 0
 
-        self._transport = AuthorizedSession(
+        self._transport: AuthorizedSession = AuthorizedSession(  # type: ignore[no-untyped-call]
             credentials=google_storage.storage_client._credentials
         )
-        self._request = None  # type: requests.ResumableUpload
+        self._request: Optional[requests.ResumableUpload] = None
 
     def __enter__(self):
         self.start()
@@ -60,8 +71,19 @@ class GCSObjectStreamUpload(object):
             metadata={"name": self._blob.name},
         )
 
-    def stop(self):
-        self._request.transmit_next_chunk(self._transport)
+    def stop(self) -> None:
+        if self._request:
+            self._request.transmit_next_chunk(self._transport)  # type: ignore[no-untyped-call]
+
+    def _transmit_chunk_if_needed(self) -> None:
+        """Transmit a chunk if the request is available."""
+        if not self._request:
+            return
+
+        try:
+            self._request.transmit_next_chunk(self._transport)  # type: ignore[no-untyped-call]
+        except common.InvalidResponse:
+            self._request.recover(self._transport)  # type: ignore[no-untyped-call]
 
     def write(self, data: bytes) -> int:
         data_len = len(data)
@@ -69,10 +91,7 @@ class GCSObjectStreamUpload(object):
         self._buffer += data
         del data
         while self._buffer_size >= self._chunk_size:
-            try:
-                self._request.transmit_next_chunk(self._transport)
-            except common.InvalidResponse:
-                self._request.recover(self._transport)
+            self._transmit_chunk_if_needed()
         return data_len
 
     def read(self, chunk_size: int) -> bytes:
