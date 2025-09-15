@@ -33,7 +33,7 @@ def after_scenario(context, scenario):
         logging.info("After Scenario Google storage issue")
 
     blobs = google_storage.list_blobs()
-    if not(blobs is None or blobs == []):
+    if not (blobs is None or blobs == []):
         google_storage.delete_blobs(blobs)
         logging.info("After Scenario delete blobs successful")
 
