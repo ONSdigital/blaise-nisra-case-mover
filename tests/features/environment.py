@@ -15,7 +15,7 @@ def before_all(context):
     context.sftp_config = SFTPConfig.from_env()
 
 
-def before_feature(context, feature):
+def before_scenario(context, scenario):
     setupLogging()
     context.mock_requests_post = None
     context.publisher_client = FakePublisherClient()
@@ -33,11 +33,9 @@ def after_scenario(context, scenario):
         logging.info("After Scenario Google storage issue")
 
     blobs = google_storage.list_blobs()
-    logging.info("After Scenario list blobs successful")
-    logging.info(google_storage.list_blobs())
-
-    google_storage.delete_blobs(blobs)
-    logging.info("After Scenario delete blobs successful")
+    if not(blobs is None or blobs == []):
+        google_storage.delete_blobs(blobs)
+        logging.info("After Scenario delete blobs successful")
 
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
@@ -48,5 +46,7 @@ def after_scenario(context, scenario):
         port=int(context.sftp_config.port),
         cnopts=cnopts,
     ) as sftp:
-        sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
-    logging.info("After Scenario SFTP successful")
+        try:
+            sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+        except Exception:
+            logging.error("error in sftp")
