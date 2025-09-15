@@ -42,7 +42,7 @@ def trigger(request):
     setupLogging()
 
     def retry_and_return():
-        retry(
+        return retry(
             do_trigger,
             attempts=3,
             sleeptime=15,
@@ -51,7 +51,6 @@ def trigger(request):
             args=(request,),
             kwargs={},
         )
-        return "Done"
 
     return retry_and_return()
 

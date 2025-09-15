@@ -1,4 +1,5 @@
 import base64
+import logging
 import os
 import sys
 
@@ -30,40 +31,40 @@ def before_all(context):
 
 
 def before_feature(context, feature):
-    print(f"Feature: {feature.name}")
     setupLogging()
-    context.publisher_client = FakePublisherClient()
-
-def before_scenario(context, scenario):
-    print(f"Scenario: {scenario.name}")
     context.mock_requests_post = None
-    context.config = Config.from_env()
-    context.sftp_config = SFTPConfig.from_env()
+    context.publisher_client = FakePublisherClient()
     
 
 def after_scenario(context, scenario):
-    try:
-        print(f"Published messages: {context.publisher_client.published_messages}")
-        context.publisher_client.published_messages = []  
+    logging.info(f"After Scenario cleanup")
+    print(f"Published messages: {context.publisher_client.published_messages}")
+    context.publisher_client.published_messages = []  
 
-        google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
-        google_storage.initialise_bucket_connection()
-        if google_storage.bucket is None:
-            print("Failed")
+    google_storage = GoogleStorage(os.getenv("NISRA_BUCKET_NAME", "env_var_not_set"))
+    google_storage.initialise_bucket_connection()
+    logging.info(f"After Scenario Bucket connection successful")
+    if google_storage.bucket is None:
+        logging.info(f"After Scenario Google storage issue")
 
-        blobs = google_storage.list_blobs()
+    blobs = google_storage.list_blobs()
+    logging.info(f"After Scenario list blobs successful")
+    logging.info(google_storage.list_blobs())
 
-        google_storage.delete_blobs(blobs)
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
-        with pysftp.Connection(
-            host=context.sftp_config.host,
-            username=context.sftp_config.username,
-            password=context.sftp_config.password,
-            port=int(context.sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp:
-            sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
-    except Exception as e:
-        print(f"Ignored SFTP cleanup error: {e}", file=sys.__stderr__, flush=True)
-        
+    google_storage.delete_blobs(blobs)
+    logging.info(f"After Scenario delete blobs successful")
+
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
+    with pysftp.Connection(
+        host=context.sftp_config.host,
+        username=context.sftp_config.username,
+        password=context.sftp_config.password,
+        port=int(context.sftp_config.port),
+        cnopts=cnopts,
+    ) as sftp:
+        sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+    logging.info(f"After Scenario SFTP successful")
+
+def after_feature(context, feature):
+    context = None
