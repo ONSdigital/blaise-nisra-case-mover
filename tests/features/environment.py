@@ -1,29 +1,13 @@
-import base64
 import logging
 import os
 
 import pysftp
-from google.cloud.pubsub_v1 import PublisherClient
 
-import main
 from pkg.config import Config
 from pkg.google_storage import GoogleStorage
 from pkg.sftp import SFTPConfig
+from tests.features.fake_publisher_client import FakePublisherClient
 from util.service_logging import setupLogging
-
-
-class FakePublisherClient(PublisherClient):
-    def __init__(self):
-        self.published_messages = []
-
-    def publish(self, topic_path, data):
-        message = {"topic_path": topic_path, "data": data}
-        self.published_messages.append(message)
-
-    def run_all(self):
-        for message in self.published_messages:
-            event = {"data": base64.encodebytes(message["data"])}
-            main.processor(event, {})
 
 
 def before_all(context):
