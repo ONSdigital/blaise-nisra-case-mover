@@ -9,7 +9,6 @@ package-mode = false
 python = "^3.13"
 pybase64 = "^1.4.2"
 pysftp = "^0.2.9"
-paramiko = "<4.0"
 google-cloud-storage = "^2.19.0"
 google-cloud-pubsub = "^2.31.1"
 google-cloud-logging = "^3.12.1"
