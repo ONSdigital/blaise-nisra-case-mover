@@ -60,12 +60,6 @@ def test_config_log(caplog):
         (
             "root",
             logging.INFO,
-            "{'logging.googleapis.com/diagnostic': {'instrumentation_source': [{'name': "
-            "'python', 'version': '3.3.1'}]}}",
-        ),
-        (
-            "root",
-            logging.INFO,
             "valid_surveys - ['OPN', 'LMS', 'LMX']",
         ),
         (

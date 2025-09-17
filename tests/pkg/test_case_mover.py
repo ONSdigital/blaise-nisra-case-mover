@@ -322,8 +322,8 @@ def test_instrument_exists_in_blaise_exists(config, requests_mock, case_mover):
 
 @mock.patch.object(CaseMover, "instrument_exists_in_blaise")
 def test_filter_existing_instruments(mock_instrument_exists_in_blaise, case_mover):
-    mock_instrument_exists_in_blaise.side_effect = (
-        lambda instrument_name: True if instrument_name.startswith("opn") else False
+    mock_instrument_exists_in_blaise.side_effect = lambda instrument_name: (
+        True if instrument_name.startswith("opn") else False
     )
     instruments = {
         "OPN2101A": Instrument(sftp_path="./ONS/OPN/OPN2101A"),

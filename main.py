@@ -30,7 +30,7 @@ def public_ip_logger():
     try:
         public_ip = requests.get("https://checkip.amazonaws.com").text.strip()
         logging.info("Public IP address - " + public_ip)
-    except:
+    except Exception:
         logging.warning("Unable to lookup public IP address")
 
 

@@ -1,10 +1,8 @@
 import logging
 from unittest import mock
 
-import blaise_restapi
 import pytest
 from notifications_python_client import NotificationsAPIClient
-from urllib3.exceptions import HTTPError
 
 from models.configuration.notification_config_model import NotificationConfig
 from services.notification_service import NotificationService
