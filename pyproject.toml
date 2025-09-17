@@ -2,41 +2,46 @@
 name = "blaise-nisra-case-mover"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Blaise Team"]
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.9"
-pybase64 = "^1.1.4"
+python = "^3.13"
+pybase64 = "^1.4.2"
 pysftp = "^0.2.9"
-google-cloud-storage = "^1.37.0"
-python-dotenv = "^0.16.0"
-google-cloud-pubsub = "^2.4.1"
-dacite = "^1.6.0"
-redo = "^2.0.4"
-notifications-python-client = "^6.4.1"
-requests = "^2.31.0"
-blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", branch = "main"}
-google-cloud-logging = "^3.3.0"
-flask = ">=1.0,<3.0"
+paramiko = "<4.0"
+google-cloud-storage = "^2.19.0"
+google-cloud-pubsub = "^2.31.1"
+google-cloud-logging = "^3.12.1"
+python-dotenv = "^1.1.1"
+dacite = "^1.9.2"
+redo = "^3.0.0"
+notifications-python-client = "^10.0.1"
+requests = "^2.32.5"
+blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client", rev = "v1.0.2"}
+flask = "^3.1.2"
+cffi = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.4.1"
-boto3 = "^1.17.40"
+pytest = "^8.4.2"
+boto3 = "^1.40.27"
 isort = "^5.8.0"
-flake8 = "^3.9.0"
+flake8 = "^7.3.0"
 flake8-cognitive-complexity = "^0.1.0"
-black = "^22.6.0"
-behave = "^1.2.6"
-mypy = "^0.812"
+black = "^25.1.0"
+mypy = "^1.17.1"
 pytest-cov = "^6.2.1"
-requests-mock = "^1.9.3"
+behave = "1.2.6"
+setuptools = "80.9.0"
+requests-mock = "^1.12.1"
+types-requests = "^2.32.4.20250913"
 
 [tool.isort]
-multi_line_output = "3"
-include_trailing_comma = "True"
-line_length = "88"
+profile = "black"
+line_length = 200
+multi_line_output = 3
+include_trailing_comma = true
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
