@@ -20,7 +20,6 @@ notifications-python-client = "^10.0.1"
 requests = "^2.32.5"
 blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client", rev = "v1.0.2"}
 flask = "^3.1.2"
-cffi = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
@@ -32,12 +31,9 @@ black = "^25.1.0"
 mypy = "^1.17.1"
 pytest-cov = "^6.2.1"
 behave = "1.2.6"
-setuptools = "80.9.0"
 requests-mock = "^1.12.1"
-types-requests = "^2.32.4.20250913"
 
 [tool.isort]
-profile = "black"
 line_length = 200
 multi_line_output = 3
 include_trailing_comma = true
