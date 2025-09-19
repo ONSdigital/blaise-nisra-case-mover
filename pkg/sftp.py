@@ -179,10 +179,10 @@ class SFTP:
             if instrument_name.lower() in conflicting_instruments:
                 if instrument_name in processed_conflicts:
                     continue
-                filtered_instruments[
-                    instrument_name.lower()
-                ] = cls._get_latest_conflicting_instrument(
-                    instruments, conflicting_instruments, instrument_name
+                filtered_instruments[instrument_name.lower()] = (
+                    cls._get_latest_conflicting_instrument(
+                        instruments, conflicting_instruments, instrument_name
+                    )
                 )
                 processed_conflicts += conflicting_instruments[instrument_name.lower()]
             else:
@@ -207,7 +207,7 @@ class SFTP:
 
     @staticmethod
     def _get_conflicting_instruments(
-        instruments: Dict[str, Instrument]
+        instruments: Dict[str, Instrument],
     ) -> Dict[str, List[str]]:
         conflicting_instruments: Dict[str, List[str]] = {}
         for folder_name in instruments.keys():

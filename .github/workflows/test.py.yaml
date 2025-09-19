@@ -7,11 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
+  permissions:
+    contents: read
   lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ 3.9 ]
+        python-version: [ 3.13 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -32,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ 3.9 ]
+        python-version: [ 3.13 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.13]
 
     steps:
     - uses: actions/checkout@v2

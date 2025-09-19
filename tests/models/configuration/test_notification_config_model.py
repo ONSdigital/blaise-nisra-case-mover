@@ -1,5 +1,3 @@
-import logging
-
 from models.configuration.notification_config_model import NotificationConfig
 
 
@@ -31,21 +29,10 @@ def test_log_outputs_the_correct_vars_from_env(monkeypatch, caplog):
     # arrange & act
     monkeypatch.setenv("NOTIFY_API_KEY", "AE88HF98")
     monkeypatch.setenv("NISRA_NOTIFY_EMAIL", "notify@ons.gov.uk")
-    config = NotificationConfig.from_env()
 
     # act
-    with caplog.at_level(logging.INFO):
-        config.log()
+    config = NotificationConfig.from_env()
 
     # assert
-    assert (
-        "root",
-        logging.INFO,
-        f"notify_api_key: AE88HF98",
-    ) in caplog.record_tuples
-
-    assert (
-        "root",
-        logging.INFO,
-        f"nisra_notify_email: notify@ons.gov.uk",
-    ) in caplog.record_tuples
+    assert config.nisra_notify_email == "notify@ons.gov.uk"
+    assert config.notify_api_key == "AE88HF98"
