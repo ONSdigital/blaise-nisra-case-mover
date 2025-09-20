@@ -17,7 +17,7 @@ def json_serialiser(obj: Any) -> str:
 
 
 def json_decode_hook(obj: Any) -> Any:
-    for (key, value) in obj.items():
+    for key, value in obj.items():
         try:
             obj[key] = datetime.fromisoformat(value)
         except Exception:

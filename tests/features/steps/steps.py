@@ -1,4 +1,3 @@
-import base64
 import os
 from unittest import mock
 
@@ -42,8 +41,8 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
 
 
 @given(
-    "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"  # noqa: E501
-)
+    "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"
+)  # noqa: E501
 def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(  # noqa: E501
     context,
 ):
@@ -89,8 +88,8 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
 
 
 @then(
-    "the new data is copied to the GCP storage bucket including all necessary support files"  # noqa: E501
-)
+    "the new data is copied to the GCP storage bucket including all necessary support files"
+)  # noqa: E501
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
     context,
 ):
