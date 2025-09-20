@@ -34,7 +34,7 @@ class GCSObjectStreamUpload(object):
         self._transport = AuthorizedSession(
             credentials=google_storage.storage_client._credentials
         )
-        self._request = None  # type: requests.ResumableUpload
+        self._request = None  # type: ignore # type: requests.ResumableUpload
 
     def __enter__(self):
         self.start()
@@ -61,7 +61,8 @@ class GCSObjectStreamUpload(object):
         )
 
     def stop(self):
-        self._request.transmit_next_chunk(self._transport)
+        if self._request:
+            self._request.transmit_next_chunk(self._transport)
 
     def write(self, data: bytes) -> int:
         data_len = len(data)
@@ -70,9 +71,9 @@ class GCSObjectStreamUpload(object):
         del data
         while self._buffer_size >= self._chunk_size:
             try:
-                self._request.transmit_next_chunk(self._transport)
+                self._request and self._request.transmit_next_chunk(self._transport)
             except common.InvalidResponse:
-                self._request.recover(self._transport)
+                self._request and self._request.recover(self._transport)
         return data_len
 
     def read(self, chunk_size: int) -> bytes:
