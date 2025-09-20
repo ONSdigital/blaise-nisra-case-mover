@@ -6,9 +6,10 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
-  permissions:
-    contents: read
   lint:
     runs-on: ubuntu-latest
     strategy:
