@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, List, Type, TypeVar
 
-import pysftp
+import paramiko
 
 from models import Instrument
 from pkg.config import Config
@@ -59,7 +59,7 @@ class SFTPConfig:
 class SFTP:
     def __init__(
         self,
-        sftp_connection: pysftp.Connection,
+        sftp_connection: paramiko.SFTPClient,
         sftp_config: SFTPConfig,
         config: Config,
     ) -> None:
