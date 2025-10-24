@@ -2,7 +2,7 @@ import base64
 import logging
 import time
 
-import pysftp
+import paramiko
 import requests
 from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
@@ -66,9 +66,11 @@ def do_trigger(request, _content=None):
         sftp_config.log()
         publisher_client = pubsub_v1.PublisherClient()
 
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
-        cnopts.compression = True
+        # cnopts = pysftp.CnOpts()
+        # cnopts.hostkeys = None
+        # cnopts.compression = True
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
@@ -76,34 +78,81 @@ def do_trigger(request, _content=None):
 
         public_ip_logger()
         logging.info("Connecting to SFTP server")
-        with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp_connection:
+        
+        try:
+            ssh_client.connect(
+                hostname=sftp_config.host,
+                username=sftp_config.username,
+                password=sftp_config.password,
+                port=int(sftp_config.port),
+                compress=True,          # enables zlib compression
+                look_for_keys=False,    # disable key-based auth
+                allow_agent=False       # disable ssh-agent
+            )
+
             logging.info("Connected to SFTP server")
 
-            sftp = SFTP(sftp_connection, sftp_config, config)
-            case_mover = CaseMover(google_storage, config, sftp)
-            instruments = get_filtered_instruments(sftp, case_mover, survey_source_path)
-            logging.info(f"Processing survey - {survey_source_path}")
+            with ssh_client.open_sftp() as sftp_connection:
+                # Wrap Paramiko's SFTP client into your existing abstraction
+                sftp = SFTP(sftp_connection, sftp_config, config)
+                case_mover = CaseMover(google_storage, config, sftp)
 
-            if len(instruments) == 0:
-                logging.info("No instrument folders found after filtering")
-                return "No instrument folders found, exiting", 200
+                instruments = get_filtered_instruments(sftp, case_mover, survey_source_path)
+                logging.info(f"Processing survey - {survey_source_path}")
 
-            for instrument_name, instrument in instruments.items():
-                trigger_processor(
-                    publisher_client,
-                    config,
-                    ProcessorEvent(
-                        instrument_name=instrument_name, instrument=instrument
-                    ),
-                )
+                if len(instruments) == 0:
+                    logging.info("No instrument folders found after filtering")
+                    return "No instrument folders found, exiting", 200
+
+                for instrument_name, instrument in instruments.items():
+                    trigger_processor(
+                        publisher_client,
+                        config,
+                        ProcessorEvent(
+                            instrument_name=instrument_name, instrument=instrument
+                        ),
+                    )
+
+        except paramiko.SSHException as e:
+            logging.error(f"SFTP connection failed: {e}", exc_info=True)
+            return f"SFTP connection failed: {e}", 500
+
+        finally:
+            ssh_client.close()
+            logging.info("SFTP connection closed")
+
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
+        return f"Error: {error}", 500
+    
+    #     with pysftp.Connection(
+    #         host=sftp_config.host,
+    #         username=sftp_config.username,
+    #         password=sftp_config.password,
+    #         port=int(sftp_config.port),
+    #         cnopts=cnopts,
+    #     ) as sftp_connection:
+    #         logging.info("Connected to SFTP server")
+
+    #         sftp = SFTP(sftp_connection, sftp_config, config)
+    #         case_mover = CaseMover(google_storage, config, sftp)
+    #         instruments = get_filtered_instruments(sftp, case_mover, survey_source_path)
+    #         logging.info(f"Processing survey - {survey_source_path}")
+
+    #         if len(instruments) == 0:
+    #             logging.info("No instrument folders found after filtering")
+    #             return "No instrument folders found, exiting", 200
+
+    #         for instrument_name, instrument in instruments.items():
+    #             trigger_processor(
+    #                 publisher_client,
+    #                 config,
+    #                 ProcessorEvent(
+    #                     instrument_name=instrument_name, instrument=instrument
+    #                 ),
+    #             )
+    # except Exception as error:
+    #     logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
 
 def processor(*args, **kwargs):
@@ -129,9 +178,11 @@ def do_processor(event, _context):
         config.log()
         sftp_config.log()
 
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
-        cnopts.compression = True
+        # cnopts = pysftp.CnOpts()
+        # cnopts.hostkeys = None
+        # cnopts.compression = True
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
@@ -139,28 +190,40 @@ def do_processor(event, _context):
 
         public_ip_logger()
         logging.info("Connecting to SFTP server")
-        with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp_connection:
+        
+        try:
+            ssh_client.connect(
+                hostname=sftp_config.host,
+                username=sftp_config.username,
+                password=sftp_config.password,
+                port=int(sftp_config.port),
+                compress=True,          # enables zlib compression
+                look_for_keys=False,    # disable key-based auth
+                allow_agent=False       # disable ssh-agent
+            )
+
             logging.info("Connected to SFTP server")
 
-            sftp = SFTP(sftp_connection, sftp_config, config)
-            case_mover = CaseMover(google_storage, config, sftp)
+            with ssh_client.open_sftp() as sftp_connection:
 
-            processor_event = ProcessorEvent.from_json(
-                base64.b64decode(event["data"]).decode("utf-8")
-            )
+                sftp = SFTP(sftp_connection, sftp_config, config)
+                case_mover = CaseMover(google_storage, config, sftp)
 
-            logging.info(f"Processing instrument: {processor_event.instrument_name}")
+                processor_event = ProcessorEvent.from_json(
+                    base64.b64decode(event["data"]).decode("utf-8")
+                )
 
-            process_instrument(
-                case_mover, processor_event.instrument_name, processor_event.instrument
-            )
-        logging.info("Closing SFTP connection")
+                logging.info(f"Processing instrument: {processor_event.instrument_name}")
+
+                process_instrument(
+                    case_mover, processor_event.instrument_name, processor_event.instrument
+                )
+        except paramiko.SSHException as e:
+            logging.error(f"SFTP connection failed: {e}", exc_info=True)
+            return f"SFTP connection failed: {e}", 500
+        finally:
+            ssh_client.close()
+            logging.info("SFTP connection closed")
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
