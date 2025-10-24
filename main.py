@@ -2,11 +2,9 @@ import base64
 import logging
 import time
 
-import paramiko
 import requests
 from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
-from util.sftp_connection import sftp_connection
 from redo import retry
 
 import cloud_functions.nisra_changes_checker
@@ -25,6 +23,7 @@ from services.google_bucket_service import GoogleBucketService
 from services.nisra_update_check_service import NisraUpdateCheckService
 from services.notification_service import NotificationService
 from util.service_logging import setupLogging
+from util.sftp_connection import sftp_connection
 
 
 def public_ip_logger():
@@ -92,8 +91,7 @@ def do_trigger(request, _content=None):
                     publisher_client,
                     config,
                     ProcessorEvent(
-                        instrument_name=instrument_name,
-                        instrument=instrument
+                        instrument_name=instrument_name, instrument=instrument
                     ),
                 )
 
@@ -132,7 +130,7 @@ def do_processor(event, _context):
             return "Connection to bucket failed", 500
 
         public_ip_logger()
-        
+
         logging.info("Connecting to SFTP server")
         with sftp_connection(sftp_config) as sftp_conn:
             logging.info("Connected to SFTP server")
