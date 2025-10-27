@@ -1,5 +1,6 @@
 import logging
 from contextlib import contextmanager
+import os
 from typing import Generator
 
 import paramiko
@@ -14,7 +15,7 @@ def sftp_connection(
 
     ssh = paramiko.SSHClient()
 
-    if allow_unknown_hosts or sftp_config.host in ("localhost", "127.0.0.1"):
+    if os.getenv("ENVIRONMENT", "prod").lower() in ("dev", "test", "local"):
         logging.warning(
             "Accepting unknown host keys! Only use this in test environments."
         )
