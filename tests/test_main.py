@@ -4,7 +4,6 @@ from unittest import mock
 import flask
 
 from main import do_processor, do_trigger, public_ip_logger
-import pkg
 
 
 def test_public_ip_logger(requests_mock, caplog):
@@ -60,11 +59,8 @@ def test_do_processor_logs_error_when_exception_is_raised(from_env, caplog):
 
 
 def test_do_trigger_bucket_none(monkeypatch, config, google_storage):
-    google_storage.bucket_name=None
-    monkeypatch.setattr(
-        "main.init_google_storage",
-        lambda config: google_storage
-    )
+    google_storage.bucket_name = None
+    monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
     monkeypatch.setattr("main.SFTP", mock.MagicMock)
     monkeypatch.setattr("main.CaseMover", mock.MagicMock)
     monkeypatch.setattr("main.get_filtered_instruments", lambda *a, **k: {})
@@ -80,9 +76,9 @@ def test_do_trigger_bucket_none(monkeypatch, config, google_storage):
 
 
 def test_do_trigger_bucket_exists(monkeypatch, config, google_storage):
-    
+
     google_storage.bucket = config.bucket_name
-    monkeypatch.setattr( "main.init_google_storage", lambda config: google_storage)
+    monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
     monkeypatch.setattr("main.SFTP", mock.MagicMock)
     monkeypatch.setattr("main.CaseMover", mock.MagicMock)
     monkeypatch.setattr("main.get_filtered_instruments", lambda *a, **k: {})
