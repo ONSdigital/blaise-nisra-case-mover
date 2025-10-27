@@ -1,6 +1,6 @@
 import logging
-from contextlib import contextmanager
 import os
+from contextlib import contextmanager
 from typing import Generator
 
 import paramiko
