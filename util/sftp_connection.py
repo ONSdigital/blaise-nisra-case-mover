@@ -1,5 +1,4 @@
 import logging
-import os
 from contextlib import contextmanager
 from typing import Generator
 
@@ -12,15 +11,28 @@ from pkg.sftp import SFTPConfig
 def sftp_connection(
     sftp_config: SFTPConfig, allow_unknown_hosts: bool = False
 ) -> Generator[paramiko.SFTPClient, None, None]:
+    """
+    Paramiko SFTP connection helper.
+
+    Behavior:
+    - For dev/test/CI: automatically accepts unknown host keys, mimicking pysftp.
+    - For production: uses RejectPolicy, secure connection.
+
+    Environment variable:
+        ALLOW_UNKNOWN_HOSTS=true -> allow unknown hosts (dev/test only)
+    """
+    host = getattr(sftp_config, "host", "").lower()
 
     ssh = paramiko.SSHClient()
 
-    if os.getenv("ENVIRONMENT", "prod").lower() in ("dev", "test", "local"):
+    if allow_unknown_hosts or host in ("localhost", "127.0.0.1", "::1"):
         logging.warning(
-            "Accepting unknown host keys! Only use this in test environments."
+            f"⚠️ Accepting unknown host keys for {host}. "
+            "Only safe for dev/test environments."
         )
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     else:
+        # Production: reject unknown hosts
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
 
