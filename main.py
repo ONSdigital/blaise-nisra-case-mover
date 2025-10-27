@@ -73,7 +73,7 @@ def do_trigger(request, _content=None):
         public_ip_logger()
 
         logging.info("Connecting to SFTP server")
-        with sftp_connection(sftp_config) as sftp_conn:
+        with sftp_connection(sftp_config, allow_unknown_hosts=sftp_config.host in ("localhost", "127.0.0.1")) as sftp_conn:
             logging.info("Connected to SFTP server")
 
             sftp = SFTP(sftp_conn, sftp_config, config)
