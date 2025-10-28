@@ -1,5 +1,5 @@
 # .github/codeql-config.yml
 suppress:
   - id: "py/paramiko-missing-host-key-validation"
-    path: "./util/sftp_connection.py"
+    path: "util/sftp_connection.py"
     reason: "Using AutoAddPolicy intentionally in prod/dev; required by current setup."
