@@ -26,3 +26,5 @@ jobs:
         uses: github/codeql-action/autobuild@v3
       - name: Run CodeQL
         uses: github/codeql-action/analyze@v3
+        with:
+          config-file: .github/codeql/codeql-suppress.yml
