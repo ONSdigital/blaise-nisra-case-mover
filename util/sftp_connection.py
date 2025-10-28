@@ -32,7 +32,7 @@ def sftp_connection(
         )
         ssh.set_missing_host_key_policy(
             paramiko.AutoAddPolicy()
-        )  # codeql: ignore [AcceptingUnknownHostKey] - Required for current prod setup
+        )  # codeql: ignore [py/paramiko-missing-host-key-validation]
     else:
         # Production: reject unknown hosts
         ssh.load_system_host_keys()
