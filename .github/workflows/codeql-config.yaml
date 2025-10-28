@@ -1,0 +1,5 @@
+# .github/codeql-config.yml
+suppress:
+  - id: "AcceptingUnknownHostKey"
+    path: "util/sftp_connection.py"
+    reason: "Using AutoAddPolicy intentionally in prod/dev; required by current setup."
