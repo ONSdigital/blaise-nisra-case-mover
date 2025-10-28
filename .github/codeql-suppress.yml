@@ -1,4 +1,3 @@
-# .github/codeql-config.yml
 suppress:
   - id: "py/paramiko-missing-host-key-validation"
     path: "util/sftp_connection.py"
