@@ -4,7 +4,6 @@ from unittest import mock
 import flask
 
 from main import do_processor, do_trigger, public_ip_logger
-from pkg.config import Config
 
 
 def test_public_ip_logger(requests_mock, caplog):
@@ -59,17 +58,15 @@ def test_do_processor_logs_error_when_exception_is_raised(from_env, caplog):
     assert error.message == "Exception: Kaboom"
 
 
-def test_do_trigger_bucket_none(monkeypatch, config, google_storage):
+def test_do_trigger_bucket_none(monkeypatch, sftp_config, config, google_storage):
 
     monkeypatch.setattr(
+        "main.SFTPConfig.from_env",
+        lambda: sftp_config,
+    )
+    monkeypatch.setattr(
         "main.Config.from_env",
-        lambda: Config(
-            bucket_name="",
-            server_park="MOCK_SERVER_PARK",
-            blaise_api_url="mock_blaise_api_url.com",
-            project_id="test_project_id",
-            processor_topic_name="test_processor_topic_name",
-        ),
+        lambda: config,
     )
     google_storage.bucket = None
     monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
@@ -89,16 +86,7 @@ def test_do_trigger_bucket_none(monkeypatch, config, google_storage):
 
 def test_do_trigger_bucket_exists(monkeypatch, config, google_storage):
 
-    monkeypatch.setattr(
-        "main.Config.from_env",
-        lambda: Config(
-            bucket_name="test_bucket",
-            server_park="MOCK_SERVER_PARK",
-            blaise_api_url="mock_blaise_api_url.com",
-            project_id="test_project_id",
-            processor_topic_name="test_processor_topic_name",
-        ),
-    )
+    monkeypatch.setattr("main.Config.from_env", lambda: config)
     google_storage.bucket = config.bucket_name
     monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
     monkeypatch.setattr("main.SFTP", mock.MagicMock)
