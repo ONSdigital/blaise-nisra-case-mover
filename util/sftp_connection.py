@@ -30,7 +30,7 @@ def sftp_connection(
             f"⚠️ Accepting unknown host keys for {host}. "
             "Only safe for dev/test environments."
         )
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy()) # codeql: ignore
     else:
         # Production: reject unknown hosts
         ssh.load_system_host_keys()
