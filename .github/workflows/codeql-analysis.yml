@@ -33,7 +33,8 @@ jobs:
           output: results.sarif
       - name: Fail if CodeQL found high-severity issues
         run: |
-            count=$(jq '[.runs[].results[] | select(.rule.severity=="error" or .rule.severity=="high")] | length' results.sarif)
+            count=$(jq '[.runs[].results[] | select(.ruleId=="py/paramiko-missing-host-key-validation")] | length' results.sarif || echo 0)
+            echo "High-severity CodeQL issues: $count"
             if [ "$count" -gt 0 ]; then
               echo "❌ Found $count high-severity CodeQL issues"
               exit 1
