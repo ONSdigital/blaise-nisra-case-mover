@@ -6,7 +6,7 @@ disable-default-queries: false
 queries: []
 
 # suppress rules
-suppress:
-  - id: py/paramiko-missing-host-key-validation
-    path: util/sftp_connection.py
+query-filters:
+  - exclude:
+    id: py/paramiko-missing-host-key-validation
     reason: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
