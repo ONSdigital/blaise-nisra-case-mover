@@ -7,7 +7,7 @@ disable-default-queries: false
 # suppress rules
 
 
-#query-filters:
-#  - exclude:
-#    id: py/paramiko-missing-host-key-validation
-#    reason: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
+query-filters:
+  - exclude:
+    id: py/paramiko-missing-host-key-validation
+    reason: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
