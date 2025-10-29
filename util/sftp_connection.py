@@ -20,7 +20,7 @@ def sftp_connection(sftp_config: SFTPConfig) -> Generator[paramiko.SFTPClient, N
     ssh = paramiko.SSHClient()
 
     logging.warning(f"⚠️ Accepting unknown host keys for {host}. " "Only safe for dev/test/ci environment.")
-    
+
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # codeql: ignore [py/paramiko-missing-host-key-validation]
 
     ssh.connect(
