@@ -2,7 +2,7 @@ name: CodeQL Analysis
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ main ]
+    branches: [ main, preprod, prod, ]
   push:
     branches: [ main, preprod, prod, BLAIS5-4953 ]
 jobs:
