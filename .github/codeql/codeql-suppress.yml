@@ -2,11 +2,6 @@
 name: "Custom CodeQL config"
 disable-default-queries: false
 
-
-
-# suppress rules
-
-
 query-filters:
   - exclude:
       id: py/paramiko-missing-host-key-validation
