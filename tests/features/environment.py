@@ -47,7 +47,7 @@ def after_scenario(context, scenario):
 
     google_storage.delete_blobs(blobs)
 
-    with sftp_connection(context.sftp_config, allow_unknown_hosts=True) as sftp_conn:
+    with sftp_connection(context.sftp_config) as sftp_conn:
         ssh_client = sftp_conn.get_channel().get_transport().open_session()
         try:
             print(f"Starting remote cleanup")
