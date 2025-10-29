@@ -40,9 +40,7 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     context.file_generation_list = file_generation_list.sort()
 
 
-@given(
-    "there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred"
-)  # noqa: E501
+@given("there is new OPN NISRA data on the NISRA SFTP that hasn't previously been transferred")  # noqa: E501
 def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_been_transferred(  # noqa: E501
     context,
 ):
@@ -51,12 +49,8 @@ def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_bee
 
 @when("the nisra-mover service is run with an OPN configuration")
 def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
-    with mock.patch(
-        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
-    ):
-        with mock.patch.object(
-            CaseMover, "instrument_exists_in_blaise"
-        ) as mock_instrument_exists_in_blaise:
+    with mock.patch("google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client):
+        with mock.patch.object(CaseMover, "instrument_exists_in_blaise") as mock_instrument_exists_in_blaise:
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
@@ -66,18 +60,10 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
                 context.publisher_client.run_all()
 
 
-@when(
-    "the nisra-mover service is run with the survey_source_path of {survey_source_path}"
-)
-def step_the_nisra_mover_service_is_run_with_survey_source_path(
-    context, survey_source_path
-):
-    with mock.patch(
-        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
-    ):
-        with mock.patch.object(
-            CaseMover, "instrument_exists_in_blaise"
-        ) as mock_instrument_exists_in_blaise:
+@when("the nisra-mover service is run with the survey_source_path of {survey_source_path}")
+def step_the_nisra_mover_service_is_run_with_survey_source_path(context, survey_source_path):
+    with mock.patch("google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client):
+        with mock.patch.object(CaseMover, "instrument_exists_in_blaise") as mock_instrument_exists_in_blaise:
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
@@ -87,9 +73,7 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
                 context.publisher_client.run_all()
 
 
-@then(
-    "the new data is copied to the GCP storage bucket including all necessary support files"
-)  # noqa: E501
+@then("the new data is copied to the GCP storage bucket including all necessary support files")  # noqa: E501
 def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessary_support_files(  # noqa: E501
     context,
 ):
@@ -118,9 +102,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
 
     check = all(item in bucket_items for item in bucket_file_list)
 
-    assert (
-        check is True
-    ), f"Bucket items {bucket_items}, did not match expected: {bucket_file_list}"
+    assert check is True, f"Bucket items {bucket_items}, did not match expected: {bucket_file_list}"
 
 
 @then("no data is copied to the GCP storage bucket")
@@ -144,10 +126,7 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
     server_park = context.config.server_park
     blaise_api_url = context.config.blaise_api_url
     context.mock_requests_post.assert_called_once_with(
-        (
-            f"http://{blaise_api_url}/api/v2/serverparks/"
-            f"{server_park}/questionnaires/opn2101a/data"
-        ),
+        (f"http://{blaise_api_url}/api/v2/serverparks/" f"{server_park}/questionnaires/opn2101a/data"),
         json={"questionnaireDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
         timeout=(2, 2),

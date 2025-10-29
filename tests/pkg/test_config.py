@@ -31,11 +31,7 @@ def test_config_from_env():
 def test_raises_when_env_vars_are_missing():
     with pytest.raises(
         Exception,
-        match=(
-            "The following required environment variables have not been set: "
-            "SERVER_PARK, BLAISE_API_URL, NISRA_BUCKET_NAME, PROJECT_ID, "
-            "PROCESSOR_TOPIC_NAME"
-        ),
+        match=("The following required environment variables have not been set: " "SERVER_PARK, BLAISE_API_URL, NISRA_BUCKET_NAME, PROJECT_ID, " "PROCESSOR_TOPIC_NAME"),
     ):
         Config.from_env()
 

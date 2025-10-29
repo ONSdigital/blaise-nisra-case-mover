@@ -22,9 +22,7 @@ def notification_service(config: NotificationConfig) -> NotificationService:
 
 
 @mock.patch.object(NotificationsAPIClient, "send_email_notification")
-def test_send_email_notification_calls_the_notification_client_with_the_correct_parameters(
-    _mock_notification_client, notification_service
-):
+def test_send_email_notification_calls_the_notification_client_with_the_correct_parameters(_mock_notification_client, notification_service):
     # arrange
     message = {"questionnaire_name": "LMS2202_AA1"}
     template_id = "94264180-7ebd-4ff9-8a27-52abb5949c78"
@@ -41,9 +39,7 @@ def test_send_email_notification_calls_the_notification_client_with_the_correct_
 
 
 @mock.patch.object(NotificationsAPIClient, "send_email_notification")
-def test_send_email_notification_logs_an_error_if_exception_occurs(
-    _mock_notification_client, notification_service, caplog
-):
+def test_send_email_notification_logs_an_error_if_exception_occurs(_mock_notification_client, notification_service, caplog):
     # arrange
     message = {"questionnaire_name": "LMS2202_AA1"}
     template_id = "94264180-7ebd-4ff9-8a27-52abb5949c78"

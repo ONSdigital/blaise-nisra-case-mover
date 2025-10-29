@@ -35,6 +35,4 @@ class ProcessorEvent:
 
     @classmethod
     def from_json(cls, json_object: str) -> "ProcessorEvent":
-        return from_dict(
-            data_class=cls, data=json.loads(json_object, object_hook=json_decode_hook)
-        )
+        return from_dict(data_class=cls, data=json.loads(json_object, object_hook=json_decode_hook))

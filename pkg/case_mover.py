@@ -57,9 +57,7 @@ class CaseMover:
             ) as blob_stream:
                 bdbx_details = self.sftp.sftp_connection.stat(sftp_path)
                 chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
-                sftp_file = self.sftp.sftp_connection.open(
-                    sftp_path, bufsize=self.config.bufsize
-                )
+                sftp_file = self.sftp.sftp_connection.open(sftp_path, bufsize=self.config.bufsize)
                 sftp_file.prefetch()
                 for chunk in range(chunks):
                     sftp_file.seek(chunk * self.config.bufsize)
@@ -74,15 +72,9 @@ class CaseMover:
             )
 
         except FileNotFoundError:
-            logging.warning(
-                f"File {sftp_path} not found on SFTP server; "
-                "it seems to have been removed since getting the list of files "
-                "from the server."
-            )
+            logging.warning(f"File {sftp_path} not found on SFTP server; " "it seems to have been removed since getting the list of files " "from the server.")
         except Exception:
-            logging.exception(
-                f"Fatal error while syncing file {sftp_path} to {blob_filepath}"
-            )
+            logging.exception(f"Fatal error while syncing file {sftp_path} to {blob_filepath}")
 
     def send_request_to_api(self, instrument_name: str) -> None:
         # added 1 second timeout exception pass to the api request
@@ -93,53 +85,35 @@ class CaseMover:
         max_retries = 2
         attempt = 0
 
-        logging.info(
-            f"Sending request to {self.config.blaise_api_url} "
-            + f"for instrument {instrument_name}"
-        )
+        logging.info(f"Sending request to {self.config.blaise_api_url} " + f"for instrument {instrument_name}")
         while attempt <= max_retries:
             try:
                 requests.post(
-                    (
-                        f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
-                        + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
-                    ),
+                    (f"http://{self.config.blaise_api_url}/api/v2/serverparks/" + f"{self.config.server_park}/questionnaires/{instrument_name}/data"),
                     headers={"content-type": "application/json"},
                     json={"questionnaireDataPath": instrument_name},
                     timeout=(2, 2),
                 )
-                logging.info(
-                    f"Attempt {attempt + 1} successful for Instrument {instrument_name}"
-                )
+                logging.info(f"Attempt {attempt + 1} successful for Instrument {instrument_name}")
                 break
             except (
                 requests.exceptions.ConnectTimeout,
                 requests.exceptions.ReadTimeout,
             ) as e:
-                logging.warning(
-                    f"Attempt {attempt + 1} failed for Instrument {instrument_name} due to timeout: {e}"
-                )
+                logging.warning(f"Attempt {attempt + 1} failed for Instrument {instrument_name} due to timeout: {e}")
                 attempt += 1
                 pass
 
     def instrument_exists_in_blaise(self, instrument_name: str) -> bool:
-        response = requests.get(
-            f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
-            + f"{self.config.server_park}/questionnaires/{instrument_name}/exists"
-        )
+        response = requests.get(f"http://{self.config.blaise_api_url}/api/v2/serverparks/" + f"{self.config.server_park}/questionnaires/{instrument_name}/exists")
         return response.json()
 
-    def filter_existing_instruments(
-        self, instruments: Dict[str, Instrument]
-    ) -> Dict[str, Instrument]:
+    def filter_existing_instruments(self, instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for key, instrument in instruments.items():
             if self.instrument_exists_in_blaise(instrument.gcp_folder()):
                 logging.info(f"Instrument {instrument.gcp_folder()} exists in blaise")
                 filtered_instruments[key] = instrument
             else:
-                logging.info(
-                    f"Instrument {instrument.gcp_folder()} does not exist in blaise, "
-                    "not ingesting..."
-                )
+                logging.info(f"Instrument {instrument.gcp_folder()} does not exist in blaise, " "not ingesting...")
         return filtered_instruments

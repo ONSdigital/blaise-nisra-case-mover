@@ -90,9 +90,7 @@ def test_sync_instrument(mock_sync_file, case_mover):
         ],
     )
     case_mover.sync_instrument(instrument)
-    mock_sync_file.assert_called_once_with(
-        "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
-    )
+    mock_sync_file.assert_called_once_with("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
 
 
 @mock.patch.object(GCSObjectStreamUpload, "write")
@@ -143,15 +141,12 @@ def test_sync_file_exception(
     mock_sftp_connection.stat.side_effect = Exception("I exploded the thing")
 
     with caplog.at_level(logging.ERROR):
-        case_mover.sync_file(
-            "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
-        )
+        case_mover.sync_file("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
 
     assert (
         "root",
         logging.ERROR,
-        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx "
-        "to opn2103a/opn2103a.bdbx",
+        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx " "to opn2103a/opn2103a.bdbx",
     ) in caplog.record_tuples
     assert "I exploded the thing" in caplog.text
 
@@ -221,30 +216,14 @@ def test_sync_with_retries_on_file_not_found(
     # mock_stream_upload.side_effect = write_to_gcp_file
 
     with caplog.at_level(logging.WARNING):
-        case_mover.sync_file(
-            "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
-        )
+        case_mover.sync_file("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
 
-    error_messages = [
-        message
-        for _logger, level, message in caplog.record_tuples
-        if level == logging.ERROR
-    ]
-    warning_messages = [
-        message
-        for _logger, level, message in caplog.record_tuples
-        if level == logging.WARNING
-    ]
+    error_messages = [message for _logger, level, message in caplog.record_tuples if level == logging.ERROR]
+    warning_messages = [message for _logger, level, message in caplog.record_tuples if level == logging.WARNING]
 
-    assert (
-        not error_messages
-    ), f"No errors should should have been logged, got {repr(error_messages)}"
+    assert not error_messages, f"No errors should should have been logged, got {repr(error_messages)}"
 
-    assert (
-        "File ./ONS/OPN/OPN2103A/oPn2103A.BdBx not found on SFTP server; "
-        "it seems to have been removed since getting the list of files from the server."
-        in warning_messages
-    )
+    assert "File ./ONS/OPN/OPN2103A/oPn2103A.BdBx not found on SFTP server; " "it seems to have been removed since getting the list of files from the server." in warning_messages
 
 
 @mock.patch.object(GCSObjectStreamUpload, "write")
@@ -276,15 +255,12 @@ def test_sync_with_too_many_retries_on_read_timeout(
     mock_stream_upload.side_effect = write_to_gcp_file
 
     with caplog.at_level(logging.ERROR):
-        case_mover.sync_file(
-            "opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx"
-        )
+        case_mover.sync_file("opn2103a/opn2103a.bdbx", "./ONS/OPN/OPN2103A/oPn2103A.BdBx")
 
     assert (
         "root",
         logging.ERROR,
-        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx "
-        "to opn2103a/opn2103a.bdbx",
+        "Fatal error while syncing file ./ONS/OPN/OPN2103A/oPn2103A.BdBx " "to opn2103a/opn2103a.bdbx",
     ) in caplog.record_tuples
 
 
@@ -292,10 +268,7 @@ def test_sync_with_too_many_retries_on_read_timeout(
 def test_send_request_to_api(mock_requests_post, case_mover, config):
     case_mover.send_request_to_api("opn2101a")
     mock_requests_post.assert_called_once_with(
-        (
-            f"http://{config.blaise_api_url}/api/v2/serverparks/"
-            + f"{config.server_park}/questionnaires/opn2101a/data"
-        ),
+        (f"http://{config.blaise_api_url}/api/v2/serverparks/" + f"{config.server_park}/questionnaires/opn2101a/data"),
         json={"questionnaireDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
         timeout=(2, 2),
@@ -304,8 +277,7 @@ def test_send_request_to_api(mock_requests_post, case_mover, config):
 
 def test_instrument_exists_in_blaise(config, requests_mock, case_mover):
     requests_mock.get(
-        f"http://{config.blaise_api_url}/api/v2/serverparks/"
-        + f"{config.server_park}/questionnaires/opn2101a/exists",
+        f"http://{config.blaise_api_url}/api/v2/serverparks/" + f"{config.server_park}/questionnaires/opn2101a/exists",
         text="false",
     )
     assert case_mover.instrument_exists_in_blaise("opn2101a") is False
@@ -313,8 +285,7 @@ def test_instrument_exists_in_blaise(config, requests_mock, case_mover):
 
 def test_instrument_exists_in_blaise_exists(config, requests_mock, case_mover):
     requests_mock.get(
-        f"http://{config.blaise_api_url}/api/v2/serverparks/"
-        + f"{config.server_park}/questionnaires/opn2101a/exists",
+        f"http://{config.blaise_api_url}/api/v2/serverparks/" + f"{config.server_park}/questionnaires/opn2101a/exists",
         text="true",
     )
     assert case_mover.instrument_exists_in_blaise("opn2101a") is True
@@ -322,9 +293,7 @@ def test_instrument_exists_in_blaise_exists(config, requests_mock, case_mover):
 
 @mock.patch.object(CaseMover, "instrument_exists_in_blaise")
 def test_filter_existing_instruments(mock_instrument_exists_in_blaise, case_mover):
-    mock_instrument_exists_in_blaise.side_effect = lambda instrument_name: (
-        True if instrument_name.startswith("opn") else False
-    )
+    mock_instrument_exists_in_blaise.side_effect = lambda instrument_name: (True if instrument_name.startswith("opn") else False)
     instruments = {
         "OPN2101A": Instrument(sftp_path="./ONS/OPN/OPN2101A"),
         "LMS2101A": Instrument(sftp_path="./ONS/OPN/LMS2101A"),
@@ -411,9 +380,7 @@ def test_gcp_missing_files_missing(mock_get_instrument_blobs, case_mover, fake_b
 )
 def test_instrument_needs_updating(case_mover, bdbx_changed, gcp_missing_files, result):
     with mock.patch.object(CaseMover, "bdbx_md5_changed", return_value=bdbx_changed):
-        with mock.patch.object(
-            CaseMover, "gcp_missing_files", return_value=gcp_missing_files
-        ):
+        with mock.patch.object(CaseMover, "gcp_missing_files", return_value=gcp_missing_files):
             instrument = Instrument(
                 sftp_path="ONS/OPN/OPN2103A",
                 bdbx_updated_at=datetime.fromisoformat("2021-05-20T10:21:53+00:00"),
