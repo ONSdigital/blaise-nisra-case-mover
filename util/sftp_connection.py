@@ -8,27 +8,22 @@ from pkg.sftp import SFTPConfig
 
 
 @contextmanager
-def sftp_connection(sftp_config: SFTPConfig, allow_unknown_hosts: bool = False) -> Generator[paramiko.SFTPClient, None, None]:
+def sftp_connection(sftp_config: SFTPConfig) -> Generator[paramiko.SFTPClient, None, None]:
     """
     Paramiko SFTP connection helper.
 
     Behavior:
-    - For dev/test/CI: automatically accepts unknown host keys, mimicking pysftp.
-    - For production: uses RejectPolicy, secure connection.
-
-    Environment variable:
-        ALLOW_UNKNOWN_HOSTS=true -> allow unknown hosts (dev/test only)
+    - Automatically accepts unknown host keys, mimicking pysftp.
     """
     host = getattr(sftp_config, "host", "").lower()
 
     ssh = paramiko.SSHClient()
 
-    if allow_unknown_hosts or host in ("localhost", "127.0.0.1", "::1"):
-        logging.warning(f"⚠️ Accepting unknown host keys for {host}. " "Only safe for dev/test/ci environments.")
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # codeql: ignore [py/paramiko-missing-host-key-validation]
+    logging.warning(f"⚠️ Accepting unknown host keys for {host}. " "Only safe for dev/test/ci environments.")
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # codeql: ignore [py/paramiko-missing-host-key-validation]
 
     ssh.connect(
-        hostname=sftp_config.host,
+        hostname=host,
         username=sftp_config.username,
         password=sftp_config.password,
         port=int(sftp_config.port),

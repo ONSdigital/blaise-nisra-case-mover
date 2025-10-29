@@ -1,6 +1,5 @@
 import base64
 import logging
-import os
 import time
 
 import requests
@@ -72,12 +71,10 @@ def do_trigger(request, _content=None):
             return "Connection to bucket failed", 500
 
         public_ip_logger()
-        allow_unknown_hosts = os.getenv("ALLOW_UNKNOWN_HOSTS", "").lower() == "true"
         logging.info("Connecting to SFTP server")
 
         with sftp_connection(
             sftp_config,
-            allow_unknown_hosts,
         ) as sftp_conn:
             logging.info("Connected to SFTP server")
 
