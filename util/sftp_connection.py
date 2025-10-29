@@ -24,8 +24,8 @@ def sftp_connection(sftp_config: SFTPConfig, allow_unknown_hosts: bool = False) 
     ssh = paramiko.SSHClient()
 
     if allow_unknown_hosts or host in ("localhost", "127.0.0.1", "::1"):
-        logging.warning(f"⚠️ Accepting unknown host keys for {host}. " "Only safe for dev/test environments.")
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # codeql: ignore [py/paramiko-missing-host-key-validation]
+        logging.warning(f"⚠️ Accepting unknown host keys for {host}. " "Only safe for dev/test/ci environments.")
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     else:
         # Production: reject unknown hosts
