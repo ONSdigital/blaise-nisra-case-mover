@@ -28,7 +28,7 @@ def sftp_connection(sftp_config: SFTPConfig, allow_unknown_hosts: bool = False) 
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     else:
-        # Production: reject unknown hosts
+        # Production: reject unknown hosts test
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
 
