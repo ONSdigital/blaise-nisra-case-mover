@@ -2,8 +2,7 @@
 name: "Custom CodeQL config"
 disable-default-queries: false
 
-# leave the default queries untouched
-queries: []
+
 
 # suppress rules
 
