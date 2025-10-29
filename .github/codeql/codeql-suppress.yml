@@ -1,4 +1,4 @@
 suppress:
-  - id: "py/paramiko-missing-host-key-validation"
-    path: "util/sftp_connection.py"
-    reason: "Using AutoAddPolicy intentionally in prod/dev; required by current setup."
+  - id: py/paramiko-missing-host-key-validation
+    path: util/sftp_connection.py
+    reason: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
