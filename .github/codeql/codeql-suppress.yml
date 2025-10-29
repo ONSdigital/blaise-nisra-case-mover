@@ -1,4 +1,8 @@
+# .github/codeql/codeql-suppress.yml
+name: Custom CodeQL config
+disable-default-queries: false
+queries: +[]
 suppress:
   - id: py/paramiko-missing-host-key-validation
     path: util/sftp_connection.py
-    reason: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
+    reason: Using AutoAddPolicy intentionally in prod; required by current setup.
