@@ -31,17 +31,12 @@ def test_sftpconfig_from_env_gets_values_from_the_env():
 def test_sftpconfig_from_env_raises_when_env_vars_are_missing():
     with pytest.raises(
         Exception,
-        match=(
-            "The following required environment variables have not been set: "
-            "SFTP_HOST, SFTP_USERNAME, SFTP_PASSWORD, SFTP_PORT"
-        ),
+        match=("The following required environment variables have not been set: " "SFTP_HOST, SFTP_USERNAME, SFTP_PASSWORD, SFTP_PORT"),
     ):
         SFTPConfig.from_env()
 
 
-def test_get_instrument_folders(
-    mock_sftp_connection, sftp_config, config, mock_list_dir_attr
-):
+def test_get_instrument_folders(mock_sftp_connection, sftp_config, config, mock_list_dir_attr):
     mock_sftp_connection.listdir_attr.return_value = [
         mock_list_dir_attr(filename="OPN2101A", st_mtime=1, st_mode=stat.S_IFDIR),
         mock_list_dir_attr(filename="LMS2101A", st_mtime=1, st_mode=stat.S_IFDIR),
@@ -59,9 +54,7 @@ def test_get_instrument_folders(
     }
 
 
-def test_get_instrument_files(
-    mock_sftp_connection, sftp_config, config, mock_list_dir_attr
-):
+def test_get_instrument_files(mock_sftp_connection, sftp_config, config, mock_list_dir_attr):
     sftp = SFTP(mock_sftp_connection, sftp_config, config)
     instrument_folders = {"OPN2101A": Instrument(sftp_path="ONS/OPN/OPN2101A")}
     mock_sftp_connection.listdir_attr.return_value = [
@@ -86,9 +79,7 @@ def test_get_instrument_files(
     }
 
 
-def test_filter_invalid_instrument_filenames_logs_an_informational_message_listing_the_filenames_found(
-    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
-):
+def test_filter_invalid_instrument_filenames_logs_an_informational_message_listing_the_filenames_found(mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog):
     # arrange
     sftp = SFTP(mock_sftp_connection, sftp_config, config)
     instrument_folders = {
@@ -162,9 +153,7 @@ def test_filter_invalid_instrument_filenames_logs_an_informational_message_listi
     ) in caplog.record_tuples
 
 
-def test_filter_invalid_instrument_filenames_logs_an_warning_when_instrument_files_are_misnamed(
-    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
-):
+def test_filter_invalid_instrument_filenames_logs_an_warning_when_instrument_files_are_misnamed(mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog):
     # arrange
     sftp = SFTP(mock_sftp_connection, sftp_config, config)
     instrument_folders = {
@@ -247,9 +236,7 @@ def test_filter_invalid_instrument_filenames_logs_an_warning_when_instrument_fil
     ) in caplog.record_tuples
 
 
-def test_filter_invalid_instrument_filenames_removes_instrument_with_invalid_files(
-    mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog
-):
+def test_filter_invalid_instrument_filenames_removes_instrument_with_invalid_files(mock_sftp_connection, sftp_config, config, mock_list_dir_attr, caplog):
     # arrange
     sftp = SFTP(mock_sftp_connection, sftp_config, config)
     instrument_folders = {
@@ -302,9 +289,7 @@ def test_filter_invalid_instrument_filenames_removes_instrument_with_invalid_fil
     }
 
 
-def test_filter_instrument_files_removes_instruments_without_bdbx_files(
-    mock_sftp_connection, sftp_config, config
-):
+def test_filter_instrument_files_removes_instruments_without_bdbx_files(mock_sftp_connection, sftp_config, config):
     instrument_folders = {
         "OPN2101A": Instrument(
             sftp_path="ONS/OPN/OPN2101A",
@@ -355,9 +340,7 @@ def test_filter_instrument_files_removes_instruments_without_bdbx_files(
     }
 
 
-def test_filter_instrument_files_returns_the_latest_modified_when_names_clash(
-    mock_sftp_connection, sftp_config, config
-):
+def test_filter_instrument_files_returns_the_latest_modified_when_names_clash(mock_sftp_connection, sftp_config, config):
     instrument_folders = {
         "OPN2101A": Instrument(
             sftp_path="ONS/OPN/OPN2101A",
@@ -420,9 +403,7 @@ def test_filter_instrument_files_returns_the_latest_modified_when_names_clash(
 
 
 @mock.patch.object(SFTP, "generate_bdbx_md5", return_value="my_lovely_md5")
-def test_get_bdbx_md5s(
-    mock_generate_bdbx_md5, mock_sftp_connection, sftp_config, config
-):
+def test_get_bdbx_md5s(mock_generate_bdbx_md5, mock_sftp_connection, sftp_config, config):
     instruments = {
         "opn2101a": Instrument(
             sftp_path="ONS/OPN/oPN2101A",
@@ -467,9 +448,7 @@ def test_get_bdbx_md5s(
     assert mock_generate_bdbx_md5.call_count == 2
 
 
-def test_generate_bdbx_md5(
-    mock_sftp_connection, sftp_config, config, mock_stat, fake_sftp_file
-):
+def test_generate_bdbx_md5(mock_sftp_connection, sftp_config, config, mock_stat, fake_sftp_file):
     fake_file = fake_sftp_file(b"My fake bdbx file")
     mock_sftp_connection.stat.return_value = mock_stat(st_size=17)
     mock_sftp_connection.open.return_value = fake_file
@@ -487,9 +466,7 @@ def test_generate_bdbx_md5(
     mock_sftp_connection.stat.assert_called_with("ONS/OPN/OPN2103A/opn2103a.bdbx")
 
 
-def test_generate_bdbx_md5_when_file_does_not_exist(
-    mock_sftp_connection, sftp_config, config, mock_stat, fake_sftp_file, caplog
-):
+def test_generate_bdbx_md5_when_file_does_not_exist(mock_sftp_connection, sftp_config, config, mock_stat, fake_sftp_file, caplog):
     mock_sftp_connection.stat.return_value = mock_stat(st_size=17)
     mock_sftp_connection.open.side_effect = FileNotFoundError
     instrument = Instrument(

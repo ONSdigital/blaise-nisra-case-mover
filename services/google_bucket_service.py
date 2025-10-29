@@ -11,9 +11,7 @@ class GoogleBucketService:
     def __init__(self, config: BucketConfig):
         self._bucket_name = config.bucket_name
 
-    def get_questionnaire_modified_dates(
-        self, file_extension: str
-    ) -> Dict[str, datetime]:
+    def get_questionnaire_modified_dates(self, file_extension: str) -> Dict[str, datetime]:
         try:
             questionnaire_modified_dates = {}
             blobs = self.get_blobs()
@@ -26,9 +24,7 @@ class GoogleBucketService:
                 questionnaire_modified_dates[questionnaire_name] = blob.updated
             return questionnaire_modified_dates
         except Exception as error:
-            logging.error(
-                f"GoogleStorageService: error in calling 'get_files_from_bucket' - {error}"
-            )
+            logging.error(f"GoogleStorageService: error in calling 'get_files_from_bucket' - {error}")
             raise error
 
     def get_blobs(self) -> List:

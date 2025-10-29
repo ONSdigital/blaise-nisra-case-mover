@@ -7,9 +7,7 @@ def test_bdbx_file_no_bdbx():
 
 
 def test_bdbx_file_with_bdbx():
-    instrument = Instrument(
-        sftp_path="path/to/file", files=["foo.bdix", "bar.bdbx", "fish.zip"]
-    )
+    instrument = Instrument(sftp_path="path/to/file", files=["foo.bdix", "bar.bdbx", "fish.zip"])
     assert instrument.bdbx_file() == "path/to/file/bar.bdbx"
 
 
@@ -27,9 +25,7 @@ def test_get_blob_filepaths():
 
 
 def test_gcp_folder():
-    instrument = Instrument(
-        sftp_path="path/to/OPN2101A", files=["foo.bdix", "OPn2101A.bDbX", "fish.zip"]
-    )
+    instrument = Instrument(sftp_path="path/to/OPN2101A", files=["foo.bdix", "OPn2101A.bDbX", "fish.zip"])
     assert instrument.gcp_folder() == "opn2101a"
 
 

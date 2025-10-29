@@ -8,9 +8,7 @@ from main import do_processor, do_trigger, public_ip_logger
 
 def test_public_ip_logger(requests_mock, caplog):
     with caplog.at_level(logging.INFO):
-        requests_mock.get(
-            "https://checkip.amazonaws.com/", status_code=200, text="1.3.3.7"
-        )
+        requests_mock.get("https://checkip.amazonaws.com/", status_code=200, text="1.3.3.7")
         public_ip_logger()
     assert ("root", logging.INFO, "Public IP address - 1.3.3.7") in caplog.record_tuples
 

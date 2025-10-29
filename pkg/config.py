@@ -16,9 +16,7 @@ class Config:
     project_id: str
     processor_topic_name: str
     valid_surveys: List[str] = field(default_factory=lambda: ["OPN", "LMS", "LMX"])
-    extension_list: List[str] = field(
-        default_factory=lambda: [".blix", ".bdbx", ".bdix", ".bmix"]
-    )
+    extension_list: List[str] = field(default_factory=lambda: [".blix", ".bdbx", ".bdix", ".bmix"])
     bufsize: int = field(default_factory=lambda: DEFAULT_WINDOW_SIZE)
 
     @classmethod
@@ -41,10 +39,7 @@ class Config:
         )
 
         if missing:
-            raise Exception(
-                "The following required environment variables have not been set: "
-                + ", ".join(missing)
-            )
+            raise Exception("The following required environment variables have not been set: " + ", ".join(missing))
 
         return instance
 
@@ -60,8 +55,4 @@ class Config:
     def valid_survey_name(self, survey_name: str) -> bool:
         survey_prefix = survey_name.upper()[:3]
         survey_number = survey_name[3:7]
-        return (
-            survey_prefix in self.valid_surveys
-            and survey_number.isnumeric()
-            and len(survey_name) >= 7
-        )
+        return survey_prefix in self.valid_surveys and survey_number.isnumeric() and len(survey_name) >= 7

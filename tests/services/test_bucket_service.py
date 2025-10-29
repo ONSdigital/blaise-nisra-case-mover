@@ -24,9 +24,7 @@ def bucket_service(config: BucketConfig) -> GoogleBucketService:
 
 
 @mock.patch.object(GoogleBucketService, "get_blobs")
-def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_names(
-    mock_get_blobs, bucket_service, bucket_name
-):
+def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_names(mock_get_blobs, bucket_service, bucket_name):
     # arrange
     file_extension = "bdbx"
     mock_get_blobs.return_value = [
@@ -52,9 +50,7 @@ def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_na
 
 
 @mock.patch.object(GoogleBucketService, "get_blobs")
-def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_names_irrespective_of_case(
-    mock_get_blobs, bucket_service, bucket_name
-):
+def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_names_irrespective_of_case(mock_get_blobs, bucket_service, bucket_name):
     # arrange
     file_extension = "bdbx"
     mock_get_blobs.return_value = [
@@ -80,9 +76,7 @@ def test_get_questionnaire_modified_dates_returns_the_correct_instrument_file_na
 
 
 @mock.patch.object(GoogleBucketService, "get_blobs")
-def test_get_questionnaire_modified_dates_returns_only_the_instrument_file_names_where_a_bdbx_exists(
-    mock_get_blobs, bucket_service, bucket_name
-):
+def test_get_questionnaire_modified_dates_returns_only_the_instrument_file_names_where_a_bdbx_exists(mock_get_blobs, bucket_service, bucket_name):
     # arrange
     file_extension = "bdbx"
     mock_get_blobs.return_value = [
@@ -108,9 +102,7 @@ def test_get_questionnaire_modified_dates_returns_only_the_instrument_file_names
 
 
 @mock.patch.object(GoogleBucketService, "get_blobs")
-def test_get_questionnaire_modified_dates_logs_an_error_if_exception_occurs(
-    mock_get_blobs, bucket_service, caplog
-):
+def test_get_questionnaire_modified_dates_logs_an_error_if_exception_occurs(mock_get_blobs, bucket_service, caplog):
     # arrange
     file_extension = "bdbx"
     mock_get_blobs.side_effect = Exception()

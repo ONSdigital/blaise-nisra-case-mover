@@ -37,6 +37,9 @@ line_length = 200
 multi_line_output = 3
 include_trailing_comma = true
 
+[tool.black]
+line-length = 200
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

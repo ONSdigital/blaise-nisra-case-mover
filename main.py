@@ -95,9 +95,7 @@ def do_trigger(request, _content=None):
                 trigger_processor(
                     publisher_client,
                     config,
-                    ProcessorEvent(
-                        instrument_name=instrument_name, instrument=instrument
-                    ),
+                    ProcessorEvent(instrument_name=instrument_name, instrument=instrument),
                 )
 
         logging.info("SFTP connection closed")
@@ -143,15 +141,11 @@ def do_processor(event, _context):
             sftp = SFTP(sftp_conn, sftp_config, config)
             case_mover = CaseMover(google_storage, config, sftp)
 
-            processor_event = ProcessorEvent.from_json(
-                base64.b64decode(event["data"]).decode("utf-8")
-            )
+            processor_event = ProcessorEvent.from_json(base64.b64decode(event["data"]).decode("utf-8"))
 
             logging.info(f"Processing instrument: {processor_event.instrument_name}")
 
-            process_instrument(
-                case_mover, processor_event.instrument_name, processor_event.instrument
-            )
+            process_instrument(case_mover, processor_event.instrument_name, processor_event.instrument)
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
@@ -177,6 +171,4 @@ def nisra_changes_checker(_request):
 
     logging.info("Created nisra_update_check_service")
 
-    return cloud_functions.nisra_changes_checker.nisra_changes_checker(
-        nisra_update_check_service=nisra_update_check_service
-    )
+    return cloud_functions.nisra_changes_checker.nisra_changes_checker(nisra_update_check_service=nisra_update_check_service)
