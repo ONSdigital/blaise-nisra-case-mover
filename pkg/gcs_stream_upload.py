@@ -31,7 +31,9 @@ class GCSObjectStreamUpload(object):
         self._chunk_size = chunk_size
         self._read = 0
 
-        self._transport = AuthorizedSession(credentials=google_storage.storage_client._credentials)
+        self._transport = AuthorizedSession(
+            credentials=google_storage.storage_client._credentials
+        )
         self._request = None  # type: ignore # type: requests.ResumableUpload
 
     def __enter__(self):
@@ -43,8 +45,13 @@ class GCSObjectStreamUpload(object):
             self.stop()
 
     def start(self):
-        url = f"https://www.googleapis.com/upload/storage/v1/b/" f"{self._bucket.name}/o?uploadType=resumable"
-        self._request = requests.ResumableUpload(upload_url=url, chunk_size=self._chunk_size)
+        url = (
+            f"https://www.googleapis.com/upload/storage/v1/b/"
+            f"{self._bucket.name}/o?uploadType=resumable"
+        )
+        self._request = requests.ResumableUpload(
+            upload_url=url, chunk_size=self._chunk_size
+        )
         self._request.initiate(
             transport=self._transport,
             content_type="application/octet-stream",

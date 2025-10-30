@@ -43,7 +43,10 @@ class SFTPConfig:
         )
 
         if missing:
-            raise Exception("The following required environment variables have not been set: " + ", ".join(missing))
+            raise Exception(
+                "The following required environment variables have not been set: "
+                + ", ".join(missing)
+            )
 
         return instance
 
@@ -72,15 +75,21 @@ class SFTP:
             folder = folder_attr.filename
             if self.config.valid_survey_name(folder):
                 logging.info(f"Instrument folder found - {folder}")
-                instruments[folder] = Instrument(sftp_path=f"{survey_source_path}/{folder}")
+                instruments[folder] = Instrument(
+                    sftp_path=f"{survey_source_path}/{folder}"
+                )
         return instruments
 
-    def get_instrument_files(self, instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
+    def get_instrument_files(
+        self, instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
         for _, instrument in instruments.items():
             instrument.files = self._get_instrument_files_for_instrument(instrument)
         return instruments
 
-    def generate_bdbx_md5s(self, instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
+    def generate_bdbx_md5s(
+        self, instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
         for _, instrument in instruments.items():
             instrument.bdbx_md5 = self.generate_bdbx_md5(instrument)
         return instruments
@@ -88,13 +97,17 @@ class SFTP:
     def generate_bdbx_md5(self, instrument: Instrument) -> str:
         bdbx_file = instrument.bdbx_file()
         if not bdbx_file:
-            logging.info(f"No bdbx file for '{instrument.sftp_path}' cannot generate an md5")
+            logging.info(
+                f"No bdbx file for '{instrument.sftp_path}' cannot generate an md5"
+            )
             return ""
         bdbx_details = self.sftp_connection.stat(bdbx_file)
         md5sum = hashlib.md5()
         chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
         try:
-            sftp_file = self.sftp_connection.open(bdbx_file, bufsize=self.config.bufsize)
+            sftp_file = self.sftp_connection.open(
+                bdbx_file, bufsize=self.config.bufsize
+            )
         except FileNotFoundError as error:
             logging.error(f"Failed to open {bdbx_file} over SFTP")
             raise error
@@ -110,14 +123,18 @@ class SFTP:
         for instrument_file in self.sftp_connection.listdir_attr(instrument.sftp_path):
             file_extension = pathlib.Path(instrument_file.filename).suffix.lower()
             if file_extension == ".bdbx":
-                instrument.bdbx_updated_at = datetime.fromtimestamp(instrument_file.st_mtime, tz=timezone.utc)
+                instrument.bdbx_updated_at = datetime.fromtimestamp(
+                    instrument_file.st_mtime, tz=timezone.utc
+                )
             if file_extension in self.config.extension_list:
                 logging.info(f"Instrument file found - {instrument_file.filename}")
                 instrument_file_list.append(instrument_file.filename)
         return instrument_file_list
 
     @classmethod
-    def filter_invalid_instrument_filenames(cls, instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
+    def filter_invalid_instrument_filenames(
+        cls, instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
             required_files = [
@@ -127,19 +144,25 @@ class SFTP:
             ]
             filenames_to_validate = [filename.lower() for filename in instrument.files]
 
-            logging.info(f"Files found in {instrument.sftp_path} in NISRA SFTP: {filenames_to_validate}")
+            logging.info(
+                f"Files found in {instrument.sftp_path} in NISRA SFTP: {filenames_to_validate}"
+            )
 
             difference = set(required_files).difference(filenames_to_validate)
             if difference:
                 for filename in difference:
-                    logging.warning(f"The required file, {filename}, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA")
+                    logging.warning(
+                        f"The required file, {filename}, was not found in {instrument.sftp_path}. {instrument_name} will not be imported from NISRA SFTP. Please notify NISRA"
+                    )
             else:
                 filtered_instruments[instrument_name] = instrument
 
         return filtered_instruments
 
     @classmethod
-    def filter_instrument_files(cls, instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
+    def filter_instrument_files(
+        cls, instruments: Dict[str, Instrument]
+    ) -> Dict[str, Instrument]:
         filtered_instruments = cls._filter_non_bdbx(instruments)
         conflicting_instruments = cls._get_conflicting_instruments(filtered_instruments)
         return cls._resolve_conflicts(filtered_instruments, conflicting_instruments)
@@ -156,7 +179,11 @@ class SFTP:
             if instrument_name.lower() in conflicting_instruments:
                 if instrument_name in processed_conflicts:
                     continue
-                filtered_instruments[instrument_name.lower()] = cls._get_latest_conflicting_instrument(instruments, conflicting_instruments, instrument_name)
+                filtered_instruments[instrument_name.lower()] = (
+                    cls._get_latest_conflicting_instrument(
+                        instruments, conflicting_instruments, instrument_name
+                    )
+                )
                 processed_conflicts += conflicting_instruments[instrument_name.lower()]
             else:
                 filtered_instruments[instrument_name] = instrument
@@ -166,11 +193,16 @@ class SFTP:
     def _filter_non_bdbx(instruments: Dict[str, Instrument]) -> Dict[str, Instrument]:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
-            file_types = [pathlib.Path(file).suffix.lower() for file in instrument.files]
+            file_types = [
+                pathlib.Path(file).suffix.lower() for file in instrument.files
+            ]
             if ".bdbx" in file_types:
                 filtered_instruments[instrument_name] = instrument
             else:
-                logging.info("Instrument database file not found - " + f"{instrument_name} - not importing")
+                logging.info(
+                    "Instrument database file not found - "
+                    + f"{instrument_name} - not importing"
+                )
         return filtered_instruments
 
     @staticmethod
@@ -183,7 +215,11 @@ class SFTP:
             if conflict_key not in conflicting_instruments:
                 conflicting_instruments[conflict_key] = []
             conflicting_instruments[conflict_key].append(folder_name)
-        return {conflict_key: conflicting_instruments[conflict_key] for conflict_key, instruments in conflicting_instruments.items() if len(instruments) > 1}
+        return {
+            conflict_key: conflicting_instruments[conflict_key]
+            for conflict_key, instruments in conflicting_instruments.items()
+            if len(instruments) > 1
+        }
 
     @staticmethod
     def _get_latest_conflicting_instrument(
@@ -192,7 +228,10 @@ class SFTP:
         instrument_name: str,
     ) -> Instrument:
         conflict_instruments = conflicting_instruments[instrument_name.lower()]
-        instrument_conflicts = {instrument_name: instruments[instrument_name] for instrument_name in conflict_instruments}
+        instrument_conflicts = {
+            instrument_name: instruments[instrument_name]
+            for instrument_name in conflict_instruments
+        }
         sorted_conflicts = sorted(
             [instrument for _, instrument in instrument_conflicts.items()],
             key=operator.attrgetter("bdbx_updated_at"),
@@ -200,5 +239,8 @@ class SFTP:
         )
         latest_instrument = sorted_conflicts[0]
         for conflict in sorted_conflicts[1:]:
-            logging.info(f"Found newer instrument '{latest_instrument.sftp_path}' " + f"folder - Skipping this folder '{conflict.sftp_path}'")
+            logging.info(
+                f"Found newer instrument '{latest_instrument.sftp_path}' "
+                + f"folder - Skipping this folder '{conflict.sftp_path}'"
+            )
         return latest_instrument

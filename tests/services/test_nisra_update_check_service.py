@@ -38,7 +38,9 @@ def nisra_update_check_service(
     )
 
 
-def test_check_nisra_files_returns_done(mock_blaise_service, nisra_update_check_service):
+def test_check_nisra_files_returns_done(
+    mock_blaise_service, nisra_update_check_service
+):
 
     # arrange
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = []
@@ -50,7 +52,9 @@ def test_check_nisra_files_returns_done(mock_blaise_service, nisra_update_check_
     assert result == "Done"
 
 
-def test_check_nisra_files_have_updated_calls_the_blaise_service_with_correct_survey_type(mock_blaise_service, nisra_update_check_service):
+def test_check_nisra_files_have_updated_calls_the_blaise_service_with_correct_survey_type(
+    mock_blaise_service, nisra_update_check_service
+):
 
     # arrange
     mock_blaise_service.get_names_of_questionnaire_in_blaise.return_value = []
