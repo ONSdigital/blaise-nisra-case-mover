@@ -101,7 +101,6 @@ def do_trigger(request, _content=None):
 
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
-        return f"Error: {error}", 500
 
 
 def processor(*args, **kwargs):
