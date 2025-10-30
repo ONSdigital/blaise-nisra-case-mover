@@ -2,7 +2,6 @@ import base64
 import logging
 import time
 
-import pysftp
 import requests
 from google.cloud import pubsub_v1
 from paramiko.ssh_exception import SSHException
@@ -24,6 +23,7 @@ from services.google_bucket_service import GoogleBucketService
 from services.nisra_update_check_service import NisraUpdateCheckService
 from services.notification_service import NotificationService
 from util.service_logging import setupLogging
+from util.sftp_connection import sftp_connection
 
 
 def public_ip_logger():
@@ -66,31 +66,25 @@ def do_trigger(request, _content=None):
         sftp_config.log()
         publisher_client = pubsub_v1.PublisherClient()
 
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
-        cnopts.compression = True
-
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
             return "Connection to bucket failed", 500
 
         public_ip_logger()
         logging.info("Connecting to SFTP server")
-        with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp_connection:
+
+        with sftp_connection(
+            sftp_config,
+        ) as sftp_conn:
             logging.info("Connected to SFTP server")
 
-            sftp = SFTP(sftp_connection, sftp_config, config)
+            sftp = SFTP(sftp_conn, sftp_config, config)
             case_mover = CaseMover(google_storage, config, sftp)
+
             instruments = get_filtered_instruments(sftp, case_mover, survey_source_path)
             logging.info(f"Processing survey - {survey_source_path}")
 
-            if len(instruments) == 0:
+            if not instruments:
                 logging.info("No instrument folders found after filtering")
                 return "No instrument folders found, exiting", 200
 
@@ -102,6 +96,9 @@ def do_trigger(request, _content=None):
                         instrument_name=instrument_name, instrument=instrument
                     ),
                 )
+
+        logging.info("SFTP connection closed")
+
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
@@ -129,26 +126,17 @@ def do_processor(event, _context):
         config.log()
         sftp_config.log()
 
-        cnopts = pysftp.CnOpts()
-        cnopts.hostkeys = None
-        cnopts.compression = True
-
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
             return "Connection to bucket failed", 500
 
         public_ip_logger()
+
         logging.info("Connecting to SFTP server")
-        with pysftp.Connection(
-            host=sftp_config.host,
-            username=sftp_config.username,
-            password=sftp_config.password,
-            port=int(sftp_config.port),
-            cnopts=cnopts,
-        ) as sftp_connection:
+        with sftp_connection(sftp_config) as sftp_conn:
             logging.info("Connected to SFTP server")
 
-            sftp = SFTP(sftp_connection, sftp_config, config)
+            sftp = SFTP(sftp_conn, sftp_config, config)
             case_mover = CaseMover(google_storage, config, sftp)
 
             processor_event = ProcessorEvent.from_json(
@@ -160,7 +148,6 @@ def do_processor(event, _context):
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
-        logging.info("Closing SFTP connection")
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
 
