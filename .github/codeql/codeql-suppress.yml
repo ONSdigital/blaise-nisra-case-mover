@@ -1,12 +1,4 @@
-# .github/codeql/codeql-suppress.yml
-name: "Custom CodeQL config"
-disable-default-queries: false
-
-# leave the default queries untouched
-queries: []
-
-# suppress rules
-query-filters:
-  - exclude:
-    id: py/paramiko-missing-host-key-validation
-    reason: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
+version: 2.0.0
+suppressions:
+  - rule-id: py/paramiko-missing-host-key-validation
+    justification: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
