@@ -8,18 +8,17 @@ from pkg.sftp import SFTPConfig
 
 
 @contextmanager
-def sftp_connection(sftp_config: SFTPConfig) -> Generator[paramiko.SFTPClient, None, None]:
-    """
-    Paramiko SFTP connection helper.
+def sftp_connection(
+    sftp_config: SFTPConfig,
+) -> Generator[paramiko.SFTPClient, None, None]:
 
-    Behavior:
-    - Automatically accepts unknown host keys, mimicking pysftp.
-    """
     host = getattr(sftp_config, "host", "").lower()
 
     ssh = paramiko.SSHClient()
 
-    logging.warning(f"⚠️ Accepting unknown host keys for {host}. Only safe for dev/test/ci environment.")
+    logging.warning(
+        f"⚠️ Accepting unknown host keys for {host}. Only safe for dev/test/ci environment."
+    )
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
