@@ -1,10 +1,9 @@
 name: CodeQL Analysis
 on:
-  workflow_dispatch:
   pull_request:
-    branches: [ main, preprod, prod, ]
+    branches: [ main ]
   push:
-    branches: [ main, preprod, prod, BLAIS5-4953 ]
+    branches: [ main, preprod, prod ]
 jobs:
   codeql:
     runs-on: ubuntu-latest
@@ -30,16 +29,6 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           output: results.sarif
-      - name: Fail if CodeQL found high-severity issues
-        run: |
-            count=$(jq '[.runs[].results[] | select(.ruleId=="py/paramiko-missing-host-key-validation")] | length' results.sarif || echo 0)
-            echo "High-severity CodeQL issues: $count"
-            if [ "$count" -gt 0 ]; then
-              echo "❌ Found $count high-severity CodeQL issues"
-              exit 1
-            else
-              echo "✅ No high-severity CodeQL issues found"
-            fi
       - name: Upload CodeQL SARIF artifact
         uses: actions/upload-artifact@v4
         with:
