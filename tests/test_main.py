@@ -56,3 +56,46 @@ def test_do_processor_logs_error_when_exception_is_raised(from_env, caplog):
     assert len(errors) == 1
     error = errors[0]
     assert error.message == "Exception: Kaboom"
+
+
+def test_do_trigger_bucket_none(monkeypatch, sftp_config, config, google_storage):
+
+    monkeypatch.setattr(
+        "main.SFTPConfig.from_env",
+        lambda: sftp_config,
+    )
+    monkeypatch.setattr(
+        "main.Config.from_env",
+        lambda: config,
+    )
+    google_storage.bucket = None
+    monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
+    monkeypatch.setattr("main.SFTP", mock.MagicMock)
+    monkeypatch.setattr("main.CaseMover", mock.MagicMock)
+    monkeypatch.setattr("main.get_filtered_instruments", lambda *a, **k: {})
+    monkeypatch.setattr("main.pubsub_v1.PublisherClient", lambda: mock.MagicMock())
+
+    request = mock.MagicMock()
+    request.get_json.return_value = {"survey": "TEST_SURVEY"}
+
+    result, status = do_trigger(request)
+
+    assert status == 500
+    assert "Connection to bucket failed" in result
+
+
+def test_do_trigger_bucket_exists(monkeypatch, config, google_storage):
+
+    monkeypatch.setattr("main.Config.from_env", lambda: config)
+    google_storage.bucket = config.bucket_name
+    monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
+    monkeypatch.setattr("main.SFTP", mock.MagicMock)
+    monkeypatch.setattr("main.CaseMover", mock.MagicMock)
+    monkeypatch.setattr("main.get_filtered_instruments", lambda *a, **k: {})
+    monkeypatch.setattr("main.pubsub_v1.PublisherClient", lambda: mock.MagicMock())
+
+    request = mock.MagicMock()
+    request.get_json.return_value = {"survey": "TEST_SURVEY"}
+
+    result = do_trigger(request)
+    assert result != ("Connection to bucket failed", 500)

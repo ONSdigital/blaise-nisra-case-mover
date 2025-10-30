@@ -2,13 +2,13 @@ import os
 from unittest import mock
 
 import flask
-import pysftp
 from behave import given, then, when
 
 import main
 from pkg.case_mover import CaseMover
 from pkg.google_storage import GoogleStorage
 from pkg.sftp import SFTPConfig
+from util.sftp_connection import sftp_connection
 
 file_list = [
     "FrameEthnicity.blix",
@@ -170,22 +170,16 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
         blob = google_storage.get_blob(f"opn2101a-nisra/{file}")
         blob.download_to_filename(file)
 
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
-    cnopts.compression = True
-
-    with pysftp.Connection(
-        host=sftp_config.host,
-        username=sftp_config.username,
-        password=sftp_config.password,
-        port=int(sftp_config.port),
-        cnopts=cnopts,
-    ) as sftp:
-
+    with sftp_connection(sftp_config) as sftp_conn:
         try:
-            sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+            ssh_client = sftp_conn.get_channel().get_transport().open_session()
+            ssh_client.exec_command("rm -rf ~/ONS/TEST/OPN2101A")
+            ssh_client.close()
         finally:
-            sftp.mkdir("ONS/TEST/OPN2101A/")
+            try:
+                sftp_conn.mkdir("ONS/TEST/OPN2101A/")
+            except IOError:
+                print("Directory already exists or cannot be created.")
 
         for file in file_list:
-            sftp.put(f"{file}", f"ONS/TEST/OPN2101A/{file}")
+            sftp_conn.put(f"{file}", f"ONS/TEST/OPN2101A/{file}")
