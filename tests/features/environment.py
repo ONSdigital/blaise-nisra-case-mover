@@ -1,7 +1,6 @@
 import base64
 import os
 
-import pysftp
 from google.cloud.pubsub_v1 import PublisherClient
 
 import main
@@ -9,6 +8,7 @@ from pkg.config import Config
 from pkg.google_storage import GoogleStorage
 from pkg.sftp import SFTPConfig
 from util.service_logging import setupLogging
+from util.sftp_connection import sftp_connection
 
 
 class FakePublisherClient(PublisherClient):
@@ -47,14 +47,10 @@ def after_scenario(context, scenario):
 
     google_storage.delete_blobs(blobs)
 
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
-
-    with pysftp.Connection(
-        host=context.sftp_config.host,
-        username=context.sftp_config.username,
-        password=context.sftp_config.password,
-        port=int(context.sftp_config.port),
-        cnopts=cnopts,
-    ) as sftp:
-        sftp.execute("rm -rf ~/ONS/TEST/OPN2101A")
+    with sftp_connection(context.sftp_config) as sftp_conn:
+        ssh_client = sftp_conn.get_channel().get_transport().open_session()
+        try:
+            print(f"Starting remote cleanup")
+            ssh_client.exec_command("rm -rf ~/ONS/TEST/OPN2101A")
+        except Exception as ssh_error:
+            print(f"Failed to execute remote cleanup: {ssh_error}", exc_info=True)
