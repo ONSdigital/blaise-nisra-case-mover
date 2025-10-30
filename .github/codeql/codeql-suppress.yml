@@ -1,4 +1,6 @@
 version: 2.0.0
 suppressions:
   - rule-id: py/paramiko-missing-host-key-validation
+    locations:
+      - file: util/sftp_connection.py
     justification: Using AutoAddPolicy intentionally in prod/dev; required by current setup.
