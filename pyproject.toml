@@ -1,8 +1,4 @@
 [tool.poetry]
-name = "blaise-nisra-case-mover"
-version = "0.1.0"
-description = ""
-authors = ["Blaise Team"]
 package-mode = false
 
 [tool.poetry.dependencies]
