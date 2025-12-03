@@ -97,14 +97,18 @@ class CaseMover:
                 + f"{self.config.server_park}/questionnaires/{instrument_name}/data",
                 headers={"content-type": "application/json"},
                 json={"questionnaireDataPath": instrument_name},
-                timeout=30
+                timeout=30,
             )
 
             if response.status_code == 202:
-                logging.info(f"Data import successfully triggered for instrument {instrument_name}")
+                logging.info(
+                    f"Data import successfully triggered for instrument {instrument_name}"
+                )
 
             elif response.status_code == 404:
-                logging.error(f"Instrument {instrument_name} not found on {self.config.server_park} server park")
+                logging.error(
+                    f"Instrument {instrument_name} not found on {self.config.server_park} server park"
+                )
 
             else:
                 logging.error(
