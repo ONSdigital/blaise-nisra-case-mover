@@ -16,8 +16,9 @@ def sftp_connection(
 
     ssh = paramiko.SSHClient()
 
+    # TODO: Set known host key for prod!
     logging.warning(
-        f"⚠️ Accepting unknown host keys for {host}. Only safe for dev/test/ci environment."
+        f"⚠️ Accepting unknown host keys for {host}."
     )
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -30,6 +31,7 @@ def sftp_connection(
         compress=True,
         look_for_keys=False,
         allow_agent=False,
+        keepalive=30,
     )
     try:
         with ssh.open_sftp() as sftp:
