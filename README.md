@@ -5,7 +5,7 @@ NISRA currently manages a Blaise web collection solution for us. Routinely, they
 This service:
 - Downloads data from the SFTP server
 - Checks MD5 hashes of files to detect changes and avoid unnecessary processing
-- Re-uploads new/modified files to a GCP storage bucket 
+- Re-uploads new/modified files to a GCP storage bucket
 - Triggers asynchronous processing via Pub/Sub for changed files only
 - Makes calls to our [REST API](https://github.com/ONSdigital/blaise-api-rest) for data processing
 
@@ -55,7 +55,7 @@ TEST_DATA_BUCKET='ons-blaise-v2-<env>-test-data
 ```
 
 Our non-prod GCP environments have an SFTP for testing purposes. Run the following gcloud command to create a local tunnel
-to the test server: 
+to the test server:
 
 ```bash
 gcloud compute start-iap-tunnel "sftp-test" "22" --zone "europe-west2-a" --project "ons-blaise-v2-<env>" --local-host-port=localhost:22
@@ -78,4 +78,3 @@ Integration tests:
 ```bash
 make integration-test
 ```
-

@@ -298,7 +298,7 @@ def test_send_request_to_api(mock_requests_post, case_mover, config):
         ),
         json={"questionnaireDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
-        timeout=(2, 2),
+        timeout=(30),
     )
 
 
