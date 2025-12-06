@@ -67,6 +67,7 @@ def trigger(request):
 
 
 def do_trigger(request, _content=None):
+    logging.info("do_trigger called!")
     try:
         request_json = request.get_json()
         if not request_json or "survey" not in request_json:
@@ -131,6 +132,7 @@ def processor(*args, **kwargs):
 
 
 def do_processor(event, _context):
+    logging.info("do_processor called!")
     try:
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
@@ -158,6 +160,8 @@ def do_processor(event, _context):
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
+
+            logging.info(f"Successfully processed instrument {processor_event.instrument_name}")
 
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
