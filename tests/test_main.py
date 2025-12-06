@@ -27,9 +27,11 @@ def test_public_ip_logger_logs_warning(requests_mock, caplog):
     ) in caplog.record_tuples
 
 
+@mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("flask.Request.get_json")
-def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, caplog):
+def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, mock_publisher, caplog):
     mock_get_json.side_effect = Exception("Kaboom")
+    mock_publisher.return_value = mock.MagicMock() 
     request = flask.Request.from_values(json={"survey": "OPN"})
 
     with caplog.at_level(logging.ERROR):
@@ -42,10 +44,12 @@ def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, caplog):
     assert error.message == "Exception: Kaboom"
 
 
+@mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.Config.from_env")
-def test_do_processor_logs_error_when_exception_is_raised(from_env, caplog):
+def test_do_processor_logs_error_when_exception_is_raised(from_env, mock_publisher, caplog):
     original_exception = Exception("Kaboom")
     from_env.side_effect = original_exception
+    mock_publisher.return_value = mock.MagicMock()
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(Exception, match="Kaboom"):
@@ -80,6 +84,7 @@ def test_do_trigger_bucket_none(monkeypatch, sftp_config, config, google_storage
 def test_do_trigger_bucket_exists(monkeypatch, sftp_config, config, google_storage):
     monkeypatch.setattr("main.Config.from_env", lambda: config)
     monkeypatch.setattr("main.SFTPConfig.from_env", lambda: sftp_config)
+    monkeypatch.setattr("main.pubsub_v1.PublisherClient", lambda: mock.MagicMock())
 
     google_storage.bucket = config.bucket_name
     monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
