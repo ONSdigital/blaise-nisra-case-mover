@@ -17,9 +17,7 @@ def sftp_connection(
     ssh = paramiko.SSHClient()
 
     # TODO: Set known host key for prod!
-    logging.warning(
-        f"⚠️ Accepting unknown host keys for {host}."
-    )
+    logging.warning(f"⚠️ Accepting unknown host keys for {host}")
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 

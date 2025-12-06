@@ -85,7 +85,7 @@ class SFTP:
                     )
         except IOError as e:
             logging.error(f"Failed to list folders at {survey_source_path}: {e}")
-        
+
         return instruments
 
     def get_instrument_files(
@@ -118,12 +118,12 @@ class SFTP:
             with self.sftp_connection.open(
                 bdbx_file, bufsize=self.config.bufsize
             ) as sftp_file:
-                
+
                 sftp_file.prefetch()
                 for chunk in range(chunks):
                     sftp_file.seek(chunk * self.config.bufsize)
                     md5sum.update(sftp_file.read(self.config.bufsize))
-                
+
                 return md5sum.hexdigest()
 
         except FileNotFoundError as error:
@@ -136,21 +136,23 @@ class SFTP:
     def _get_instrument_files_for_instrument(self, instrument: Instrument) -> List[str]:
         instrument_file_list = []
         try:
-            for instrument_file in self.sftp_connection.listdir_attr(instrument.sftp_path):
+            for instrument_file in self.sftp_connection.listdir_attr(
+                instrument.sftp_path
+            ):
                 file_extension = pathlib.Path(instrument_file.filename).suffix.lower()
-                
+
                 if file_extension == ".bdbx":
                     instrument.bdbx_updated_at = datetime.fromtimestamp(
                         instrument_file.st_mtime, tz=timezone.utc
                     )
-                
+
                 if file_extension in self.config.extension_list:
                     logging.info(f"Instrument file found - {instrument_file.filename}")
                     instrument_file_list.append(instrument_file.filename)
-                    
+
         except IOError as e:
             logging.error(f"Failed to list files in {instrument.sftp_path}: {e}")
-            
+
         return instrument_file_list
 
     @classmethod
@@ -160,16 +162,19 @@ class SFTP:
         filtered_instruments = {}
         for instrument_name, instrument in instruments.items():
             required_files = {
-                f"{instrument_name.lower()}{ext}" 
-                for ext in [".bdbx", ".bdix", ".bmix"]
+                f"{instrument_name.lower()}{ext}" for ext in [".bdbx", ".bdix", ".bmix"]
             }
-            filenames_to_validate = {filename.lower() for filename in instrument.files}
+            filenames_to_validate = [
+                filename.lower() for filename in instrument.files
+            ]  # ← List, not set
 
             logging.info(
                 f"Files found in {instrument.sftp_path} in NISRA SFTP: {filenames_to_validate}"
             )
 
-            difference = required_files.difference(filenames_to_validate)
+            difference = required_files.difference(
+                set(filenames_to_validate)
+            )  # ← Convert to set here
             if difference:
                 for filename in difference:
                     logging.warning(
@@ -251,25 +256,25 @@ class SFTP:
     ) -> Instrument:
         conflict_instruments = conflicting_instruments[instrument_name.lower()]
         instrument_conflicts = {
-            name: instruments[name]
-            for name in conflict_instruments
+            name: instruments[name] for name in conflict_instruments
         }
-        
+
         def get_update_time(inst):
-            return getattr(inst, "bdbx_updated_at", datetime.min.replace(tzinfo=timezone.utc))
+            return getattr(
+                inst, "bdbx_updated_at", datetime.min.replace(tzinfo=timezone.utc)
+            )
 
         sorted_conflicts = sorted(
             instrument_conflicts.values(),
             key=get_update_time,
             reverse=True,
         )
-        
+
         latest_instrument = sorted_conflicts[0]
-        
+
         for conflict in sorted_conflicts[1:]:
             logging.info(
                 f"Found newer instrument '{latest_instrument.sftp_path}' "
                 + f"folder - Skipping this folder '{conflict.sftp_path}'"
             )
         return latest_instrument
-    
