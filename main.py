@@ -1,7 +1,5 @@
 import base64
 import logging
-import time
-import os
 
 import requests
 from google.cloud import pubsub_v1
@@ -30,43 +28,56 @@ setupLogging()
 
 publisher_client = pubsub_v1.PublisherClient()
 
+
 def public_ip_logger():
     try:
-        public_ip = requests.get("https://checkip.amazonaws.com", timeout=5).text.strip()
+        public_ip = requests.get(
+            "https://checkip.amazonaws.com", timeout=5
+        ).text.strip()
         logging.info(f"Public IP address - {public_ip}")
     except Exception:
         logging.warning("Unable to lookup public IP address")
 
-def ssh_retry_logger():
-    logging.info("Retrying for SSH Exception")
+
+def retry_logger(exception):
+    logging.info(
+        f"Retrying due to exception: {exception.__class__.__name__}: {exception}"
+    )
+
+
+RETRYABLE_EXCEPTIONS = (
+    SSHException,
+    IOError,
+    OSError,
+    ConnectionError,
+)
+
 
 def trigger(request):
-    def retry_and_return():
-        retry(
-            do_trigger,
-            attempts=3,
-            sleeptime=15,
-            retry_exceptions=(SSHException),
-            cleanup=ssh_retry_logger,
-            args=(request,),
-            kwargs={},
-        )
-        return "Done"
+    retry(
+        do_trigger,
+        attempts=3,
+        sleeptime=15,
+        retry_exceptions=RETRYABLE_EXCEPTIONS,
+        cleanup=retry_logger,
+        args=(request,),
+        kwargs={},
+    )
+    return "Done"
 
-    return retry_and_return()
 
 def do_trigger(request, _content=None):
     try:
         request_json = request.get_json()
         if not request_json or "survey" not in request_json:
-            logging.error("Invalid request: 'survey' field missing.")
+            logging.error("Invalid request: 'survey' field missing")
             return "Invalid Request", 400
-            
+
         survey_source_path = request_json["survey"]
-        
+
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
-        
+
         config.log()
         sftp_config.log()
 
@@ -100,27 +111,30 @@ def do_trigger(request, _content=None):
                 )
 
         logging.info("SFTP connection closed")
+        return "Done"
 
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
         raise error
+
 
 def processor(*args, **kwargs):
     retry(
         do_processor,
         attempts=3,
         sleeptime=15,
-        retry_exceptions=(SSHException),
-        cleanup=ssh_retry_logger,
+        retry_exceptions=RETRYABLE_EXCEPTIONS,
+        cleanup=retry_logger,
         args=args,
         kwargs=kwargs,
     )
+
 
 def do_processor(event, _context):
     try:
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
-        
+
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
             logging.error("Connection to bucket failed")
@@ -131,10 +145,10 @@ def do_processor(event, _context):
         processor_event = ProcessorEvent.from_json(
             base64.b64decode(event["data"]).decode("utf-8")
         )
-        
+
         logging.info(f"Processing instrument: {processor_event.instrument_name}")
         logging.info("Connecting to SFTP server")
-        
+
         with sftp_connection(sftp_config) as sftp_conn:
             logging.info("Connected to SFTP server")
 
@@ -144,10 +158,11 @@ def do_processor(event, _context):
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
-            
+
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
         raise error
+
 
 def nisra_changes_checker(_request):
     logging.info("Running Cloud Function - nisra_changes_checker")
