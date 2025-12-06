@@ -46,14 +46,10 @@ def test_do_trigger_logs_error_when_exception_is_raised(
     assert error.message == "Exception: Kaboom"
 
 
-@mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.Config.from_env")
-def test_do_processor_logs_error_when_exception_is_raised(
-    from_env, mock_publisher, caplog
-):
+def test_do_processor_logs_error_when_exception_is_raised(from_env, caplog):
     original_exception = Exception("Kaboom")
     from_env.side_effect = original_exception
-    mock_publisher.return_value = mock.MagicMock()
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(Exception, match="Kaboom"):

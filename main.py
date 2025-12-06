@@ -26,7 +26,7 @@ from util.sftp_connection import sftp_connection
 
 setupLogging()
 
-publisher_client = pubsub_v1.PublisherClient()
+publisher_client = None
 
 
 def public_ip_logger():
@@ -68,7 +68,11 @@ def trigger(request):
 
 def do_trigger(request, _content=None):
     logging.info("do_trigger called!")
+
     try:
+        global publisher_client
+        if publisher_client is None:
+            publisher_client = pubsub_v1.PublisherClient()
         request_json = request.get_json()
         if not request_json or "survey" not in request_json:
             logging.error("Invalid request: 'survey' field missing")
