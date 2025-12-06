@@ -52,8 +52,8 @@ def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_bee
 @when("the nisra-mover service is run with an OPN configuration")
 def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
     with mock.patch(
-        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
-    ):
+        "main.publisher_client", context.publisher_client
+    ):  # ← Patch the instance
         with mock.patch.object(
             CaseMover, "instrument_exists_in_blaise"
         ) as mock_instrument_exists_in_blaise:
@@ -73,8 +73,8 @@ def step_the_nisra_mover_service_is_run_with_survey_source_path(
     context, survey_source_path
 ):
     with mock.patch(
-        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
-    ):
+        "main.publisher_client", context.publisher_client
+    ):  # ← Patch the instance
         with mock.patch.object(
             CaseMover, "instrument_exists_in_blaise"
         ) as mock_instrument_exists_in_blaise:

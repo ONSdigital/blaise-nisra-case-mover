@@ -161,7 +161,9 @@ def do_processor(event, _context):
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
 
-            logging.info(f"Successfully processed instrument {processor_event.instrument_name}")
+            logging.info(
+                f"Successfully processed instrument {processor_event.instrument_name}"
+            )
 
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
