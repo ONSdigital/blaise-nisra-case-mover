@@ -36,7 +36,6 @@ def test_sftp_connection(caplog, monkeypatch):
         compress=True,
         look_for_keys=False,
         allow_agent=False,
-        keepalive=30,
     )
 
     mock_ssh.set_missing_host_key_policy.assert_called()

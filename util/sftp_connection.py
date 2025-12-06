@@ -29,8 +29,12 @@ def sftp_connection(
         compress=True,
         look_for_keys=False,
         allow_agent=False,
-        keepalive=30,
     )
+
+    transport = ssh.get_transport()
+    if transport:
+        transport.set_keepalive(30)
+
     try:
         with ssh.open_sftp() as sftp:
             yield sftp
