@@ -29,16 +29,13 @@ def test_public_ip_logger_logs_warning(requests_mock, caplog):
 
 @mock.patch("flask.Request.get_json")
 def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, caplog):
-    # arrange
     mock_get_json.side_effect = Exception("Kaboom")
     request = flask.Request.from_values(json={"survey": "OPN"})
 
-    # act
     with caplog.at_level(logging.ERROR):
         with pytest.raises(Exception, match="Kaboom"):
             do_trigger(request)
 
-    # assert
     errors = [entry for entry in caplog.records if entry.levelno == logging.ERROR]
     assert len(errors) == 1
     error = errors[0]
@@ -87,7 +84,6 @@ def test_do_trigger_bucket_exists(monkeypatch, sftp_config, config, google_stora
     google_storage.bucket = config.bucket_name
     monkeypatch.setattr("main.init_google_storage", lambda config: google_storage)
 
-    # Mock the SFTP connection context manager
     mock_sftp_conn = mock.MagicMock()
 
     class MockSFTPConnection:
@@ -101,15 +97,13 @@ def test_do_trigger_bucket_exists(monkeypatch, sftp_config, config, google_stora
         "main.sftp_connection", lambda *args, **kwargs: MockSFTPConnection()
     )
 
-    # Mock SFTP and CaseMover classes
     monkeypatch.setattr("main.SFTP", lambda *args, **kwargs: mock.MagicMock())
     monkeypatch.setattr("main.CaseMover", lambda *args, **kwargs: mock.MagicMock())
 
-    # Mock to return instruments
     mock_instrument = mock.MagicMock()
 
     def mock_get_filtered(*args, **kwargs):
-        print("get_filtered_instruments called!")  # Debug print
+        print("get_filtered_instruments called!")
         return {"TEST_INSTRUMENT": mock_instrument}
 
     monkeypatch.setattr("main.get_filtered_instruments", mock_get_filtered)
@@ -119,5 +113,5 @@ def test_do_trigger_bucket_exists(monkeypatch, sftp_config, config, google_stora
     request.get_json.return_value = {"survey": "TEST_SURVEY"}
 
     result = do_trigger(request)
-    print(f"Result: {result}")  # Debug print
+    print(f"Result: {result}")
     assert result == "Done"
