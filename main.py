@@ -28,6 +28,7 @@ setupLogging()
 
 _publisher_client = None
 
+
 def get_publisher_client():
     global _publisher_client
     if _publisher_client is None:
