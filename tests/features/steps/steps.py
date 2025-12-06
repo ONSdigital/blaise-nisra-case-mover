@@ -27,17 +27,14 @@ def step_there_is_no_new_opn_nisra_data_on_the_nisra_sftp(context):
     nisra_google_storage.initialise_bucket_connection()
 
     if nisra_google_storage.bucket is None:
-        print("Failed")
+        raise RuntimeError("Failed to connect to bucket")
 
     for file in file_list:
         nisra_google_storage.upload_file(file, f"opn2101a/{file}".lower())
 
-    file_generation_list = []
-
-    for blob in nisra_google_storage.list_blobs():
-        file_generation_list.append(blob.generation)
-
-    context.file_generation_list = file_generation_list.sort()
+    context.file_generation_list = sorted(
+        blob.generation for blob in nisra_google_storage.list_blobs()
+    )
 
 
 @given(
@@ -51,9 +48,7 @@ def step_there_is_new_opn_nisra_data_on_the_nisra_sftp_that_hasnt_previously_bee
 
 @when("the nisra-mover service is run with an OPN configuration")
 def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
-    with mock.patch(
-        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
-    ):
+    with mock.patch("main.get_publisher_client", return_value=context.publisher_client):
         with mock.patch.object(
             CaseMover, "instrument_exists_in_blaise"
         ) as mock_instrument_exists_in_blaise:
@@ -72,16 +67,16 @@ def step_the_nisra_mover_service_is_run_with_an_opn_configuration(context):
 def step_the_nisra_mover_service_is_run_with_survey_source_path(
     context, survey_source_path
 ):
-    with mock.patch(
-        "google.cloud.pubsub_v1.PublisherClient", return_value=context.publisher_client
-    ):
+    with mock.patch("main.get_publisher_client", return_value=context.publisher_client):
         with mock.patch.object(
             CaseMover, "instrument_exists_in_blaise"
         ) as mock_instrument_exists_in_blaise:
             mock_instrument_exists_in_blaise.return_value = True
             with mock.patch("requests.post") as mock_requests_post:
                 mock_requests_post.return_value.status_code = 200
-                mock_request = flask.Request.from_values(json={"survey": "./ONS/TEST"})
+                mock_request = flask.Request.from_values(
+                    json={"survey": survey_source_path}
+                )
                 main.trigger(mock_request)
                 context.mock_requests_post = mock_requests_post
                 context.publisher_client.run_all()
@@ -97,7 +92,7 @@ def step_the_new_data_is_copied_to_the_gcp_storage_bucket_including_all_necessar
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
-        print("Failed")
+        raise RuntimeError("Failed to connect to bucket")
 
     bucket_file_list = [
         "opn2101a/frameethnicity.blix",
@@ -129,14 +124,13 @@ def step_no_data_is_copied_to_the_gcp_storage_bucket(context):
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
-        print("Failed")
+        raise RuntimeError("Failed to connect to bucket")
 
-    bucket_items = []
+    current_generations = sorted(
+        [blob.generation for blob in google_storage.list_blobs()]
+    )
 
-    for blob in google_storage.list_blobs():
-        bucket_items.append(blob.generation)
-
-    assert context.file_generation_list == bucket_items.sort()
+    assert context.file_generation_list == current_generations
 
 
 @then("a call is made to the RESTful API to process the new data")
@@ -150,7 +144,7 @@ def step_a_call_is_made_to_the_restful_api_to_process_the_new_data(context):
         ),
         json={"questionnaireDataPath": "opn2101a"},
         headers={"content-type": "application/json"},
-        timeout=(2, 2),
+        timeout=(30),
     )
 
 
@@ -164,7 +158,7 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
     google_storage.initialise_bucket_connection()
 
     if google_storage.bucket is None:
-        print("Failed")
+        raise RuntimeError("Failed to connect to bucket")
 
     for file in file_list:
         blob = google_storage.get_blob(f"opn2101a-nisra/{file}")
@@ -172,14 +166,9 @@ def copy_opn2101a_files_to_sftp(sftp_config: SFTPConfig) -> None:
 
     with sftp_connection(sftp_config) as sftp_conn:
         try:
-            ssh_client = sftp_conn.get_channel().get_transport().open_session()
-            ssh_client.exec_command("rm -rf ~/ONS/TEST/OPN2101A")
-            ssh_client.close()
-        finally:
-            try:
-                sftp_conn.mkdir("ONS/TEST/OPN2101A/")
-            except IOError:
-                print("Directory already exists or cannot be created.")
+            sftp_conn.mkdir("ONS/TEST/OPN2101A/")
+        except IOError:
+            pass  # already exists
 
         for file in file_list:
             sftp_conn.put(f"{file}", f"ONS/TEST/OPN2101A/{file}")
