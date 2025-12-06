@@ -20,16 +20,9 @@ class FakePublisherClient(PublisherClient):
         self.published_messages.append(message)
 
     def run_all(self):
-        print(f"Running {len(self.published_messages)} messages")
         for message in self.published_messages:
             event = {"data": base64.encodebytes(message["data"])}
-            try:
-                print(f"Processing message: {message}")
-                main.processor(event, {})
-                print(f"Successfully processed message")
-            except Exception as e:
-                print(f"Error processing message: {e}")
-                raise
+            main.processor(event, {})
 
 
 def before_all(context):
