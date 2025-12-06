@@ -85,42 +85,40 @@ class CaseMover:
             )
 
     def send_request_to_api(self, instrument_name: str) -> None:
-        # added 1 second timeout exception pass to the api request
-        # because the connection to the api was timing out before
-        # it completed the work. this also allows parallel requests
-        # to be made to the api.
-
-        max_retries = 2
-        attempt = 0
 
         logging.info(
             f"Sending request to {self.config.blaise_api_url} "
             + f"for instrument {instrument_name}"
         )
-        while attempt <= max_retries:
-            try:
-                requests.post(
-                    (
-                        f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
-                        + f"{self.config.server_park}/questionnaires/{instrument_name}/data"
-                    ),
-                    headers={"content-type": "application/json"},
-                    json={"questionnaireDataPath": instrument_name},
-                    timeout=(2, 2),
-                )
+
+        try:
+            response = requests.post(
+                f"http://{self.config.blaise_api_url}/api/v2/serverparks/"
+                + f"{self.config.server_park}/questionnaires/{instrument_name}/data",
+                headers={"content-type": "application/json"},
+                json={"questionnaireDataPath": instrument_name},
+                timeout=30,
+            )
+
+            if response.status_code == 202:
                 logging.info(
-                    f"Attempt {attempt + 1} successful for Instrument {instrument_name}"
+                    f"Data import successfully triggered for instrument {instrument_name}"
                 )
-                break
-            except (
-                requests.exceptions.ConnectTimeout,
-                requests.exceptions.ReadTimeout,
-            ) as e:
-                logging.warning(
-                    f"Attempt {attempt + 1} failed for Instrument {instrument_name} due to timeout: {e}"
+
+            elif response.status_code == 404:
+                logging.error(
+                    f"Instrument {instrument_name} not found on {self.config.server_park} server park"
                 )
-                attempt += 1
-                pass
+
+            else:
+                logging.error(
+                    f"Failed to trigger data import for instrument {instrument_name} "
+                    f"Status: {response.status_code} "
+                    f"Body: {response.text}"
+                )
+
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error connecting to REST API: {e}")
 
     def instrument_exists_in_blaise(self, instrument_name: str) -> bool:
         response = requests.get(
