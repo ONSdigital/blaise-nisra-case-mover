@@ -26,6 +26,8 @@ from util.sftp_connection import sftp_connection
 
 setupLogging()
 
+publisher_client = pubsub_v1.PublisherClient()
+
 
 def public_ip_logger():
     try:
@@ -64,12 +66,8 @@ def trigger(request):
     return "Done"
 
 
-def do_trigger(request, publisher_client=None, _content=None):
+def do_trigger(request, _content=None):
     logging.info("do_trigger called!")
-
-    if publisher_client is None:
-        publisher_client = pubsub_v1.PublisherClient()
-
     try:
         request_json = request.get_json()
         if not request_json or "survey" not in request_json:
@@ -133,12 +131,8 @@ def processor(*args, **kwargs):
     )
 
 
-def do_processor(event, _context, publisher_client=None):
+def do_processor(event, _context):
     logging.info("do_processor called!")
-
-    if publisher_client is None:
-        publisher_client = pubsub_v1.PublisherClient()
-
     try:
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
