@@ -29,9 +29,11 @@ def test_public_ip_logger_logs_warning(requests_mock, caplog):
 
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("flask.Request.get_json")
-def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, mock_publisher, caplog):
+def test_do_trigger_logs_error_when_exception_is_raised(
+    mock_get_json, mock_publisher, caplog
+):
     mock_get_json.side_effect = Exception("Kaboom")
-    mock_publisher.return_value = mock.MagicMock() 
+    mock_publisher.return_value = mock.MagicMock()
     request = flask.Request.from_values(json={"survey": "OPN"})
 
     with caplog.at_level(logging.ERROR):
@@ -46,7 +48,9 @@ def test_do_trigger_logs_error_when_exception_is_raised(mock_get_json, mock_publ
 
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.Config.from_env")
-def test_do_processor_logs_error_when_exception_is_raised(from_env, mock_publisher, caplog):
+def test_do_processor_logs_error_when_exception_is_raised(
+    from_env, mock_publisher, caplog
+):
     original_exception = Exception("Kaboom")
     from_env.side_effect = original_exception
     mock_publisher.return_value = mock.MagicMock()
