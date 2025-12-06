@@ -1,6 +1,5 @@
 import base64
 import logging
-import time
 
 import requests
 from google.cloud import pubsub_v1
@@ -25,46 +24,67 @@ from services.notification_service import NotificationService
 from util.service_logging import setupLogging
 from util.sftp_connection import sftp_connection
 
+setupLogging()
+
+publisher_client = None
+
 
 def public_ip_logger():
     try:
-        public_ip = requests.get("https://checkip.amazonaws.com").text.strip()
-        logging.info("Public IP address - " + public_ip)
+        public_ip = requests.get(
+            "https://checkip.amazonaws.com/", timeout=5
+        ).text.strip()
+        logging.info(f"Public IP address - {public_ip}")
     except Exception:
         logging.warning("Unable to lookup public IP address")
 
 
-def ssh_retry_logger():
-    logging.info("Retrying for SSH Exception")
+def retry_logger(exception):
+    logging.info(
+        f"Retrying due to exception: {exception.__class__.__name__}: {exception}"
+    )
+
+
+RETRYABLE_EXCEPTIONS = (
+    SSHException,
+    IOError,
+    OSError,
+    ConnectionError,
+)
 
 
 def trigger(request):
-    setupLogging()
-
-    def retry_and_return():
-        retry(
-            do_trigger,
-            attempts=3,
-            sleeptime=15,
-            retry_exceptions=(SSHException),
-            cleanup=ssh_retry_logger,
-            args=(request,),
-            kwargs={},
-        )
-        return "Done"
-
-    return retry_and_return()
+    retry(
+        do_trigger,
+        attempts=3,
+        sleeptime=15,
+        retry_exceptions=RETRYABLE_EXCEPTIONS,
+        cleanup=retry_logger,
+        args=(request,),
+        kwargs={},
+    )
+    return "Done"
 
 
 def do_trigger(request, _content=None):
+    logging.info("do_trigger called!")
+
     try:
-        survey = request.get_json()["survey"]
+        global publisher_client
+        if publisher_client is None:
+            publisher_client = pubsub_v1.PublisherClient()
+        request_json = request.get_json()
+        if not request_json or "survey" not in request_json:
+            logging.error("Invalid request: 'survey' field missing")
+            return "Invalid Request", 400
+
+        survey_source_path = request_json["survey"]
+
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
+
         config.log()
-        survey_source_path = survey
         sftp_config.log()
-        publisher_client = pubsub_v1.PublisherClient()
 
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
@@ -73,9 +93,7 @@ def do_trigger(request, _content=None):
         public_ip_logger()
         logging.info("Connecting to SFTP server")
 
-        with sftp_connection(
-            sftp_config,
-        ) as sftp_conn:
+        with sftp_connection(sftp_config) as sftp_conn:
             logging.info("Connected to SFTP server")
 
             sftp = SFTP(sftp_conn, sftp_config, config)
@@ -98,77 +116,75 @@ def do_trigger(request, _content=None):
                 )
 
         logging.info("SFTP connection closed")
+        return "Done"
 
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
+        raise error
 
 
 def processor(*args, **kwargs):
-    setupLogging()
     retry(
         do_processor,
         attempts=3,
         sleeptime=15,
-        retry_exceptions=(SSHException),
-        cleanup=ssh_retry_logger,
+        retry_exceptions=RETRYABLE_EXCEPTIONS,
+        cleanup=retry_logger,
         args=args,
         kwargs=kwargs,
     )
 
 
 def do_processor(event, _context):
+    logging.info("do_processor called!")
     try:
-        logging.info("Pausing for 15 seconds")
-        time.sleep(15)
-        logging.info("Unpaused")
         config = Config.from_env()
         sftp_config = SFTPConfig.from_env()
-        config.log()
-        sftp_config.log()
 
         google_storage = init_google_storage(config)
         if google_storage.bucket is None:
-            return "Connection to bucket failed", 500
+            logging.error("Connection to bucket failed")
+            raise Exception("Connection to bucket failed")
 
         public_ip_logger()
 
+        processor_event = ProcessorEvent.from_json(
+            base64.b64decode(event["data"]).decode("utf-8")
+        )
+
+        logging.info(f"Processing instrument: {processor_event.instrument_name}")
         logging.info("Connecting to SFTP server")
+
         with sftp_connection(sftp_config) as sftp_conn:
             logging.info("Connected to SFTP server")
 
             sftp = SFTP(sftp_conn, sftp_config, config)
             case_mover = CaseMover(google_storage, config, sftp)
 
-            processor_event = ProcessorEvent.from_json(
-                base64.b64decode(event["data"]).decode("utf-8")
-            )
-
-            logging.info(f"Processing instrument: {processor_event.instrument_name}")
-
             process_instrument(
                 case_mover, processor_event.instrument_name, processor_event.instrument
             )
+
+            logging.info(
+                f"Successfully processed instrument {processor_event.instrument_name}"
+            )
+
     except Exception as error:
         logging.error(f"{error.__class__.__name__}: {error}", exc_info=True)
+        raise error
 
 
 def nisra_changes_checker(_request):
-    setupLogging()
     logging.info("Running Cloud Function - nisra_changes_checker")
 
     blaise_config = BlaiseConfig.from_env()
-    blaise_service = BlaiseService(config=blaise_config)
-
     bucket_config = BucketConfig.from_env()
-    bucket_service = GoogleBucketService(config=bucket_config)
-
     notification_config = NotificationConfig.from_env()
-    notification_service = NotificationService(notification_config)
 
     nisra_update_check_service = NisraUpdateCheckService(
-        blaise_service=blaise_service,
-        bucket_service=bucket_service,
-        notification_service=notification_service,
+        blaise_service=BlaiseService(config=blaise_config),
+        bucket_service=GoogleBucketService(config=bucket_config),
+        notification_service=NotificationService(notification_config),
     )
 
     logging.info("Created nisra_update_check_service")
