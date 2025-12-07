@@ -82,6 +82,13 @@ def fake_sftp_file():
             def prefetch(self):
                 pass
 
+            # Add context manager support
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
         return FakeSFTPFile(contents)
 
     return inner
