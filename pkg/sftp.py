@@ -164,17 +164,13 @@ class SFTP:
             required_files = {
                 f"{instrument_name.lower()}{ext}" for ext in [".bdbx", ".bdix", ".bmix"]
             }
-            filenames_to_validate = [
-                filename.lower() for filename in instrument.files
-            ]  # ← List, not set
+            filenames_to_validate = [filename.lower() for filename in instrument.files]
 
             logging.info(
                 f"Files found in {instrument.sftp_path} in NISRA SFTP: {filenames_to_validate}"
             )
 
-            difference = required_files.difference(
-                set(filenames_to_validate)
-            )  # ← Convert to set here
+            difference = required_files.difference(set(filenames_to_validate))
             if difference:
                 for filename in difference:
                     logging.warning(
