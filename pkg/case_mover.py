@@ -55,15 +55,19 @@ class CaseMover:
                 blob_name=blob_filepath,
                 chunk_size=self.config.bufsize,
             ) as blob_stream:
+
                 bdbx_details = self.sftp.sftp_connection.stat(sftp_path)
                 chunks = math.ceil(bdbx_details.st_size / self.config.bufsize)
-                sftp_file = self.sftp.sftp_connection.open(
+
+                with self.sftp.sftp_connection.open(
                     sftp_path, bufsize=self.config.bufsize
-                )
-                sftp_file.prefetch()
-                for chunk in range(chunks):
-                    sftp_file.seek(chunk * self.config.bufsize)
-                    blob_stream.write(sftp_file.read(self.config.bufsize))
+                ) as sftp_file:
+
+                    sftp_file.prefetch()
+
+                    for chunk in range(chunks):
+                        sftp_file.seek(chunk * self.config.bufsize)
+                        blob_stream.write(sftp_file.read(self.config.bufsize))
 
         try:
             redo.retry(
