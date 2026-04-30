@@ -1,9 +1,11 @@
-name: CodeQL Analysis
+name: ✅ Run CodeQL Analyser
 on:
   pull_request:
     branches: [ main ]
   push:
     branches: [ main, preprod, prod ]
+  schedule:
+    - cron: '0 6 * * 1'
 jobs:
   codeql:
     runs-on: ubuntu-latest
@@ -14,22 +16,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'python' ]
+        language: [ 'python', 'actions' ]
     steps:
-      - name: Checkout repository
+      - name: 🛎️ Checkout repository
         uses: actions/checkout@v4
-      - name: Initialize CodeQL
+      - name: 🏗️ Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
-      - name: Run CodeQL
+      - name: 🧪 Run CodeQL Analyser
         uses: github/codeql-action/analyze@v3
         with:
           output: results.sarif
-      - name: Upload CodeQL SARIF artifact
+      - name: ⬆️ Upload CodeQL SARIF artifact
         uses: actions/upload-artifact@v4
         with:
           name: codeql-sarif
