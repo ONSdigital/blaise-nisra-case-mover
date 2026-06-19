@@ -11,7 +11,7 @@ from services.notification_service import NotificationService
 @pytest.fixture()
 def config() -> NotificationConfig:
     return NotificationConfig(
-        notify_api_key="REDACTED_SECRET",
+        notify_api_key="REDACTED_SECRET_REDACTED_SECRET_REDACTED_SECRET_REDACTED_SECRET_REDACTED_",
         nisra_notify_email="notify@ons.gov.uk",
     )
 
